@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 477cc4148fad3449482a3bc3178594e2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 242586
+  packageName: LowPoly Factory Machine Pack
+  packageVersion: 1.5
+  assetPath: Assets/LowPoly Factory Machine Pack/ExampleScene/SampleSceneLightingSettings.lighting
+  uploadId: 636571

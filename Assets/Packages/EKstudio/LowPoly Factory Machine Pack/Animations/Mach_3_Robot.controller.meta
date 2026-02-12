@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 53ce6452ba3bc5641a4be84f16724be6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 242586
+  packageName: LowPoly Factory Machine Pack
+  packageVersion: 1.5
+  assetPath: Assets/LowPoly Factory Machine Pack/Animations/Mach_3_Robot.controller
+  uploadId: 636571

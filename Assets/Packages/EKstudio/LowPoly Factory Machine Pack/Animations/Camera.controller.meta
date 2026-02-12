@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0568fec3af406ba4e8802107e691bedc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 242586
+  packageName: LowPoly Factory Machine Pack
+  packageVersion: 1.5
+  assetPath: Assets/LowPoly Factory Machine Pack/Animations/Camera.controller
+  uploadId: 636571

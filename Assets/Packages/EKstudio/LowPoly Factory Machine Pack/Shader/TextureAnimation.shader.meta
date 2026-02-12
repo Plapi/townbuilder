@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d90216605c6dae849a344bf9a8fa618e
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 242586
+  packageName: LowPoly Factory Machine Pack
+  packageVersion: 1.5
+  assetPath: Assets/LowPoly Factory Machine Pack/Shader/TextureAnimation.shader
+  uploadId: 636571
