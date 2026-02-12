@@ -38,11 +38,7 @@ public class Conveyor : MonoBehaviour
         _currentConveyorGraphic.transform.SetLocalAngleY(angle);
 
         if (conveyorType == ConveyorType.Round)
-        {
             _currentConveyorGraphic.transform.GetChild(0).GetComponent<MeshRenderer>().material.SetFloat("_Speed", speedSign);
-            Debug.LogError(speedSign);
-            UnityEditor.Selection.activeGameObject = _currentConveyorGraphic.transform.GetChild(0).gameObject;    
-        }
     }
     
     public void SetPrevConveyor(Conveyor conveyor)
@@ -52,7 +48,7 @@ public class Conveyor : MonoBehaviour
         
         SetVisual(ConveyorType.Straight, Vector3Int.zero, 0f);
         
-        UpdateVisuals(true);
+        UpdateVisuals();
     }
     
     private void UpdateVisuals(bool logs = false)

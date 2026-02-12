@@ -8,7 +8,10 @@ public class ConveyorBuilderController : MonoBehaviour
     [SerializeField] private Camera _camera;
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private Conveyor _conveyor;
-    [SerializeField] private Transform _cellSelector;
+    
+    [Header("Cell Selector")]
+    [SerializeField] private GameObject _cellSelectorBuild;
+    [SerializeField] private GameObject _cellSelectorRemove;
     
     private readonly Dictionary<Vector3Int, Conveyor> _conveyors = new Dictionary<Vector3Int, Conveyor>();
     private Vector3Int? _prevGridPos;
@@ -25,15 +28,35 @@ public class ConveyorBuilderController : MonoBehaviour
             
             var gridPos = WorldToGrid(worldPos);
             
-            _cellSelector.gameObject.SetActive(true);
-            _cellSelector.SetXZ(gridPos.x, gridPos.z);
+            _cellSelectorBuild.SetActive(true);
+            _cellSelectorBuild.transform.SetXZ(gridPos.x, gridPos.z);
             
             TryCreateNewConveyor(gridPos);
-            
-        } else if (Input.GetMouseButtonUp(0))
+        } 
+        else if (Input.GetMouseButtonUp(0))
         {
-            _cellSelector.gameObject.SetActive(false);
+            _cellSelectorBuild.SetActive(false);
             _prevGridPos = null;
+        }
+        else if (Input.GetMouseButton(1))
+        {
+            if (TryGetMouseWorldPosition(out Vector3 worldPos) == false)
+                return;
+            
+            var gridPos = WorldToGrid(worldPos);
+            
+            _cellSelectorRemove.SetActive(true);
+            _cellSelectorRemove.transform.SetXZ(gridPos.x, gridPos.z);
+
+            if (_conveyors.TryGetValue(gridPos, out var conveyor))
+            {
+                Destroy(conveyor.gameObject);
+                _conveyors.Remove(gridPos);
+            }
+        }
+        else if (Input.GetMouseButtonUp(1))
+        {
+            _cellSelectorRemove.SetActive(false);
         }
     }
 
