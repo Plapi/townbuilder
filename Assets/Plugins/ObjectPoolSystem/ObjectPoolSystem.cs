@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
+public class ObjectPoolSystem : MonoBehaviourSingleton<ObjectPoolSystem> {
 
 	private readonly Dictionary<string, Queue<MonoBehaviour>> pools = new();
 
