@@ -44,8 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5408d57a40fbe48cc824d888f310bbb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Conveyor
-  _straightConveyorGraphic: {fileID: 246572658037321952, guid: bb0b20b84da9e47d68512d7a1b840804, type: 3}
-  _roundConveyorGraphic: {fileID: 2366903751774271078, guid: accc6d668e0ce44e69eb903ea98b5f57, type: 3}
+  _straightConveyorGraphicWithPillar: {fileID: 246572658037321952, guid: bb0b20b84da9e47d68512d7a1b840804, type: 3}
+  _straightConveyorGraphicWithoutPillar: {fileID: 2084301171743408893, guid: ae8fe486faa2547639d6c03db4cd8f53, type: 3}
+  _roundConveyorGraphicWithPillar: {fileID: 2366903751774271078, guid: accc6d668e0ce44e69eb903ea98b5f57, type: 3}
+  _roundConveyorGraphicWithoutPillar: {fileID: 8718392676535341919, guid: 9efc66623cf814b21b852911cc12ff4e, type: 3}
   _conveyorType: 0
   _gridPos: {x: 0, y: 0, z: 0}
   _nextConveyor: {fileID: 0}

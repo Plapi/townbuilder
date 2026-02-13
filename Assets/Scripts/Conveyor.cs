@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class Conveyor : MonoBehaviour
 {
-    [SerializeField] private GameObject _straightConveyorGraphic;
-    [SerializeField] private GameObject _roundConveyorGraphic;
+    [SerializeField] private GameObject _straightConveyorGraphicWithPillar;
+    [SerializeField] private GameObject _straightConveyorGraphicWithoutPillar;
+    [SerializeField] private GameObject _roundConveyorGraphicWithPillar;
+    [SerializeField] private GameObject _roundConveyorGraphicWithoutPillar;
     
     [Header("Runtime Properties")]
     [SerializeField] private ConveyorType _conveyorType;
@@ -11,6 +13,8 @@ public class Conveyor : MonoBehaviour
     [SerializeField] private Conveyor _nextConveyor;
     [SerializeField] private Conveyor _prevConveyor;
     [SerializeField] private GameObject _currentConveyorGraphic;
+
+    private bool _hasPillar;
     
     public Vector3Int GridPos => _gridPos;
     public int Connexions => _prevConveyor != null && _nextConveyor != null ? 2 :
@@ -30,7 +34,10 @@ public class Conveyor : MonoBehaviour
                 Destroy(_currentConveyorGraphic);
         
             _conveyorType = conveyorType;
-            var conveyorGraphic = conveyorType == ConveyorType.Straight ? _straightConveyorGraphic : _roundConveyorGraphic;
+            _hasPillar = _prevConveyor == null || _prevConveyor._hasPillar == false;
+            var conveyorGraphic = conveyorType == ConveyorType.Straight ? 
+                _hasPillar ? _straightConveyorGraphicWithPillar : _straightConveyorGraphicWithoutPillar : 
+                _hasPillar ? _roundConveyorGraphicWithPillar : _roundConveyorGraphicWithoutPillar;
             _currentConveyorGraphic = Instantiate(conveyorGraphic, transform);
         }
         
