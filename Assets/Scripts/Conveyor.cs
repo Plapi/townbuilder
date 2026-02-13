@@ -51,8 +51,11 @@ public class Conveyor : MonoBehaviour
         UpdateVisuals();
     }
     
-    private void UpdateVisuals(bool logs = false)
+    public void UpdateVisuals(bool logs = false)
     {
+        if (_prevConveyor == null)
+            return;
+        
         var direction = GetPrevDirection();
         var direction1 = _prevConveyor._prevConveyor != null ? _prevConveyor.GetPrevDirection() : ConveyorDirection.Front;
         

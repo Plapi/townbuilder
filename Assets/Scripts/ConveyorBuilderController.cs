@@ -50,8 +50,13 @@ public class ConveyorBuilderController : MonoBehaviour
 
             if (_conveyors.TryGetValue(gridPos, out var conveyor))
             {
-                Destroy(conveyor.gameObject);
+                DestroyImmediate(conveyor.gameObject);
                 _conveyors.Remove(gridPos);
+                
+                var neighbors = GetNearConveyors(gridPos);
+                foreach (var neighbor in neighbors)
+                    if (neighbor.Connexions == 1)
+                        neighbor.UpdateVisuals();
             }
         }
         else if (Input.GetMouseButtonUp(1))
