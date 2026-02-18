@@ -117,6 +117,11 @@ namespace Cysharp.Threading.Tasks
             return new UniTask(DelayFramePromise.Create(delayFrameCount, delayTiming, cancellationToken, out var token), token);
         }
 
+        public static UniTask Delay(float seconds, CancellationToken cancellationToken)
+        {
+            return Delay(TimeSpan.FromSeconds(seconds), cancellationToken : cancellationToken);
+        }
+        
         public static UniTask Delay(int millisecondsDelay, bool ignoreTimeScale = false, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
         {
             var delayTimeSpan = TimeSpan.FromMilliseconds(millisecondsDelay);
