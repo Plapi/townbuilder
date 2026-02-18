@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine.SceneManagement;
+using Cysharp.Threading.Tasks;
 
 public class ConveyorBuilderController : MonoBehaviour
 {
@@ -19,7 +21,10 @@ public class ConveyorBuilderController : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyUp(KeyCode.R))
+        {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
         
         if (Input.GetMouseButton(0))
         {

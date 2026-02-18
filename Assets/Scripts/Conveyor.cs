@@ -13,7 +13,7 @@ public class Conveyor : MonoBehaviour
     [SerializeField] private Conveyor _nextConveyor;
     [SerializeField] private Conveyor _prevConveyor;
     [SerializeField] private GameObject _currentConveyorGraphic;
-
+    
     private bool _hasPillar;
     
     public Vector3Int GridPos => _gridPos;
