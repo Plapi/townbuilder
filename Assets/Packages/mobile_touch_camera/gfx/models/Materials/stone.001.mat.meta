@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a411b9b39449d456a99711e49d1f1e8d
+timeCreated: 1456679170
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/models/Materials/stone.001.mat
+  uploadId: 817142

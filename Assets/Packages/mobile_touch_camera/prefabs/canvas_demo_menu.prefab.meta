@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a5f2391b20f57af47bbde588d3e21469
+timeCreated: 1445857012
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/prefabs/canvas_demo_menu.prefab
+  uploadId: 817142

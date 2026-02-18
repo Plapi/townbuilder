@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a388b73fe87ac2147b6658ab45a58fbb
+timeCreated: 1438565949
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/scenes/demo_scene_2d_sideview.unity
+  uploadId: 817142

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 359e42cb28f492a4ca53444d6cb2e876
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/scripts/tools/DisableInputOnPointerDown.cs
+  uploadId: 817142

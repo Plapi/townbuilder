@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4d30f7ff9bc4c445980e8162e01e945f
+timeCreated: 1456587873
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/prefabs/tree_001.prefab
+  uploadId: 817142

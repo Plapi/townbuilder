@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1b645aa9a50644d069baa2898b284ada
+timeCreated: 1456578755
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/models/Materials/ground.001.mat
+  uploadId: 817142

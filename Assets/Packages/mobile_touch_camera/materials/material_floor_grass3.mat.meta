@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fcd428bbaf1fb22479f56156a8045b08
+timeCreated: 1440272891
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/materials/material_floor_grass3.mat
+  uploadId: 817142

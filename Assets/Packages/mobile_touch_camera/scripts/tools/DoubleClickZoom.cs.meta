@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 16dad82bc743d4452a62ca8704d483f8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/scripts/tools/DoubleClickZoom.cs
+  uploadId: 817142

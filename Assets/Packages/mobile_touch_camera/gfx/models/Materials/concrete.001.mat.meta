@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 263913970d7a94216803a928a6b149b0
+timeCreated: 1457040503
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/models/Materials/concrete.001.mat
+  uploadId: 817142

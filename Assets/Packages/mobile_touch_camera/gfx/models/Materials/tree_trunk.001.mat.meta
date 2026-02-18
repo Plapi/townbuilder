@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9d3f9d7d80e614b1391fc889f85797e0
+timeCreated: 1456581731
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/models/Materials/tree_trunk.001.mat
+  uploadId: 817142

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f0b850c3f82eb49eb974cd092438fede
+timeCreated: 1456695219
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/prefabs/stone_003.prefab
+  uploadId: 817142

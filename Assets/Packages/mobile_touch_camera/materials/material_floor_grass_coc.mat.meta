@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 307b21bd440794ffbbbf9dc400f9ab68
+timeCreated: 1440272891
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/materials/material_floor_grass_coc.mat
+  uploadId: 817142

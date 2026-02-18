@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9b7a020a1764f456d8aa43ec665967a2
+timeCreated: 1456581731
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/gfx/models/Materials/tree_leaves.001.mat
+  uploadId: 817142

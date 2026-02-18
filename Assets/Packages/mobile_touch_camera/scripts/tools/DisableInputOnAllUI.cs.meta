@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 7e9257422a2d0404ba2d3447cd4fcfbf
+timeCreated: 1543652696
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/scripts/tools/DisableInputOnAllUI.cs
+  uploadId: 817142

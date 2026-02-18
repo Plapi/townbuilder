@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 97a265b1237b2e74186a87a0a62e982d
+timeCreated: 1440274231
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 43960
+  packageName: Mobile Touch Camera
+  packageVersion: 2.10
+  assetPath: Assets/mobile_touch_camera/materials/material_column_side2.mat
+  uploadId: 817142
