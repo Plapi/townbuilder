@@ -37,8 +37,8 @@ public abstract class UIPanel<T> : UIPanelBase where T : UIPanelBase.Data
         if (_background != null && _content != null)
         {
             _background.SetAlpha(0f);
-            _content.transform.DOPunchScale(Vector3.one * 0.2f, UIController.DEFAULT_TIME).SetUpdate(true);
-            await _background.DOFade(1f, UIController.DEFAULT_TIME).SetUpdate(true).ToUniTask(cancellationToken: cancellationToken);
+            _content.transform.DOPunchScale(Vector3.one * 0.2f, UISystem.DEFAULT_TIME).SetUpdate(true);
+            await _background.DOFade(1f, UISystem.DEFAULT_TIME).SetUpdate(true).ToUniTask(cancellationToken: cancellationToken);
         }
     }
     
@@ -49,16 +49,16 @@ public abstract class UIPanel<T> : UIPanelBase where T : UIPanelBase.Data
 
             await UniTask.WhenAll(
                 _content.transform
-                    .DOScale(Vector3.one * 0.5f, UIController.DEFAULT_TIME)
+                    .DOScale(Vector3.one * 0.5f, UISystem.DEFAULT_TIME)
                     .SetEase(Ease.InQuad)
                     .ToUniTask(cancellationToken: cancellationToken),
                 
                 _content
-                    .DOFade(0f, UIController.DEFAULT_TIME)
+                    .DOFade(0f, UISystem.DEFAULT_TIME)
                     .ToUniTask(cancellationToken: cancellationToken),
                 
                 _background.
-                    DOFade(0f, UIController.DEFAULT_TIME).
+                    DOFade(0f, UISystem.DEFAULT_TIME).
                     ToUniTask(cancellationToken: cancellationToken));
             
             _content.transform.localScale = Vector3.one;

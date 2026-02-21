@@ -24,7 +24,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
     
     private void InitUI()
     {
-        _mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
+        _mainPanel = UISystem.Instance.GetPanel<UIMainPanel>();
         _mainPanel.Init(new UIMainPanel.Data());
     }
     

@@ -6,10 +6,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class UIController : MonoBehaviourSingleton<UIController>
+public class UISystem : MonoBehaviourSingleton<UISystem>
 {
     public const float DEFAULT_TIME = 0.2f;
-
+    
     [SerializeField] private CanvasScaler _canvasScaler;
     [SerializeField] private GameObject _loading;
     [SerializeField] private Image _fadeToBlackImage;
@@ -22,8 +22,11 @@ public class UIController : MonoBehaviourSingleton<UIController>
     {
         base.Awake();
         var panels = GetComponentsInChildren<UIPanelBase>(true);
-        for (int i = 0; i < panels.Length; i++)
-            _dictPanels.Add(panels[i].GetType(), panels[i]);
+        foreach (var panel in panels)
+        {
+            _dictPanels.Add(panel.GetType(), panel);
+            panel.gameObject.SetActive(false);
+        }
     }
     
     public T GetPanel<T>() where T : UIPanelBase

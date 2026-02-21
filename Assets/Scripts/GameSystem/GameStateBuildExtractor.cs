@@ -11,27 +11,30 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     
     [SerializeField] private Camera _camera;
     [SerializeField] private MobileTouchCamera _mobileTouchCamera;
-    [SerializeField] private Extractor _extractor;
     
     [Space]
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private LayerMask _factoryEntityLayer;
-    
-    private UIBuildPanel _buildPanel;
 
+    private Extractor _extractor;
+    private UIBuildPanel _buildPanel;
+    
     private void Start()
     {
-        _buildPanel = UIController.Instance.GetPanel<UIBuildPanel>();
+        _buildPanel = UISystem.Instance.GetPanel<UIBuildPanel>();
         _buildPanel.Init(new UIBuildPanel.Data());
     }
-
+    
     public new class Context : GameStateBase.Context
     {
         
     }
-
+    
     public override async UniTask Run(CancellationToken cancellationToken)
     {
+        if (TryPlaceExtractor() == false)
+            return;
+        
         await _buildPanel.Show(cancellationToken);
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
@@ -92,11 +95,34 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     private async UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.enabled = false;
-        
-        if (_buildPanel.SelectedButton == UIButtonType.Close)
+
+        if (_buildPanel.SelectedButton == UIButtonType.Confirm)
         {
+            
+        }
+        else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
+        {
+            _extractor.Rotate();
+        }
+        else if (_buildPanel.SelectedButton == UIButtonType.Close)
+        {
+            ObjectPoolingSystem.Instance.ReleaseObject(_extractor);
+            _extractor = null;
+            
             await _buildPanel.Close(true, cancellationToken);
             ShouldExit = true;
         }
+    }
+    
+    private bool TryPlaceExtractor()
+    {
+        var ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
+        if (Physics.Raycast(ray, out var hitPoint, RAY_MAX_DISTANCE, _groundLayer) == false)
+            return false;
+        
+        _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
+        _extractor.PlaceOnCenter(hitPoint.point);
+
+        return true;
     }
 }
