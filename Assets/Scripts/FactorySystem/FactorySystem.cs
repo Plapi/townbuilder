@@ -9,8 +9,17 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
     private readonly Dictionary<Vector2Int, FactoryEntity> _entities = new Dictionary<Vector2Int, FactoryEntity>();
     private readonly List<Transform> _debugCells = new List<Transform>();
     
+    public LayerMask InteractableLayer { get; private set; }
+    
+    protected override void Awake()
+    {
+        base.Awake();
+        InteractableLayer = LayerMask.NameToLayer(Constants.INTERACTABLE_LAYER_NAME);
+    }
+    
     public void PlaceOnCenter(FactoryEntity entity, Vector3 worldPos)
     {
+        entity.gameObject.SetLayerRecursively(InteractableLayer);
         entity.PlaceOnCenter(worldPos);
         SetEntities(entity);
     }
@@ -38,9 +47,20 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         entity.GridPositions.Clear();
         
         var hasCorrectPlacement = true;
-        Vector2Int origin = entity.GridPos;
+        
         Vector2Int right = entity.Right;
         Vector2Int forward = entity.Forward;
+        Vector2Int origin = entity.GridPos;
+
+        var offset = Vector2Int.zero;
+        var angleY = Mathf.RoundToInt(entity.transform.localEulerAngles.y);
+        if (angleY == 90)
+            offset = new Vector2Int(0, -1);
+        else if (angleY == 180)
+            offset = new Vector2Int(-1, -1);
+        else if (angleY == -90 || angleY == 270)
+            offset = new Vector2Int(0, 1);
+        origin += offset;
         
         for (int x = 0; x < entity.Size.x; x++)
         {
@@ -58,10 +78,28 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
             }
         }
         
-        entity.SetColor(hasCorrectPlacement ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor);
+        entity.ApplyCorrectPlacement(hasCorrectPlacement);
         
         if (_showDebugCells)
             PlaceDebugCells();
+    }
+    
+    public void Release(FactoryEntity entity)
+    {
+        foreach (var gridPos in entity.GridPositions)
+            _entities.Remove(gridPos);
+        entity.GridPositions.Clear();
+        entity.gameObject.SetLayerRecursively(0);
+        ObjectPoolingSystem.Instance.ReleaseObject(entity);
+        
+        if (_showDebugCells)
+            PlaceDebugCells();
+    }
+    
+    public void ConfirmPlacement(FactoryEntity entity)
+    {
+        entity.SetColor(Color.white);
+        entity.gameObject.SetLayerRecursively(0);
     }
     
     private void PlaceDebugCells()
@@ -73,12 +111,9 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         foreach (var kvp in _entities)
         {
             if (index == _debugCells.Count)
-            {
-                var newDebugCll = Instantiate(_debugCell, transform);
-                newDebugCll.name = $"DebugCell{index}";
-                _debugCells.Add(newDebugCll);
-            }
+                _debugCells.Add(Instantiate(_debugCell, transform));
             var debugCell = _debugCells[index];
+            debugCell.name = $"DebugCell{index}_{kvp.Key}";
             debugCell.transform.position = new Vector3(kvp.Key.x, 0f, kvp.Key.y);
             debugCell.gameObject.SetActive(true);
             index++;

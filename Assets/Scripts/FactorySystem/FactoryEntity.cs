@@ -27,6 +27,7 @@ public abstract class FactoryEntity : MonoBehaviour, IPoolableObject
             return new Vector2Int(Mathf.RoundToInt(r.x), Mathf.RoundToInt(r.z));
         }
     }
+    public bool HasCorrectPlacement { get; private set; }
     
     private readonly List<Material> _materials = new List<Material>();
     
@@ -65,6 +66,13 @@ public abstract class FactoryEntity : MonoBehaviour, IPoolableObject
         GridPos = Utils.WorldToGrid(transform.position);
     }
 
+    public void ApplyCorrectPlacement(bool hasCorrectPlacement)
+    {
+        var color = hasCorrectPlacement ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor;
+        SetColor(color);
+        HasCorrectPlacement = hasCorrectPlacement;
+    }
+    
     public void SetColor(Color color)
     {
         foreach (var material in _materials)

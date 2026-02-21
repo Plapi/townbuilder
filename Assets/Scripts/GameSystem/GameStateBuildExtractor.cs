@@ -11,17 +11,13 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     
     [SerializeField] private Camera _camera;
     [SerializeField] private MobileTouchCamera _mobileTouchCamera;
-    
-    [Space]
     [SerializeField] private LayerMask _groundLayer;
     
-    private LayerMask _interactableLayer;
     private Extractor _extractor;
     private UIBuildPanel _buildPanel;
     
     private void Start()
     {
-        _interactableLayer = LayerMask.NameToLayer(Constants.INTERACTABLE_LAYER_NAME);
         _buildPanel = UISystem.Instance.GetPanel<UIBuildPanel>();
         _buildPanel.Init(new UIBuildPanel.Data());
     }
@@ -53,7 +49,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
                 return false;
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, 1 << _interactableLayer);
+            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, 1 << FactorySystem.Instance.InteractableLayer);
         }, cancellationToken: cancellationToken);
     }
     
@@ -99,9 +95,13 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         
         if (_buildPanel.SelectedButton == UIButtonType.Confirm)
         {
-            ReleaseExtractor();
-            await _buildPanel.Close(true, cancellationToken);
-            ShouldExit = true;
+            if (_extractor.HasCorrectPlacement)
+            {
+                FactorySystem.Instance.ConfirmPlacement(_extractor);
+                _extractor = null;
+                await _buildPanel.Close(true, cancellationToken);
+                ShouldExit = true;    
+            }
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
         {
@@ -109,9 +109,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
-            ObjectPoolingSystem.Instance.ReleaseObject(_extractor);
-            ReleaseExtractor();
-            
+            FactorySystem.Instance.Release(_extractor);
             await _buildPanel.Close(true, cancellationToken);
             ShouldExit = true;
         }
@@ -125,14 +123,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         
         _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
         FactorySystem.Instance.PlaceOnCenter(_extractor, hitPoint.point);
-        _extractor.gameObject.SetLayerRecursively(_interactableLayer);
         
         return true;
-    }
-    
-    private void ReleaseExtractor()
-    {
-        _extractor.gameObject.SetLayerRecursively(0);
-        _extractor = null;
     }
 }
