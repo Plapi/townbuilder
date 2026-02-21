@@ -14,13 +14,14 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     
     [Space]
     [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private LayerMask _factoryEntityLayer;
-
+    
+    private LayerMask _interactableLayer;
     private Extractor _extractor;
     private UIBuildPanel _buildPanel;
     
     private void Start()
     {
+        _interactableLayer = LayerMask.NameToLayer(Constants.INTERACTABLE_LAYER_NAME);
         _buildPanel = UISystem.Instance.GetPanel<UIBuildPanel>();
         _buildPanel.Init(new UIBuildPanel.Data());
     }
@@ -52,7 +53,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
                 return false;
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, _factoryEntityLayer);
+            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, 1 << _interactableLayer);
         }, cancellationToken: cancellationToken);
     }
     
@@ -95,10 +96,12 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     private async UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.enabled = false;
-
+        
         if (_buildPanel.SelectedButton == UIButtonType.Confirm)
         {
-            
+            ReleaseExtractor();
+            await _buildPanel.Close(true, cancellationToken);
+            ShouldExit = true;
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
         {
@@ -107,7 +110,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
             ObjectPoolingSystem.Instance.ReleaseObject(_extractor);
-            _extractor = null;
+            ReleaseExtractor();
             
             await _buildPanel.Close(true, cancellationToken);
             ShouldExit = true;
@@ -122,7 +125,14 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         
         _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
         _extractor.PlaceOnCenter(hitPoint.point);
-
+        _extractor.gameObject.SetLayerRecursively(_interactableLayer);
+        
         return true;
+    }
+    
+    private void ReleaseExtractor()
+    {
+        _extractor.gameObject.SetLayerRecursively(0);
+        _extractor = null;
     }
 }

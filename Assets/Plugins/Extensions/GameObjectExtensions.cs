@@ -25,4 +25,11 @@ public static class GameObjectExtensions {
 	public static void SetLocalZ(this GameObject obj, float z) {
 		obj.transform.SetLocalZ(z);
 	}
+	
+	public static void SetLayerRecursively(this GameObject obj, int layer)
+	{
+		obj.layer = layer;
+		foreach (Transform child in obj.transform)
+			SetLayerRecursively(child.gameObject, layer);
+	}
 }

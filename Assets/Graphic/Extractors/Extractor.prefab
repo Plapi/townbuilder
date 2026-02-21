@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7321030617804188903}
   - component: {fileID: 1759671340448990520}
   - component: {fileID: 8746417485690835587}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Opiton_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3758796301267886378}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Mach_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 6466798090715559522}
   - component: {fileID: 2095478598979169414}
   - component: {fileID: 6552911918303086321}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Opiton_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 402748407393613765}
   - component: {fileID: 769906519879968519}
   - component: {fileID: 2331218031069613923}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: MachnIronRotate2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -388,7 +388,7 @@ GameObject:
   - component: {fileID: 4689569619775345797}
   - component: {fileID: 3713275494332908351}
   - component: {fileID: 902327277900484745}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Opiton_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -498,7 +498,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2786744123942623845}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Opitons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -534,7 +534,7 @@ GameObject:
   - component: {fileID: 3172158602026687680}
   - component: {fileID: 1478252030037612519}
   - component: {fileID: 2362173771789094466}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: MachnIronRotate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,7 +647,7 @@ GameObject:
   - component: {fileID: 3339872007481526161}
   - component: {fileID: 1474342457011779787}
   - component: {fileID: 6418345196455073743}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Machn_7_Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -760,7 +760,7 @@ GameObject:
   - component: {fileID: 3470017629455623938}
   - component: {fileID: 6053790197927895756}
   - component: {fileID: 6613201969542619114}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: AlertOrange.006
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -849,7 +849,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7111121179752939067}
   - component: {fileID: 7555508984605573205}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Extractor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
