@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -104,5 +105,14 @@ public class GameSystem : MonoBehaviourSingleton<GameSystem>
             cancellationTokenSource = new CancellationTokenSource()
         };
         _newState.state.SetContext(context);
+    }
+
+    public List<string> GetCurrentStateNames()
+    {
+        var stackList = _stateStack.ToList();
+        var stackListString = new List<string>();
+        foreach (var state in stackList) 
+            stackListString.Add(state.state.ToString());
+        return stackListString;
     }
 }

@@ -3749,7 +3749,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIMainPanel
   _background: {fileID: 0}
   _content: {fileID: 0}
-  _closeButtons: []
   _extractorButton: {fileID: 2133528472}
   _conveyorButton: {fileID: 369062871}
   _craftingButton: {fileID: 2126305029}
@@ -4406,7 +4405,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIBuilderPanel
   _background: {fileID: 0}
   _content: {fileID: 0}
-  _closeButtons: []
   _confirmButton: {fileID: 554872927}
   _rotateButton: {fileID: 769312504}
   _cancelButton: {fileID: 1645487568}
@@ -5731,9 +5729,9 @@ SceneRoots:
   m_Roots:
   - {fileID: 410087041}
   - {fileID: 832575519}
+  - {fileID: 1268288363}
   - {fileID: 17705366}
   - {fileID: 379399443}
-  - {fileID: 1268288363}
   - {fileID: 1868220538}
   - {fileID: 1280876554}
   - {fileID: 8702636446998582185}

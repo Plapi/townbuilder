@@ -30,6 +30,8 @@ public class GameStateMain : GameState<GameStateMain.Context>
     
     public override async UniTask Run(CancellationToken cancellationToken)
     {
+        await _mainPanel.Show(cancellationToken);
+        
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>
         {
             { WaitForSelectedButton, ProcessSelectedButton },
@@ -54,12 +56,13 @@ public class GameStateMain : GameState<GameStateMain.Context>
         await UniTask.WaitUntil(() => _mainPanel.SelectedButton != null, cancellationToken: cancellationToken);
     }
     
-    private UniTask ProcessSelectedButton(CancellationToken cancellationToken)
+    private async UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.enabled = false;
         
         if (_mainPanel.SelectedButton == UIButtonType.Extractor)
         {
+            await _mainPanel.Close(true, cancellationToken: cancellationToken);
             GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(new GameStateBuildExtractor.Context(), false);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Conveyor)
@@ -70,7 +73,5 @@ public class GameStateMain : GameState<GameStateMain.Context>
         {
             
         }
-        
-        return UniTask.CompletedTask;
     }
 }
