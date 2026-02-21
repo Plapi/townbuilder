@@ -4,49 +4,39 @@ using System.Threading;
 using BitBenderGames;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameStateMain : GameState<GameStateMain.Context>
 {
     [SerializeField] private MobileTouchCamera _mobileTouchCamera;
-    [SerializeField] private Button _extractorButton;
-    [SerializeField] private Button _conveyorButton;
-    [SerializeField] private Button _craftingButton;
-    
-    private bool _extractorTapped;
-    private bool _conveyorTapped;
-    private bool _craftingTapped;
+
+    private UIMainPanel _mainPanel;
     
     public new class Context : GameStateBase.Context
     {
         
     }
-    
-    private void Awake()
+
+    private void Start()
     {
-        InitializeUI();
+        InitUI();
         GameSystem.Instance.EnqueueState<GameStateMain, Context>(new Context(), true);
     }
     
-    private void InitializeUI()
+    private void InitUI()
     {
-        _extractorButton.onClick.RemoveAllListeners();
-        _extractorButton.onClick.AddListener(() => _extractorTapped = true);
-        _conveyorButton.onClick.RemoveAllListeners();
-        _conveyorButton.onClick.AddListener(() => _conveyorTapped = true);
-        _craftingButton.onClick.RemoveAllListeners();
-        _craftingButton.onClick.AddListener(() => _craftingTapped = true);
+        _mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
+        _mainPanel.Init(new UIMainPanel.Data());
     }
     
     public override async UniTask Run(CancellationToken cancellationToken)
     {
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>
         {
-            { WaitForButtonTapped, ProcessButtonTapped },
+            { WaitForSelectedButton, ProcessSelectedButton },
             { WaitForCameraMovement, ProcessCameraMovement }
         }, cancellationToken);
     }
-
+    
     private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.enabled = true;
@@ -58,32 +48,29 @@ public class GameStateMain : GameState<GameStateMain.Context>
         await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging == false && _mobileTouchCamera.IsPinching == false, cancellationToken: cancellationToken);
     }
     
-    private async UniTask WaitForButtonTapped(CancellationToken cancellationToken)
+    private async UniTask WaitForSelectedButton(CancellationToken cancellationToken)
     {
-        _extractorTapped = false;
-        _conveyorTapped = false;
-        _craftingTapped = false;
-        
-        await UniTask.WaitUntil(() => _extractorTapped || _conveyorTapped || _craftingTapped, 
-            cancellationToken: cancellationToken);
+        _mainPanel.ResetSelectedButton();
+        await UniTask.WaitUntil(() => _mainPanel.SelectedButton != null, cancellationToken: cancellationToken);
     }
     
-    private async UniTask ProcessButtonTapped(CancellationToken cancellationToken)
+    private UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.enabled = false;
         
-        if (_extractorTapped)
+        if (_mainPanel.SelectedButton == UIButtonType.Extractor)
         {
-            Debug.LogError("Extractor tapped");
             GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(new GameStateBuildExtractor.Context(), false);
         }
-        else if (_conveyorTapped)
+        else if (_mainPanel.SelectedButton == UIButtonType.Conveyor)
         {
-            Debug.LogError("Conveyor tapped");
+            
         }
-        else
+        else if (_mainPanel.SelectedButton == UIButtonType.Crafting)
         {
-            Debug.LogError("Crafting tapped");
+            
         }
+        
+        return UniTask.CompletedTask;
     }
 }

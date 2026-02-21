@@ -13,9 +13,18 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     [SerializeField] private MobileTouchCamera _mobileTouchCamera;
     [SerializeField] private Extractor _extractor;
     
+    [Space]
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private LayerMask _factoryEntityLayer;
     
+    private UIBuildPanel _buildPanel;
+
+    private void Start()
+    {
+        _buildPanel = UIController.Instance.GetPanel<UIBuildPanel>();
+        _buildPanel.Init(new UIBuildPanel.Data());
+    }
+
     public new class Context : GameStateBase.Context
     {
         
@@ -23,10 +32,13 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
 
     public override async UniTask Run(CancellationToken cancellationToken)
     {
+        await _buildPanel.Show(cancellationToken);
+        
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
             { WaitForTouchOnExtractor, ProcessExtractorPlacement },
-            { WaitForCameraMovement, ProcessCameraMovement }
+            { WaitForCameraMovement, ProcessCameraMovement },
+            { WaitForSelectedButton, ProcessSelectedButton }
         }, cancellationToken);
     }
     
@@ -69,5 +81,22 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
     private async UniTask ProcessCameraMovement(CancellationToken cancellationToken)
     {
         await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging == false && _mobileTouchCamera.IsPinching == false, cancellationToken: cancellationToken);
+    }
+    
+    private async UniTask WaitForSelectedButton(CancellationToken cancellationToken)
+    {
+        _buildPanel.ResetSelectedButton();
+        await UniTask.WaitUntil(() => _buildPanel.SelectedButton != null, cancellationToken: cancellationToken);
+    }
+    
+    private async UniTask ProcessSelectedButton(CancellationToken cancellationToken)
+    {
+        _mobileTouchCamera.enabled = false;
+        
+        if (_buildPanel.SelectedButton == UIButtonType.Close)
+        {
+            await _buildPanel.Close(true, cancellationToken);
+            ShouldExit = true;
+        }
     }
 }
