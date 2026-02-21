@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using Random = System.Random;
 
 public static class Utils {
@@ -72,7 +71,7 @@ public static class Utils {
 		}
 	}
 
-	public static bool IsOverUI() {
+	public static bool MouseIsOverUI() {
 		if (EventSystem.current == null) {
 			return false;
 		}
@@ -187,6 +186,27 @@ public static class Utils {
 			>= 1_000 => (value / 1_000D).ToString("0.#") + "K",
 			_ => value.ToString("N0")
 		};
+	}
+	
+	public static bool TryGetMouseWorldPosition(Camera camera, LayerMask layer, float maxDistance, out Vector3 worldPos)
+	{
+		var ray = camera.ScreenPointToRay(Input.mousePosition);
+		if (Physics.Raycast(ray, out var hit, maxDistance, layer))
+		{
+			worldPos = hit.point;
+			return true;
+		}
+        
+		worldPos = Vector3.zero;
+		return false;
+	}
+	
+	public static Vector2Int WorldToGrid(Vector3 worldPos)
+	{
+		return new Vector2Int(
+			Mathf.FloorToInt(worldPos.x),
+			Mathf.FloorToInt(worldPos.z)
+		);
 	}
 	
 	public static void DrawArrowHead(Vector3 start, Vector3 end, float size) {

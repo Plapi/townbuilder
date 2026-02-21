@@ -3,14 +3,23 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameSystem : MonoBehaviourSingleton<GameSystem>
 {
+    private class StateHandle
+    {
+        public bool isRootState;
+        public GameStateBase state;
+        public CancellationTokenSource cancellationTokenSource;
+    }
+    
     private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly Dictionary<Type, GameStateBase> _dictStates = new Dictionary<Type, GameStateBase>();
-    private readonly Queue<GameStateBase> queueStates = new Queue<GameStateBase>();
-
-    private GameStateBase _newState;
+    private readonly Stack<StateHandle> _stateStack = new Stack<StateHandle>();
+    
+    private StateHandle _currentState;
+    private StateHandle _newState;
     
     protected override void Awake() {
         base.Awake();
@@ -33,18 +42,22 @@ public class GameSystem : MonoBehaviourSingleton<GameSystem>
             
             if (_newState != null)
             {
-                queueStates.Enqueue(_newState);
+                _stateStack.Push(_newState);
                 _newState = null;
             }
             
-            if (queueStates.Count == 0)
+            if (_stateStack.Count == 0)
                 break;
-
+            
+            _currentState = _stateStack.Peek();
+            var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_currentState.cancellationTokenSource.Token, _cancellationTokenSource.Token).Token;
+            
             try
             {
                 await UniTask.WhenAny(
-                    queueStates.Peek().Run(_cancellationTokenSource.Token),
-                    UniTask.WaitUntil(() => _newState != null, cancellationToken: _cancellationTokenSource.Token)
+                    _currentState.state.Run(linkedToken),
+                    UniTask.WaitUntil(() => _newState != null, cancellationToken: _cancellationTokenSource.Token),
+                    UniTask.WaitUntil(() => Input.GetKeyUp(KeyCode.R), cancellationToken: _cancellationTokenSource.Token)
                 );
             }
             catch (OperationCanceledException) when (_cancellationTokenSource.IsCancellationRequested) { }
@@ -54,6 +67,15 @@ public class GameSystem : MonoBehaviourSingleton<GameSystem>
                     Debug.LogException(e);
                 break;
             }
+
+            if (Input.GetKeyUp(KeyCode.R))
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                return;
+            }
+            
+            if (_newState == null)
+                _stateStack.Pop();
         }
     }
     
@@ -63,11 +85,24 @@ public class GameSystem : MonoBehaviourSingleton<GameSystem>
         _cancellationTokenSource.Dispose();
     }
     
-    public void EnqueueState<TState, TContext>(TContext context) 
+    public void EnqueueState<TState, TContext>(TContext context, bool isRootState) 
         where TContext : GameStateBase.Context
         where TState : GameState<TContext>
     {
-        _newState = _dictStates[typeof(TState)];
-        _newState.SetContext(context);
+        if (_currentState != null)
+        {
+            _currentState.cancellationTokenSource.Cancel();
+            _currentState.cancellationTokenSource.Dispose();
+            if (isRootState == false)
+                _currentState.cancellationTokenSource = new CancellationTokenSource();
+        }
+        
+        _newState = new StateHandle()
+        {
+            isRootState = isRootState,
+            state = _dictStates[typeof(TState)],
+            cancellationTokenSource = new CancellationTokenSource()
+        };
+        _newState.state.SetContext(context);
     }
 }
