@@ -33,7 +33,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         entity.Place(gridPos);
         SetEntities(entity);
     }
-
+    
     public void Rotate(FactoryEntity entity)
     {
         entity.Rotate();
