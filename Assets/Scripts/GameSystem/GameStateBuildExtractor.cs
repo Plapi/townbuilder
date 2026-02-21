@@ -69,7 +69,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             if (Utils.TryGetMouseWorldPosition(_camera, _groundLayer, RAY_MAX_DISTANCE, out Vector3 worldPos))
             {
                 var translation = worldPos - firstWorldPos;
-                _extractor.Place(extractorFirstPos + translation); 
+                FactorySystem.Instance.Place(_extractor, extractorFirstPos + translation);
             }
             
             await UniTask.NextFrame(cancellationToken: cancellationToken);
@@ -105,7 +105,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
         {
-            _extractor.Rotate();
+            FactorySystem.Instance.Rotate(_extractor);
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
@@ -124,7 +124,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             return false;
         
         _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
-        _extractor.PlaceOnCenter(hitPoint.point);
+        FactorySystem.Instance.PlaceOnCenter(_extractor, hitPoint.point);
         _extractor.gameObject.SetLayerRecursively(_interactableLayer);
         
         return true;
