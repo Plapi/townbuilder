@@ -3,11 +3,16 @@ using UnityEngine;
 
 public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
 {
-    [SerializeField] private Transform _debugCell;
-    [SerializeField] private bool _showDebugCells;
+    [SerializeField] private DebugCells _debugCells;
     
-    private readonly Dictionary<Vector2Int, FactoryEntity> _entities = new Dictionary<Vector2Int, FactoryEntity>();
-    private readonly List<Transform> _debugCells = new List<Transform>();
+    private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
+    
+    private void Start()
+    {
+        var materialEntities = GetComponentsInChildren<MaterialEntity>();
+        foreach (var materialEntity in materialEntities)
+            SetEntities(materialEntity);
+    }
     
     public void PlaceOnCenter(FactoryEntity entity, Vector3 worldPos)
     {
@@ -31,7 +36,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         SetEntities(entity);
     }
     
-    private void SetEntities(FactoryEntity entity)
+    private void SetEntities(Entity entity)
     {
         foreach (var gridPos in entity.GridPositions)
             _entities.Remove(gridPos);
@@ -71,8 +76,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         
         entity.ApplyCorrectPlacement(hasCorrectPlacement);
         
-        if (_showDebugCells)
-            PlaceDebugCells();
+        _debugCells.UpdateDebugCells(_entities);
     }
     
     public void Release(FactoryEntity entity)
@@ -81,30 +85,11 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
             _entities.Remove(gridPos);
         entity.GridPositions.Clear();
         
-        if (_showDebugCells)
-            PlaceDebugCells();
+        _debugCells.UpdateDebugCells(_entities);
     }
     
     public void ConfirmPlacement(FactoryEntity entity)
     {
         entity.SetColor(Color.white);
-    }
-    
-    private void PlaceDebugCells()
-    {
-        foreach (var debugCell in _debugCells)
-            debugCell.gameObject.SetActive(false);
-        
-        var index = 0;
-        foreach (var kvp in _entities)
-        {
-            if (index == _debugCells.Count)
-                _debugCells.Add(Instantiate(_debugCell, transform));
-            var debugCell = _debugCells[index];
-            debugCell.name = $"DebugCell{index}_{kvp.Key}";
-            debugCell.transform.position = new Vector3(kvp.Key.x, 0f, kvp.Key.y);
-            debugCell.gameObject.SetActive(true);
-            index++;
-        }
     }
 }

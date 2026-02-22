@@ -98,6 +98,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             if (_extractor.HasCorrectPlacement)
             {
                 _extractor.gameObject.SetLayerRecursively(0);
+                _extractor.SetActiveInputsOutputs(false);
                 FactorySystem.Instance.ConfirmPlacement(_extractor);
                 _extractor = null;
                 await _buildPanel.Close(true, cancellationToken);
@@ -111,6 +112,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
             _extractor.gameObject.SetLayerRecursively(0);
+            _extractor.SetActiveInputsOutputs(false);
             FactorySystem.Instance.Release(_extractor);
             ObjectPoolingSystem.Instance.ReleaseObject(_extractor);
             await _buildPanel.Close(true, cancellationToken);
@@ -126,6 +128,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         
         _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
         _extractor.gameObject.SetLayerRecursively(Constants.InteractableLayer);
+        _extractor.SetActiveInputsOutputs(true);
         FactorySystem.Instance.PlaceOnCenter(_extractor, hitPoint.point);
         
         return true;

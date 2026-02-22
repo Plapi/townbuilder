@@ -3,35 +3,21 @@ using UnityEngine;
 
 public abstract class FactoryEntity : Entity
 {
-    public Vector2Int GridPos { get; private set; }
-    public List<Vector2Int> GridPositions { get; private set; } 
-    public Vector2Int Forward
-    {
-        get
-        {
-            Vector3 f = transform.forward;
-            return new Vector2Int(Mathf.RoundToInt(f.x), Mathf.RoundToInt(f.z));
-        }
-    }
-    public Vector2Int Right
-    {
-        get
-        {
-            Vector3 r = transform.right;
-            return new Vector2Int(Mathf.RoundToInt(r.x), Mathf.RoundToInt(r.z));
-        }
-    }
+    [SerializeField] private GameObject _graphic;
+    [SerializeField] private Transform[] _inputs;
+    [SerializeField] private Transform[] _outputs;
+    
     public bool HasCorrectPlacement { get; private set; }
     
-    private readonly List<Material> _materials = new List<Material>();
+    private readonly List<Material> _graphicMaterials = new List<Material>();
     
-    private void Awake()
+    protected override void Awake()
     {
-        GridPositions = new List<Vector2Int>();
-        
-        var renderers = gameObject.GetComponentsInChildren<Renderer>(true); 
+        base.Awake();
+        var renderers = _graphic.GetComponentsInChildren<Renderer>(true); 
         foreach (var rend in renderers)
-            _materials.AddRange(rend.materials);
+            _graphicMaterials.AddRange(rend.materials);
+        SetActiveInputsOutputs(false);
     }
     
     public void PlaceOnCenter(Vector3 worldPos)
@@ -60,8 +46,9 @@ public abstract class FactoryEntity : Entity
         GridPos = Utils.WorldToGrid(transform.position);
     }
 
-    public void ApplyCorrectPlacement(bool hasCorrectPlacement)
+    public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
     {
+        base.ApplyCorrectPlacement(hasCorrectPlacement);
         var color = hasCorrectPlacement ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor;
         SetColor(color);
         HasCorrectPlacement = hasCorrectPlacement;
@@ -69,7 +56,15 @@ public abstract class FactoryEntity : Entity
     
     public void SetColor(Color color)
     {
-        foreach (var material in _materials)
+        foreach (var material in _graphicMaterials)
             material.SetColor("_BaseColor", color);   
+    }
+    
+    public void SetActiveInputsOutputs(bool active)
+    {
+        foreach (var input in _inputs)
+            input.gameObject.SetActive(active);
+        foreach (var output in _outputs)
+            output.gameObject.SetActive(active);
     }
 }
