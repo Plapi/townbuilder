@@ -46,17 +46,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         
         Vector2Int right = entity.Right;
         Vector2Int forward = entity.Forward;
-        Vector2Int origin = entity.GridPos;
-
-        var offset = Vector2Int.zero;
-        var angleY = Mathf.RoundToInt(entity.transform.localEulerAngles.y);
-        if (angleY == 90)
-            offset = new Vector2Int(0, -1);
-        else if (angleY == 180)
-            offset = new Vector2Int(-1, -1);
-        else if (angleY == -90 || angleY == 270)
-            offset = new Vector2Int(0, 1);
-        origin += offset;
+        Vector2Int origin = Utils.WorldToGrid(entity.transform);
         
         for (int x = 0; x < entity.Size.x; x++)
         {
@@ -74,7 +64,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
             }
         }
         
-        entity.ApplyCorrectPlacement(hasCorrectPlacement);
+        entity.ApplyCorrectPlacement(hasCorrectPlacement && entity.HasNecessaryConnexion(_entities));
         
         _debugCells.UpdateDebugCells(_entities);
     }

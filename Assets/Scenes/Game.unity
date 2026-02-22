@@ -4908,6 +4908,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MaterialEntity
       objectReference: {fileID: 0}
+    - target: {fileID: 8584398209503739509, guid: 104396b3e9b3548f7a9e65d579f5cd6c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

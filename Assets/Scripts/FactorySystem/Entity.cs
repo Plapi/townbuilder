@@ -33,8 +33,13 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
         GridPos = Utils.WorldToGrid(transform.position);
         GridPositions = new List<Vector2Int>();
     }
+
+    public abstract bool HasNecessaryConnexion(Dictionary<Vector2Int, Entity> map);
     
-    public virtual void ApplyCorrectPlacement(bool hasCorrectPlacement) { }
+    public virtual void ApplyCorrectPlacement(bool hasCorrectPlacement)
+    {
+        
+    }
     
     private void OnDrawGizmos()
     {

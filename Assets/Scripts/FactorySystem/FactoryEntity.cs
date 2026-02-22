@@ -4,8 +4,8 @@ using UnityEngine;
 public abstract class FactoryEntity : Entity
 {
     [SerializeField] private GameObject _graphic;
-    [SerializeField] private Transform[] _inputs;
-    [SerializeField] private Transform[] _outputs;
+    [SerializeField] protected Transform[] _inputs;
+    [SerializeField] protected Transform[] _outputs;
     
     public bool HasCorrectPlacement { get; private set; }
     
@@ -45,7 +45,7 @@ public abstract class FactoryEntity : Entity
         transform.position += centerBefore - centerAfter;
         GridPos = Utils.WorldToGrid(transform.position);
     }
-
+    
     public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
     {
         base.ApplyCorrectPlacement(hasCorrectPlacement);

@@ -203,10 +203,21 @@ public static class Utils {
 	
 	public static Vector2Int WorldToGrid(Vector3 worldPos)
 	{
-		return new Vector2Int(
-			Mathf.FloorToInt(worldPos.x),
-			Mathf.FloorToInt(worldPos.z)
-		);
+		return new Vector2Int(Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.z));
+	}
+	
+	public static Vector2Int WorldToGrid(Transform target)
+	{
+		var origin = new Vector2Int(Mathf.RoundToInt(target.position.x), Mathf.RoundToInt(target.position.z));
+		var angleY = Mathf.RoundToInt(target.eulerAngles.y);
+		var offset = Vector2Int.zero;
+		if (angleY == 90)
+			offset = new Vector2Int(0, -1);
+		else if (angleY == 180)
+			offset = new Vector2Int(-1, -1);
+		else if (angleY == -90 || angleY == 270)
+			offset = new Vector2Int(-1, 0);
+		return origin + offset;
 	}
 	
 	public static void DrawArrowHead(Vector3 start, Vector3 end, float size) {
