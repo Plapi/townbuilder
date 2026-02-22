@@ -49,7 +49,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
                 return false;
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, 1 << FactorySystem.Instance.InteractableLayer);
+            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, 1 << Constants.InteractableLayer);
         }, cancellationToken: cancellationToken);
     }
     
@@ -97,6 +97,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         {
             if (_extractor.HasCorrectPlacement)
             {
+                _extractor.gameObject.SetLayerRecursively(0);
                 FactorySystem.Instance.ConfirmPlacement(_extractor);
                 _extractor = null;
                 await _buildPanel.Close(true, cancellationToken);
@@ -109,7 +110,9 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
+            _extractor.gameObject.SetLayerRecursively(0);
             FactorySystem.Instance.Release(_extractor);
+            ObjectPoolingSystem.Instance.ReleaseObject(_extractor);
             await _buildPanel.Close(true, cancellationToken);
             ShouldExit = true;
         }
@@ -122,6 +125,7 @@ public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context
             return false;
         
         _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
+        _extractor.gameObject.SetLayerRecursively(Constants.InteractableLayer);
         FactorySystem.Instance.PlaceOnCenter(_extractor, hitPoint.point);
         
         return true;

@@ -9,17 +9,8 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
     private readonly Dictionary<Vector2Int, FactoryEntity> _entities = new Dictionary<Vector2Int, FactoryEntity>();
     private readonly List<Transform> _debugCells = new List<Transform>();
     
-    public LayerMask InteractableLayer { get; private set; }
-    
-    protected override void Awake()
-    {
-        base.Awake();
-        InteractableLayer = LayerMask.NameToLayer(Constants.INTERACTABLE_LAYER_NAME);
-    }
-    
     public void PlaceOnCenter(FactoryEntity entity, Vector3 worldPos)
     {
-        entity.gameObject.SetLayerRecursively(InteractableLayer);
         entity.PlaceOnCenter(worldPos);
         SetEntities(entity);
     }
@@ -89,8 +80,6 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         foreach (var gridPos in entity.GridPositions)
             _entities.Remove(gridPos);
         entity.GridPositions.Clear();
-        entity.gameObject.SetLayerRecursively(0);
-        ObjectPoolingSystem.Instance.ReleaseObject(entity);
         
         if (_showDebugCells)
             PlaceDebugCells();
@@ -99,7 +88,6 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
     public void ConfirmPlacement(FactoryEntity entity)
     {
         entity.SetColor(Color.white);
-        entity.gameObject.SetLayerRecursively(0);
     }
     
     private void PlaceDebugCells()
