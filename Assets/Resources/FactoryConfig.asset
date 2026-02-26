@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FactoryConfig
   correctColor: {r: 0.3915094, g: 1, b: 0.3915094, a: 1}
   wrongColor: {r: 1, g: 0.28773582, b: 0.28773582, a: 1}
+  previewColor: {r: 0.36320752, g: 0.36320752, b: 1, a: 1}

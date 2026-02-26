@@ -26,6 +26,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
     {
         _mainPanel = UISystem.Instance.GetPanel<UIMainPanel>();
         _mainPanel.Init(new UIMainPanel.Data());
+        UISystem.Instance.GetPanel<UIBuildPanel>().Init(new UIBuildPanel.Data());
     }
     
     public override async UniTask Run(CancellationToken cancellationToken)
@@ -41,7 +42,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
     
     private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
     {
-        _mobileTouchCamera.enabled = true;
+        _mobileTouchCamera.SetEnabled(true);
         await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging || _mobileTouchCamera.IsPinching, cancellationToken: cancellationToken);
     }
     
@@ -58,16 +59,23 @@ public class GameStateMain : GameState<GameStateMain.Context>
     
     private async UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
-        _mobileTouchCamera.enabled = false;
+        _mobileTouchCamera.SetEnabled(false);
         
         if (_mainPanel.SelectedButton == UIButtonType.Extractor)
         {
             await _mainPanel.Close(true, cancellationToken: cancellationToken);
-            GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(new GameStateBuildExtractor.Context(), false);
+            GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(new GameStateBuildExtractor.Context()
+            {
+                id = "Extractor"
+            }, false);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Conveyor)
         {
-            
+            await _mainPanel.Close(true, cancellationToken: cancellationToken);
+            GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(new GameStateBuildConveyor.Context()
+            {
+                id = "ConveyorStraight"
+            }, false);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Crafting)
         {

@@ -9,10 +9,10 @@ public class ConveyorBeltMesh : MonoBehaviour {
     
     [SerializeField] private MeshFilter _meshFilter;
     [SerializeField] private ConveyorType _conveyorType;
-    [SerializeField] private ConveyorDirection _direction;
+    [SerializeField] private EntityDirection _direction;
     [SerializeField] private Object _targetFolder;
     
-    public void UpdateMesh(ConveyorType conveyorType, ConveyorDirection direction)
+    public void UpdateMesh(ConveyorType conveyorType, EntityDirection direction)
     {
         if (_meshFilter.sharedMesh == null)
             _meshFilter.sharedMesh = new Mesh();
@@ -34,7 +34,7 @@ public class ConveyorBeltMesh : MonoBehaviour {
                 0, 2, 3
             }, 0);
             
-            if (direction == ConveyorDirection.Front)
+            if (direction == EntityDirection.Front)
             {
                 mesh.uv = new Vector2[]
                 {
@@ -44,7 +44,7 @@ public class ConveyorBeltMesh : MonoBehaviour {
                     new Vector2(1, 1)
                 };    
             }
-            else if (direction == ConveyorDirection.Back)
+            else if (direction == EntityDirection.Back)
             {
                 mesh.uv = new Vector2[]
                 {
@@ -54,7 +54,7 @@ public class ConveyorBeltMesh : MonoBehaviour {
                     new Vector2(0, 0)
                 };  
             }
-            else if (direction == ConveyorDirection.Left)
+            else if (direction == EntityDirection.Left)
             {
                 mesh.uv = new Vector2[]
                 {
@@ -64,7 +64,7 @@ public class ConveyorBeltMesh : MonoBehaviour {
                     new Vector2(1, 0)
                 };
             }
-            else if (direction == ConveyorDirection.Right)
+            else if (direction == EntityDirection.Right)
             {
                 mesh.uv = new Vector2[]
                 {
@@ -77,15 +77,15 @@ public class ConveyorBeltMesh : MonoBehaviour {
         }
         else
         {
-            if (direction == ConveyorDirection.Front)
-                direction = ConveyorDirection.Right;
-            else if (direction == ConveyorDirection.Back)
-                direction = ConveyorDirection.Left;
+            if (direction == EntityDirection.Front)
+                direction = EntityDirection.Right;
+            else if (direction == EntityDirection.Back)
+                direction = EntityDirection.Left;
             
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
             
-            if (direction == ConveyorDirection.Right)
+            if (direction == EntityDirection.Right)
             {
                 vertices.Add(new Vector3(1, 0, 0));
                 vertices.AddRange(Bezier.GetPoints(
@@ -103,7 +103,7 @@ public class ConveyorBeltMesh : MonoBehaviour {
                     0, 4, 5
                 };
 
-            } else if (direction == ConveyorDirection.Left)
+            } else if (direction == EntityDirection.Left)
             {
                 vertices.Add(new Vector3(0, 0, 0));
                 vertices.AddRange(Bezier.GetPoints(

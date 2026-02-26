@@ -14,23 +14,27 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
             SetEntities(materialEntity);
     }
     
-    public void PlaceOnCenter(FactoryEntity entity, Vector3 worldPos)
+    public bool HasEntity(Vector2Int gridPos)
     {
-        entity.PlaceOnCenter(worldPos);
+        return _entities.ContainsKey(gridPos);
+    }
+    
+    public void PlaceOnCenter(Entity entity, Vector3 worldPos)
+    {
+        entity.SnapToGridOnCenter(worldPos);
         SetEntities(entity);
     }
     
-    public void Place(FactoryEntity entity, Vector3 worldPos)
+    public void Place(Entity entity, Vector2Int gridPos)
     {
-        var gridPos = Utils.WorldToGrid(worldPos);
-        if (gridPos == entity.GridPos)
-            return;
+        var prevGridPos = entity.GridPos;
+        entity.SnapToGrid(gridPos);
         
-        entity.Place(gridPos);
-        SetEntities(entity);
+        if (prevGridPos != entity.GridPos)
+            SetEntities(entity);
     }
-    
-    public void Rotate(FactoryEntity entity)
+
+    public void Rotate(Entity entity)
     {
         entity.Rotate();
         SetEntities(entity);
@@ -42,29 +46,24 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
             _entities.Remove(gridPos);
         entity.GridPositions.Clear();
         
-        var hasCorrectPlacement = true;
-        
         Vector2Int right = entity.Right;
         Vector2Int forward = entity.Forward;
-        Vector2Int origin = Utils.WorldToGrid(entity.transform);
+        Vector2Int origin = entity.GridPos;
         
         for (int x = 0; x < entity.Size.x; x++)
         {
             for (int y = 0; y < entity.Size.y; y++)
             {
                 Vector2Int gridPos = origin + right * x + forward * y;
-                if (_entities.ContainsKey(gridPos))
+                if (_entities.ContainsKey(gridPos) == false)
                 {
-                    hasCorrectPlacement = false;
-                    continue;
+                    entity.GridPositions.Add(gridPos);
+                    _entities.Add(gridPos, entity);    
                 }
-                
-                entity.GridPositions.Add(gridPos);
-                _entities.Add(gridPos, entity);
             }
         }
         
-        entity.ApplyCorrectPlacement(hasCorrectPlacement && entity.HasNecessaryConnexion(_entities));
+        entity.ApplyCorrectPlacement(entity.HasCorrectPlacement(_entities));
         
         _debugCells.UpdateDebugCells(_entities);
     }

@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class MaterialEntity : Entity
 {
-    public override bool HasNecessaryConnexion(Dictionary<Vector2Int, Entity> map)
+    public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
     {
-        return true;
+        
     }
 }

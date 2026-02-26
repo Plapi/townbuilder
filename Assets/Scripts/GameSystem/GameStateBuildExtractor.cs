@@ -1,136 +1,45 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using BitBenderGames;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
-public class GameStateBuildExtractor : GameState<GameStateBuildExtractor.Context>
+public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Context, Extractor>
 {
-    private const float RAY_MAX_DISTANCE = 1000f;
-    
-    [SerializeField] private Camera _camera;
-    [SerializeField] private MobileTouchCamera _mobileTouchCamera;
-    [SerializeField] private LayerMask _groundLayer;
-    
-    private Extractor _extractor;
-    private UIBuildPanel _buildPanel;
-    
-    private void Start()
-    {
-        _buildPanel = UISystem.Instance.GetPanel<UIBuildPanel>();
-        _buildPanel.Init(new UIBuildPanel.Data());
-    }
-    
-    public new class Context : GameStateBase.Context
-    {
-        
-    }
-    
     public override async UniTask Run(CancellationToken cancellationToken)
     {
-        if (TryPlaceExtractor() == false)
+        if (TryPlaceEntity() == false)
             return;
         
         await _buildPanel.Show(cancellationToken);
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
-            { WaitForTouchOnExtractor, ProcessExtractorPlacement },
+            { WaitForTouchOnEntity, ProcessEntityPlacement },
             { WaitForCameraMovement, ProcessCameraMovement },
             { WaitForSelectedButton, ProcessSelectedButton }
         }, cancellationToken);
-    }
-    
-    private async UniTask WaitForTouchOnExtractor(CancellationToken cancellationToken)
-    {
-        await UniTask.WaitUntil(() =>
-        {
-            if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
-                return false;
-            var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out _, RAY_MAX_DISTANCE, 1 << Constants.InteractableLayer);
-        }, cancellationToken: cancellationToken);
-    }
-    
-    private async UniTask ProcessExtractorPlacement(CancellationToken cancellationToken)
-    {
-        _mobileTouchCamera.enabled = false;
-        if (Utils.TryGetMouseWorldPosition(_camera, _groundLayer, RAY_MAX_DISTANCE, out Vector3 firstWorldPos) == false)
+        
+        if (cancellationToken.IsCancellationRequested)
             return;
-        var extractorFirstPos = _extractor.transform.position;
         
-        while (Input.GetMouseButton(0) && cancellationToken.IsCancellationRequested == false)
-        {
-            if (Utils.TryGetMouseWorldPosition(_camera, _groundLayer, RAY_MAX_DISTANCE, out Vector3 worldPos))
-            {
-                var translation = worldPos - firstWorldPos;
-                FactorySystem.Instance.Place(_extractor, extractorFirstPos + translation);
-            }
-            
-            await UniTask.NextFrame(cancellationToken: cancellationToken);
-        }
-    }
-    
-    private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
-    {
-        _mobileTouchCamera.enabled = true;
-        await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging || _mobileTouchCamera.IsPinching, cancellationToken: cancellationToken);
-    }
-    
-    private async UniTask ProcessCameraMovement(CancellationToken cancellationToken)
-    {
-        await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging == false && _mobileTouchCamera.IsPinching == false, cancellationToken: cancellationToken);
-    }
-    
-    private async UniTask WaitForSelectedButton(CancellationToken cancellationToken)
-    {
-        _buildPanel.ResetSelectedButton();
-        await UniTask.WaitUntil(() => _buildPanel.SelectedButton != null, cancellationToken: cancellationToken);
-    }
-    
-    private async UniTask ProcessSelectedButton(CancellationToken cancellationToken)
-    {
-        _mobileTouchCamera.enabled = false;
+        _entity.gameObject.SetLayerRecursively(0);
+        _entity.SetActiveInputsOutputs(false);
         
-        if (_buildPanel.SelectedButton == UIButtonType.Confirm)
+        if (_confirmEntityPlacement)
         {
-            if (_extractor.HasCorrectPlacement)
-            {
-                _extractor.gameObject.SetLayerRecursively(0);
-                _extractor.SetActiveInputsOutputs(false);
-                FactorySystem.Instance.ConfirmPlacement(_extractor);
-                _extractor = null;
-                await _buildPanel.Close(true, cancellationToken);
-                ShouldExit = true;    
-            }
+            FactorySystem.Instance.ConfirmPlacement(_entity);
         }
-        else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
+        else
         {
-            FactorySystem.Instance.Rotate(_extractor);
+            FactorySystem.Instance.Release(_entity);
+            ObjectPoolingSystem.Instance.ReleaseObject(_entity);
         }
-        else if (_buildPanel.SelectedButton == UIButtonType.Close)
-        {
-            _extractor.gameObject.SetLayerRecursively(0);
-            _extractor.SetActiveInputsOutputs(false);
-            FactorySystem.Instance.Release(_extractor);
-            ObjectPoolingSystem.Instance.ReleaseObject(_extractor);
-            await _buildPanel.Close(true, cancellationToken);
-            ShouldExit = true;
-        }
+        
+        await _buildPanel.Close(true, cancellationToken);
     }
     
-    private bool TryPlaceExtractor()
+    public new class Context : GameStateBuild<Context, Extractor>.Context
     {
-        var ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
-        if (Physics.Raycast(ray, out var hitPoint, RAY_MAX_DISTANCE, _groundLayer) == false)
-            return false;
         
-        _extractor = ObjectPoolingSystem.Instance.GetObject<Extractor>("Extractor");
-        _extractor.gameObject.SetLayerRecursively(Constants.InteractableLayer);
-        _extractor.SetActiveInputsOutputs(true);
-        FactorySystem.Instance.PlaceOnCenter(_extractor, hitPoint.point);
-        
-        return true;
     }
 }

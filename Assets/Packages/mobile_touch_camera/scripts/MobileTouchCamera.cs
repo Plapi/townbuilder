@@ -233,6 +233,12 @@ namespace BitBenderGames {
 
     private bool isStarted = false;
 
+    public void SetEnabled(bool isEnabled)
+    {
+      enabled = isEnabled;
+      touchInputController.enabled = isEnabled;
+    }
+    
     public Camera Cam {
       get {
         if(cam == null) {

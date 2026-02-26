@@ -3,11 +3,9 @@ using UnityEngine;
 
 public abstract class FactoryEntity : Entity
 {
-    [SerializeField] private GameObject _graphic;
-    [SerializeField] protected Transform[] _inputs;
-    [SerializeField] protected Transform[] _outputs;
+    [SerializeField] protected GameObject _graphic;
     
-    public bool HasCorrectPlacement { get; private set; }
+    public bool IsCorrectlyPlaced { get; private set; }
     
     private readonly List<Material> _graphicMaterials = new List<Material>();
     
@@ -20,38 +18,11 @@ public abstract class FactoryEntity : Entity
         SetActiveInputsOutputs(false);
     }
     
-    public void PlaceOnCenter(Vector3 worldPos)
-    {
-        Vector3 offset = new Vector3(Size.x * 0.5f, 0f, Size.y * 0.5f);
-        Vector3 backLeftPos = worldPos - offset;
-        Place(Utils.WorldToGrid(backLeftPos));
-    }
-    
-    public void Place(Vector2Int gridPos)
-    {
-        transform.position = new Vector3(gridPos.x, 0f, gridPos.y);
-        GridPos = gridPos;
-    }
-    
-    public void Rotate()
-    {
-        Vector3 centerBefore = transform.position + 
-                               transform.right * (Size.x * 0.5f) + 
-                               transform.forward * (Size.y * 0.5f);
-        transform.Rotate(0f, 90f, 0f);
-        Vector3 centerAfter = transform.position + 
-                              transform.right * (Size.x * 0.5f) + 
-                              transform.forward * (Size.y * 0.5f);
-        transform.position += centerBefore - centerAfter;
-        GridPos = Utils.WorldToGrid(transform.position);
-    }
-    
     public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
     {
-        base.ApplyCorrectPlacement(hasCorrectPlacement);
         var color = hasCorrectPlacement ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor;
         SetColor(color);
-        HasCorrectPlacement = hasCorrectPlacement;
+        IsCorrectlyPlaced = hasCorrectPlacement;
     }
     
     public void SetColor(Color color)

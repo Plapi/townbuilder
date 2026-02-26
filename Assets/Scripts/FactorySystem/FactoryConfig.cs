@@ -5,4 +5,5 @@ public class FactoryConfig : ScriptableObjectSingleton<FactoryConfig>
 {
     public Color correctColor;
     public Color wrongColor;
+    public Color previewColor;
 }

@@ -6,11 +6,11 @@ using UnityEngine;
 
 public abstract class GameState<TContext> : GameStateBase where TContext : GameStateBase.Context
 {
-    protected new TContext Context { get; private set; }
+    protected TContext context { get; private set; }
     
-    public override void SetContext(Context context)
+    public override void SetContext(Context _context)
     {
-        Context = (TContext)context;
+        context = (TContext)_context;
     }
 }
 

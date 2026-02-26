@@ -5,11 +5,21 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
 {
     [SerializeField] private string _id;
     [SerializeField] private Vector2Int _size = Vector2Int.one;
+    [SerializeField] private Vector2Int _gridPos;
+    [SerializeField] protected Transform[] _inputs;
+    [SerializeField] protected Transform[] _outputs;
+    
+    public Transform[] Inputs => _inputs;
+    public Transform[] Outputs => _outputs;
     
     public string Id => _id;
     public MonoBehaviour Behaviour => this;
     public Vector2Int Size => _size;
-    public Vector2Int GridPos { get; protected set; }
+    public Vector2Int GridPos
+    {
+        get => _gridPos;
+        private set => _gridPos = value;
+    }
     public List<Vector2Int> GridPositions { get; private set; } 
     public Vector2Int Forward
     {
@@ -30,15 +40,50 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
     
     protected virtual void Awake()
     {
-        GridPos = Utils.WorldToGrid(transform.position);
+        GridPos = FactoryUtils.GetGridPos(transform);
         GridPositions = new List<Vector2Int>();
     }
-
-    public abstract bool HasNecessaryConnexion(Dictionary<Vector2Int, Entity> map);
     
-    public virtual void ApplyCorrectPlacement(bool hasCorrectPlacement)
+    public void SnapToGridOnCenter(Vector3 worldPos)
     {
+        Vector3 offset = new Vector3(Size.x * 0.5f, 0f, Size.y * 0.5f);
+        GridPos = FactoryUtils.WorldToGrid(worldPos - offset, RoundType.Floor);
+        FactoryUtils.PlaceToGrid(this);
+    }
+    
+    public void SnapToGrid(Vector2Int gridPos)
+    {
+        GridPos = gridPos;
+        FactoryUtils.PlaceToGrid(this);
+    }
+    
+    public void Rotate()
+    {
+        transform.Rotate(0f, 90f, 0f);
+        var angleY = Mathf.RoundToInt(transform.eulerAngles.y);
         
+        Vector2Int offset = Vector2Int.zero;
+        if (Size.x > 1 || Size.y > 1)
+        {
+            if (angleY == 90)
+                offset = new Vector2Int(-1, 1);
+            else if (angleY == 180)
+                offset = new Vector2Int(1, 1);
+            else if (angleY == 270 || angleY == -90)
+                offset = new Vector2Int(1, -1);
+            else
+                offset = new Vector2Int(-1, -1);
+            GridPos += offset * _size / 2;
+        }
+        
+        FactoryUtils.PlaceToGrid(this);
+    }
+    
+    public abstract void ApplyCorrectPlacement(bool hasCorrectPlacement);
+    
+    public virtual bool HasCorrectPlacement(Dictionary<Vector2Int, Entity> map)
+    {
+        return Size.x * Size.y == GridPositions.Count;
     }
     
     private void OnDrawGizmos()
