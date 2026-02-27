@@ -122,7 +122,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
 
     protected TFactoryEntity InstantiateEntity()
     {
-        var entity = ObjectPoolingSystem.Instance.GetObject<TFactoryEntity>(context.id);
+        var entity = FactorySystem.Instance.InstantiateEntity<TFactoryEntity>(context.id);
         entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
         return entity;
     }

@@ -66,7 +66,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
             await _mainPanel.Close(true, cancellationToken: cancellationToken);
             GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(new GameStateBuildExtractor.Context()
             {
-                id = "Extractor"
+                id = FactoryConstants.EXTRACTOR_NAME
             }, false);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Conveyor)
@@ -74,7 +74,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
             await _mainPanel.Close(true, cancellationToken: cancellationToken);
             GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(new GameStateBuildConveyor.Context()
             {
-                id = "ConveyorStraight"
+                id = FactoryConstants.CONVEYOR_STRAIGHT_NAME
             }, false);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Crafting)

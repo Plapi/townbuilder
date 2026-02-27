@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class Conveyor : FactoryEntity
 {
+    [SerializeField] private GameObject _pillar;
     [SerializeField] private Conveyor _prevConveyor;
     [SerializeField] private Conveyor _nextConveyor;
     
@@ -13,6 +14,19 @@ public abstract class Conveyor : FactoryEntity
     {
         _nextConveyor = next;
         next._prevConveyor = this;
+        next._pillar.gameObject.SetActive(!_pillar.activeSelf);
+    }
+
+    public void Disconnect(Conveyor next)
+    {
+        if (_nextConveyor != next)
+        {
+            Debug.LogError("Disconnection failed");
+            return;
+        }
+        
+        _nextConveyor = null;
+        next._prevConveyor = null;
     }
     
     private void OnDrawGizmos()

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Entity : MonoBehaviour, IPoolableObject
@@ -52,6 +53,7 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
     {
         GridPos = FactoryUtils.GetGridPos(transform);
         GridPositions = new List<Vector2Int>();
+        SetEntityColliders();
     }
     
     public void SnapToGridOnCenter(Vector3 worldPos)
@@ -87,6 +89,13 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
         }
         
         FactoryUtils.PlaceToGrid(this);
+    }
+
+    private void SetEntityColliders()
+    {
+        var colliders = transform.GetComponentsInChildren<Collider>();
+        for (int i = 0; i < colliders.Length; i++)
+            colliders[i].AddComponent<EntityCollider>().SetEntity(this);
     }
     
     public abstract void ApplyCorrectPlacement(bool hasCorrectPlacement);
