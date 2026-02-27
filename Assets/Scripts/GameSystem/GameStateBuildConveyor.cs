@@ -6,12 +6,11 @@ using UnityEngine;
 
 public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Context, Conveyor>
 {
-    private List<Conveyor> _previewConveyors;
-    
     public override async UniTask Run(CancellationToken cancellationToken)
     {
         if (TryPlaceEntity() == false)
             return;
+        _entity.SetActiveInputsOutputs(false);
         
         await _buildPanel.Show(cancellationToken);
         
@@ -25,8 +24,6 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (cancellationToken.IsCancellationRequested)
             return;
         
-        _entity.SetActiveInputsOutputs(false);
-        
         if (_confirmEntityPlacement == false)
         {
             FactorySystem.Instance.Release(_entity);
@@ -36,73 +33,71 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         }
         
         FactorySystem.Instance.ConfirmPlacement(_entity);
-        
-        _previewConveyors = PlacePreviewConveyors();
+        ActivateAllowedOutputs();
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
-            { WaitForTouchOnEntity, ProcessConveyorPlacementPreview },
+            { WaitingForTap, ProcessTap },
             { WaitForCameraMovement, ProcessCameraMovement },
             { WaitForSelectedButton, ProcessSelectedButtonPreview }
         }, cancellationToken);
+        
+        if (cancellationToken.IsCancellationRequested)
+            return;
+        
+        _entity.SetActiveInputsOutputs(false);
+        await _buildPanel.Close(true, cancellationToken);
     }
-
-    private async UniTask ProcessConveyorPlacementPreview(CancellationToken cancellationToken)
+    
+    private UniTask ProcessTap(CancellationToken cancellationToken)
     {
-        _mobileTouchCamera.SetEnabled(false);
-
-        while (Input.GetMouseButton(0) && cancellationToken.IsCancellationRequested == false)
+        if (Layers.Raycast(_camera, Layers.GroundLayer, out var hit) == false)
+            return UniTask.CompletedTask;
+        
+        var gridPos = FactoryUtils.WorldToGrid(hit.point, RoundType.Floor);
+        if (FactorySystem.Instance.HasEntity(gridPos) == false && FactoryUtils.AreAdjacent(_entity.GridPos, gridPos))
         {
-            await UniTask.NextFrame(cancellationToken: cancellationToken);
+            var newConveyor = InstantiateEntity();
+            FactorySystem.Instance.Place(newConveyor, gridPos);
+            FactorySystem.Instance.ConfirmPlacement(newConveyor);
+            
+            _entity.SetActiveInputsOutputs(false);
+            
+            FactorySystem.Instance.MakeConveyorsConnexions(_entity, newConveyor);
+            
+            _entity = newConveyor;
+            
+            ActivateAllowedOutputs();
         }
-
-        if (cancellationToken.IsCancellationRequested == false)
-        {
-            var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out var hit, Constants.RAY_MAX_DISTANCE, 1 << Constants.InteractableLayer) &&
-                hit.transform.parent.TryGetComponent(out Conveyor hitConveyor))
-            {
-                foreach (var conveyor in _previewConveyors)
-                {
-                    if (conveyor == hitConveyor)
-                    {
-                        FactorySystem.Instance.ConfirmPlacement(conveyor);
-                        _entity = conveyor;
-                    }
-                    else
-                    {
-                        FactorySystem.Instance.Release(conveyor);
-                        ObjectPoolingSystem.Instance.ReleaseObject(conveyor);
-                    }
-                }
-                _previewConveyors = PlacePreviewConveyors();
-            }
-        }
+        
+        return UniTask.CompletedTask;
     }
     
     private UniTask ProcessSelectedButtonPreview(CancellationToken cancellationToken)
     {
+        if (_buildPanel.SelectedButton == UIButtonType.Confirm)
+        {
+            ExitBaseRun = true;
+        }
+        else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
+        {
+            
+        }
+        else if (_buildPanel.SelectedButton == UIButtonType.Close)
+        {
+            
+        }
+        
         return UniTask.CompletedTask;
     }
     
-    private List<Conveyor> PlacePreviewConveyors()
+    private void ActivateAllowedOutputs()
     {
-        var conveyors = new List<Conveyor>();
-        Vector2Int[] directions = { Vector2Int.up , Vector2Int.down, Vector2Int.right, Vector2Int.left };
-        for (var i = 0; i < directions.Length; i++)
+        foreach (var output in _entity.Outputs)
         {
-            var direction = directions[i];
-            var gridPos = _entity.GridPos + direction;
-            if (FactorySystem.Instance.HasEntity(gridPos) == false)
-            {
-                var conveyor = InstantiateEntity();
-                var angle = FactoryUtils.GetAngle((EntityDirection)i);
-                conveyor.transform.SetLocalAngleY(angle);
-                FactorySystem.Instance.Place(conveyor, gridPos);
-                conveyors.Add(conveyor);
-            }
+            var gridPos = FactoryUtils.GetGridPos(output);
+            output.gameObject.SetActive(FactorySystem.Instance.HasEntity(gridPos) == false);
         }
-        return conveyors;
     }
     
     public new class Context : GameStateBuild<Context, Conveyor>.Context

@@ -41,7 +41,7 @@ public class ObjectPoolingSystem : MonoBehaviourSingleton<ObjectPoolingSystem>
             if (TryGetItem(id, out obj) == false)
                 throw new KeyNotFoundException($"Object with id {id} not found");
             obj = Instantiate(obj, transform);
-            obj.name = $"{id}{queue.Count}";
+            obj.name = $"{id}";
         }
         else
         {

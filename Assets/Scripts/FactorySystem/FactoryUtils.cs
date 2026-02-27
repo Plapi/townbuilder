@@ -13,8 +13,7 @@ public static class FactoryUtils
     
     public static void PlaceToGrid(Entity entity)
     {
-        var angleY = Mathf.RoundToInt(entity.transform.eulerAngles.y);
-        var offset = GetOffset(angleY);
+        var offset = GetOffset(entity.AngleY);
         entity.transform.position = new Vector3(entity.GridPos.x + offset.x, 0f, entity.GridPos.y + offset.y);
     }
 
@@ -40,39 +39,26 @@ public static class FactoryUtils
     public static bool TryGetMouseGridPosition(Camera camera, out Vector2Int gridPos)
     {
         gridPos = Vector2Int.zero;
-        if (Utils.TryGetMouseWorldPosition(camera, 1 << Constants.GroundLayer, Constants.RAY_MAX_DISTANCE, out var worldPos))
+        if (Layers.Raycast(camera, Layers.GroundLayer, out var hit))
         {
-            gridPos = WorldToGrid(worldPos, RoundType.Floor);
+            gridPos = WorldToGrid(hit.point, RoundType.Floor);
             return true;
         }
         return false;
     }
-
-    public static EntityDirection GetDirection(Vector2Int from, Vector2Int to)
+    
+    public static bool AreAdjacent(Vector2Int a, Vector2Int b)
     {
-        var dif = to - from;
-        if (dif.x == 0 && dif.y < 0)
-            return EntityDirection.Front;
-        if (dif.x == 0 && dif.y > 0)
-            return EntityDirection.Back;
-        if (dif.x < 0 && dif.y == 0)
-            return EntityDirection.Right;
-        if (dif.x > 0 && dif.y == 0)
-            return EntityDirection.Left;
-        
-        throw new Exception("Direction not found");
+        int dx = Mathf.Abs(a.x - b.x);
+        int dy = Mathf.Abs(a.y - b.y);
+        return dx + dy == 1;
     }
     
-    public static int GetAngle(EntityDirection direction)
+    public static bool AreDiagonals(Vector2Int a, Vector2Int b)
     {
-        return direction switch
-        {
-            EntityDirection.Front => 0,
-            EntityDirection.Back => 180,
-            EntityDirection.Right => 90,
-            EntityDirection.Left => -90,
-            _ => 0
-        };
+        int dx = Mathf.Abs(a.x - b.x);
+        int dy = Mathf.Abs(a.y - b.y);
+        return dx == 1 && dy == 1;
     }
 }
 

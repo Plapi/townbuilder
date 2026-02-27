@@ -5,10 +5,12 @@ public class DebugCells : MonoBehaviour
 {
     [SerializeField] private Transform _debugCellEntity;
     [SerializeField] private Transform _debugCellInput;
+    [SerializeField] private Transform _debugCellOutput;
     [SerializeField] private bool _showDebugCells;
     
     private readonly List<Transform> _debugCellsEntities = new List<Transform>();
     private readonly List<Transform> _debugCellsInputs = new List<Transform>();
+    private readonly List<Transform> _debugCellsOutputs = new List<Transform>();
     
     public void UpdateDebugCells(Dictionary<Vector2Int, Entity> entities)
     {
@@ -18,7 +20,9 @@ public class DebugCells : MonoBehaviour
         foreach (var debugCell in _debugCellsEntities)
             debugCell.gameObject.SetActive(false);
         foreach (var debugCellInput in _debugCellsInputs)
-            debugCellInput.gameObject.SetActive(true);
+            debugCellInput.gameObject.SetActive(false);
+        foreach (var debugCellOutput in _debugCellsOutputs)
+            debugCellOutput.gameObject.SetActive(false);
         
         var factoryEntities = new List<FactoryEntity>();
         
@@ -38,6 +42,16 @@ public class DebugCells : MonoBehaviour
             foreach (var input in factoryEntity.Inputs)
             {
                 InstantiateDebugCell(index, _debugCellInput, _debugCellsInputs, FactoryUtils.GetGridPos(input));
+                index++;
+            }
+        }
+        
+        index = 0;
+        foreach (var factoryEntity in factoryEntities)
+        {
+            foreach (var output in factoryEntity.Outputs)
+            {
+                InstantiateDebugCell(index, _debugCellOutput, _debugCellsOutputs, FactoryUtils.GetGridPos(output));
                 index++;
             }
         }

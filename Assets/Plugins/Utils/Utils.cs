@@ -188,19 +188,6 @@ public static class Utils {
 		};
 	}
 	
-	public static bool TryGetMouseWorldPosition(Camera camera, LayerMask layer, float maxDistance, out Vector3 worldPos)
-	{
-		var ray = camera.ScreenPointToRay(Input.mousePosition);
-		if (Physics.Raycast(ray, out var hit, maxDistance, layer))
-		{
-			worldPos = hit.point;
-			return true;
-		}
-        
-		worldPos = Vector3.zero;
-		return false;
-	}
-	
 	public static void DrawArrowHead(Vector3 start, Vector3 end, float size) {
 		Vector3 direction = (end - start).normalized;
 		Vector3 right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 35, 0) * Vector3.forward;

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public static class Constants
+public static class Layers
 {
-    public const float RAY_MAX_DISTANCE = 10000f;
+    private const float RAY_MAX_DISTANCE = 10000f;
     
     private const string INTERACTABLE_LAYER_NAME = "Interactable";
     private static LayerMask? _interactableLayer;
@@ -24,5 +24,16 @@ public static class Constants
             _groundLayer ??= LayerMask.NameToLayer(GROUND_LAYER_NAME);
             return _groundLayer.Value;
         }
+    }
+    
+    public static bool Raycast(Camera camera, LayerMask layerMask, out RaycastHit hit)
+    {
+        return Raycast(camera, layerMask, Input.mousePosition, out hit);
+    }
+    
+    public static bool Raycast(Camera camera, LayerMask layerMask, Vector3 screenPosition, out RaycastHit hit)
+    {
+        var ray = camera.ScreenPointToRay(screenPosition);
+        return Physics.Raycast(ray, out hit, RAY_MAX_DISTANCE, 1 << layerMask);
     }
 }

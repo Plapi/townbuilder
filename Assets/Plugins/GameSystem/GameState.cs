@@ -16,7 +16,7 @@ public abstract class GameState<TContext> : GameStateBase where TContext : GameS
 
 public abstract class GameStateBase : MonoBehaviour
 {
-    public bool ShouldExit { get; protected set; }
+    protected bool ExitBaseRun { get; set; }
     
     public abstract class Context { }
     
@@ -40,9 +40,9 @@ public abstract class GameStateBase : MonoBehaviour
             
             await result.Invoke(cancellationToken);
 
-            if (ShouldExit)
+            if (ExitBaseRun)
             {
-                ShouldExit = false;
+                ExitBaseRun = false;
                 break;
             }
         }

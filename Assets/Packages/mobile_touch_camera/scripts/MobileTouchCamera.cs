@@ -169,6 +169,7 @@ namespace BitBenderGames {
 
     public bool IsPinching { get; private set; }
     public bool IsDragging { get; private set; }
+    public bool HasInteraction => IsDragging || IsPinching;
 
     #region expert mode tweakables
     [Header("Expert Mode")]

@@ -15,6 +15,16 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
     public string Id => _id;
     public MonoBehaviour Behaviour => this;
     public Vector2Int Size => _size;
+    public int AngleY
+    {
+        get
+        {
+            var angleY = Mathf.RoundToInt(transform.eulerAngles.y);
+            if (angleY == 270)
+                angleY = -90;
+            return angleY;
+        }
+    }
     public Vector2Int GridPos
     {
         get => _gridPos;
@@ -60,16 +70,16 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
     public void Rotate()
     {
         transform.Rotate(0f, 90f, 0f);
-        var angleY = Mathf.RoundToInt(transform.eulerAngles.y);
         
         Vector2Int offset = Vector2Int.zero;
+        var angleY = AngleY;
         if (Size.x > 1 || Size.y > 1)
         {
             if (angleY == 90)
                 offset = new Vector2Int(-1, 1);
             else if (angleY == 180)
                 offset = new Vector2Int(1, 1);
-            else if (angleY == 270 || angleY == -90)
+            else if (angleY == -90)
                 offset = new Vector2Int(1, -1);
             else
                 offset = new Vector2Int(-1, -1);

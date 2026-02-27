@@ -43,12 +43,12 @@ public class GameStateMain : GameState<GameStateMain.Context>
     private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.SetEnabled(true);
-        await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging || _mobileTouchCamera.IsPinching, cancellationToken: cancellationToken);
+        await UniTask.WaitUntil(() => _mobileTouchCamera.HasInteraction, cancellationToken: cancellationToken);
     }
     
     private async UniTask ProcessCameraMovement(CancellationToken cancellationToken)
     {
-        await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging == false && _mobileTouchCamera.IsPinching == false, cancellationToken: cancellationToken);
+        await UniTask.WaitUntil(() => _mobileTouchCamera.HasInteraction == false, cancellationToken: cancellationToken);
     }
     
     private async UniTask WaitForSelectedButton(CancellationToken cancellationToken)

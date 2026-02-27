@@ -7,6 +7,9 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     where TContext : GameStateBuild<TContext, TFactoryEntity>.Context
     where TFactoryEntity : FactoryEntity
 {
+
+    private const float TAP_MAX_TIME = 0.2f;
+    
     [SerializeField] protected Camera _camera;
     [SerializeField] protected MobileTouchCamera _mobileTouchCamera;
     
@@ -25,8 +28,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         {
             if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
                 return false;
-            var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out _, Constants.RAY_MAX_DISTANCE, 1 << Constants.InteractableLayer);
+            return Layers.Raycast(_camera, Layers.InteractableLayer, out _);
         }, cancellationToken: cancellationToken);
     }
     
@@ -53,12 +55,12 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     protected async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.SetEnabled(true);
-        await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging || _mobileTouchCamera.IsPinching, cancellationToken: cancellationToken);
+        await UniTask.WaitUntil(() => _mobileTouchCamera.HasInteraction, cancellationToken: cancellationToken);
     }
     
     protected async UniTask ProcessCameraMovement(CancellationToken cancellationToken)
     {
-        await UniTask.WaitUntil(() => _mobileTouchCamera.IsDragging == false && _mobileTouchCamera.IsPinching == false, cancellationToken: cancellationToken);
+        await UniTask.WaitUntil(() => _mobileTouchCamera.HasInteraction == false, cancellationToken: cancellationToken);
     }
     
     protected async UniTask WaitForSelectedButton(CancellationToken cancellationToken)
@@ -75,7 +77,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         {
             if (_entity.IsCorrectlyPlaced)
             {
-                ShouldExit = true;
+                ExitBaseRun = true;
                 _confirmEntityPlacement = true;
             }
         }
@@ -85,22 +87,35 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
-            ShouldExit = true;
+            ExitBaseRun = true;
             _confirmEntityPlacement = false;
         }
         
         return UniTask.CompletedTask;
     }
-    
+
+    protected async UniTask WaitingForTap(CancellationToken cancellationToken)
+    {
+        while (cancellationToken.IsCancellationRequested == false)
+        {
+            await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && Utils.MouseIsOverUI() == false, cancellationToken: cancellationToken);
+            float time = Time.time;
+            await UniTask.WaitUntil(() => Time.time > time + TAP_MAX_TIME || Input.GetMouseButtonUp(0) || _mobileTouchCamera.HasInteraction, 
+                cancellationToken: cancellationToken);
+            if (_mobileTouchCamera.HasInteraction == false && Time.time <= time + TAP_MAX_TIME)
+                return;
+        }
+    }
+
     protected bool TryPlaceEntity()
     {
-        var ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0));
-        if (Physics.Raycast(ray, out var hitPoint, Constants.RAY_MAX_DISTANCE, 1 << Constants.GroundLayer) == false)
+        var center = new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
+        if (Layers.Raycast(_camera, Layers.GroundLayer, center, out var hit) == false)
             return false;
         
         _entity = InstantiateEntity();
         _entity.SetActiveInputsOutputs(true);
-        FactorySystem.Instance.PlaceOnCenter(_entity, hitPoint.point);
+        FactorySystem.Instance.PlaceOnCenter(_entity, hit.point);
         
         return true;
     }
@@ -108,7 +123,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     protected TFactoryEntity InstantiateEntity()
     {
         var entity = ObjectPoolingSystem.Instance.GetObject<TFactoryEntity>(context.id);
-        entity.gameObject.SetLayerRecursively(Constants.InteractableLayer);
+        entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
         return entity;
     }
     
