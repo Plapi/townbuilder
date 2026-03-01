@@ -25,7 +25,7 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
         _entity.gameObject.SetLayerRecursively(0);
         _entity.SetActiveInputsOutputs(false);
         
-        if (_confirmEntityPlacement == false)
+        if (_buildPanel.SelectedButton == UIButtonType.Close)
             FactorySystem.Instance.Release(_entity);
         
         await _buildPanel.Close(true, cancellationToken);

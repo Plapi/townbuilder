@@ -29,7 +29,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (cancellationToken.IsCancellationRequested)
             return;
         
-        if (_confirmEntityPlacement == false)
+        if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
             FactorySystem.Instance.Release(_entity);
             await _buildPanel.Close(true, cancellationToken);
@@ -38,7 +38,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         
         ActivateAllowedOutputs(_entity);
         
-        _conveyors = new List<Conveyor>() { _entity };
+        _conveyors.Add(_entity);
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
@@ -51,6 +51,15 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             return;
         
         _conveyors[^1].SetActiveInputsOutputs(false);
+
+        if (_buildPanel.SelectedButton == UIButtonType.Close)
+        {
+            foreach (var conveyor in _conveyors)
+                FactorySystem.Instance.Release(conveyor);
+        }
+        
+        _conveyors.Clear();
+        
         await _buildPanel.Close(true, cancellationToken);
     }
     
@@ -92,7 +101,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
-            
+            ExitBaseRun = true;
         }
         
         return UniTask.CompletedTask;
@@ -112,14 +121,6 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         _conveyors[^1].SetActiveInputsOutputs(false);
         FactorySystem.Instance.Release(_conveyors[^1]);
         _conveyors.RemoveAt(_conveyors.Count - 1);
-    }
-    
-    [ContextMenu("Remove All Conveyors")]
-    private void RemoveAllConveyors()
-    {
-        while (_conveyors.Count > 1)
-            RemoveLastConveyor();
-        ActivateAllowedOutputs(_conveyors[^1]);
     }
     
     private void ProcessNextBuildStep()

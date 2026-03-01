@@ -15,7 +15,6 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     
     protected TFactoryEntity _entity;
     protected UIBuildPanel _buildPanel;
-    protected bool _confirmEntityPlacement;
     
     private void Start()
     {
@@ -78,7 +77,6 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
             if (_entity.IsCorrectlyPlaced)
             {
                 ExitBaseRun = true;
-                _confirmEntityPlacement = true;
             }
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
@@ -88,7 +86,6 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
             ExitBaseRun = true;
-            _confirmEntityPlacement = false;
         }
         
         return UniTask.CompletedTask;
