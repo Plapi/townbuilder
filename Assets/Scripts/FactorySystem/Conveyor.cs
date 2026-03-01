@@ -34,6 +34,7 @@ public abstract class Conveyor : FactoryEntity
 
     public override void OnRelease()
     {
+        base.OnRelease();
         _prevConveyor = null;
         _nextConveyor = null;
     }

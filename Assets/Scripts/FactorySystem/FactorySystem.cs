@@ -19,6 +19,17 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
     {
         return _entities.ContainsKey(gridPos);
     }
+    
+    public bool TryGetEntity<T>(Vector2Int gridPos, out T entity) where T : Entity
+    {
+        if (_entities.TryGetValue(gridPos, out var baseEntity) && baseEntity is T typedEntity)
+        {
+            entity = typedEntity;
+            return true;
+        }
+        entity = null;
+        return false;
+    }
 
     public T InstantiateEntity<T>(string id) where T : Entity
     {
@@ -34,11 +45,8 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
     
     public void Place(Entity entity, Vector2Int gridPos)
     {
-        var prevGridPos = entity.GridPos;
         entity.SnapToGrid(gridPos);
-        
-        if (prevGridPos != entity.GridPos)
-            SetEntities(entity);
+        SetEntities(entity);
     }
     
     public void Rotate(Entity entity)
@@ -106,7 +114,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
                 if (_entities.ContainsKey(gridPos) == false)
                 {
                     entity.GridPositions.Add(gridPos);
-                    _entities.Add(gridPos, entity);    
+                    _entities.Add(gridPos, entity);
                 }
             }
         }
@@ -124,10 +132,5 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         _debugCells.UpdateDebugCells(_entities);
         
         ObjectPoolingSystem.Instance.ReleaseObject(entity);
-    }
-    
-    public void ConfirmPlacement(FactoryEntity entity)
-    {
-        
     }
 }

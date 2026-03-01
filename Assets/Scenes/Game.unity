@@ -3178,6 +3178,8 @@ MonoBehaviour:
   _debugCellInput: {fileID: 1027319092}
   _debugCellOutput: {fileID: 581186756}
   _showDebugCells: 1
+  _showDebugCellsInputs: 0
+  _showDebugCellsOutputs: 0
 --- !u!4 &1290306710
 Transform:
   m_ObjectHideFlags: 0
@@ -3378,6 +3380,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameStateBuildConveyor
   _camera: {fileID: 379399442}
   _mobileTouchCamera: {fileID: 379399440}
+  _conveyors: []
 --- !u!1 &1591373190
 GameObject:
   m_ObjectHideFlags: 0
