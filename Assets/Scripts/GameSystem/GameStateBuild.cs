@@ -68,7 +68,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         await UniTask.WaitUntil(() => _buildPanel.SelectedButton != null, cancellationToken: cancellationToken);
     }
     
-    protected UniTask ProcessSelectedButton(CancellationToken cancellationToken)
+    protected virtual UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.SetEnabled(false);
         

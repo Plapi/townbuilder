@@ -45,7 +45,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         {
             { WaitingForDragStart, ProcessDragging },
             { WaitForCameraMovement, ProcessCameraMovement },
-            { WaitForSelectedButton, ProcessSelectedButtonPreview }
+            { WaitForSelectedButton, ProcessSelectedButton }
         }, cancellationToken);
         
         if (cancellationToken.IsCancellationRequested)
@@ -66,13 +66,10 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     
     private async UniTask WaitingForDragStart(CancellationToken cancellationToken)
     {
-        while (cancellationToken.IsCancellationRequested == false)
-        {
-            await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0), cancellationToken: cancellationToken);
-            await UniTask.WaitForEndOfFrame(cancellationToken: cancellationToken);
-            if (Utils.MouseIsOverUI() == false && UpdateNextBuildingStep(true))
-                return;
-        }
+        await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && 
+                                      Utils.MouseIsOverUI() == false && 
+                                      UpdateNextBuildingStep(true), 
+            cancellationToken: cancellationToken);
     }
     
     private async UniTask ProcessDragging(CancellationToken cancellationToken)
@@ -93,15 +90,11 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         }
     }
     
-    private UniTask ProcessSelectedButtonPreview(CancellationToken cancellationToken)
+    protected override UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         if (_buildPanel.SelectedButton == UIButtonType.Confirm)
         {
             ExitBaseRun = true;
-        }
-        else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
-        {
-            
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
