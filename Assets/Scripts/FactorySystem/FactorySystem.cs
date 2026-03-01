@@ -87,6 +87,26 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         
         from.Connect(to);
     }
+
+    public bool TryFindPath(Conveyor conveyor, Vector2Int gridPos, out List<Vector2Int> path)
+    {
+        path = new List<Vector2Int>();
+        
+        var fPath = GridPathfinder.FindPath(conveyor.GridPos, gridPos, _entities);
+        if (fPath == null || fPath.Count == 0)
+            return false;
+        
+        fPath.RemoveAt(0);
+        
+        foreach (var pos in fPath)
+        {
+            if (_entities.ContainsKey(pos))
+                break;
+            path.Add(pos);
+        }
+        
+        return true;
+    }
     
     private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
     {

@@ -32,6 +32,11 @@ public abstract class Conveyor : FactoryEntity
         next._prevConveyor = null;
     }
 
+    public void SetPillarActive(bool active)
+    {
+        _pillar.SetActive(active);
+    }
+    
     public override void OnRelease()
     {
         base.OnRelease();

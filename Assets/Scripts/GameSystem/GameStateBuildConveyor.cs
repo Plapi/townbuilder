@@ -16,6 +16,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (TryPlaceEntity() == false)
             return;
         _entity.SetActiveInputsOutputs(false);
+        _entity.SetPillarActive(true);
         
         await _buildPanel.Show(cancellationToken);
         
@@ -65,10 +66,13 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     
     private async UniTask WaitingForDragStart(CancellationToken cancellationToken)
     {
-        await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && 
-                                      Utils.MouseIsOverUI() == false && 
-                                      UpdateNextBuildingStep(), 
-            cancellationToken: cancellationToken);
+        while (cancellationToken.IsCancellationRequested == false)
+        {
+            await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0), cancellationToken: cancellationToken);
+            await UniTask.WaitForEndOfFrame(cancellationToken: cancellationToken);
+            if (Utils.MouseIsOverUI() == false && UpdateNextBuildingStep(true))
+                return;
+        }
     }
     
     private async UniTask ProcessDragging(CancellationToken cancellationToken)
@@ -85,7 +89,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             if (Input.GetMouseButton(0) == false)
                 return;
             
-            UpdateNextBuildingStep();
+            UpdateNextBuildingStep(false);
         }
     }
     
@@ -107,28 +111,17 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         return UniTask.CompletedTask;
     }
     
-    private void RemoveLastConveyor()
-    {
-        if (_conveyors.Count > 1)
-            _conveyors[^2].Disconnect(_conveyors[^1]);
-        
-        if (_conveyors.Count == 0)
-        {
-            Debug.LogError("Remove Failed");
-            return;
-        }
-        
-        _conveyors[^1].SetActiveInputsOutputs(false);
-        FactorySystem.Instance.Release(_conveyors[^1]);
-        _conveyors.RemoveAt(_conveyors.Count - 1);
-    }
-    
     private void ProcessNextBuildStep()
     {
         if (_nextBuildStep.build)
         {
+            if (FactorySystem.Instance.TryFindPath(_conveyors[^1], _nextBuildStep.gridPos, out var path) == false)
+                return;
+            
             _conveyors[^1].SetActiveInputsOutputs(false);
-            _conveyors.Add(CreateNewConveyor(_conveyors[^1], _nextBuildStep.gridPos));
+            
+            foreach (var gridPos in path)
+                _conveyors.Add(CreateNewConveyor(_conveyors[^1], gridPos));    
         }
         else
         {
@@ -146,12 +139,12 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
                 if (_conveyors.Count > 0)
                     _conveyors.Add(CreateNewConveyor(_conveyors[^1], lastConveyorGridPos));
             }
-            
-            ActivateAllowedOutputs(_conveyors[^1]);
         }
+        
+        ActivateAllowedOutputs(_conveyors[^1]);
     }
     
-    private bool UpdateNextBuildingStep()
+    private bool UpdateNextBuildingStep(bool onlyAdjacent)
     {
         _nextBuildStep = null;
         
@@ -179,18 +172,33 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (lastConveyor == null)
             return false;
         
-        if (FactoryUtils.AreAdjacent(lastConveyor.GridPos, gridPos))
+        if (onlyAdjacent && FactoryUtils.AreNeighbour(lastConveyor.GridPos, gridPos) == false)
+            return false;
+        
+        _nextBuildStep = new BuildStep
         {
-            _nextBuildStep = new BuildStep
-            {
-                build = true,
-                gridPos = gridPos,
-                removeConveyor = null
-            };
-            return true;
+            build = true,
+            gridPos = gridPos,
+            removeConveyor = null
+        };
+        
+        return true;
+    }
+    
+    private void RemoveLastConveyor()
+    {
+        if (_conveyors.Count > 1)
+            _conveyors[^2].Disconnect(_conveyors[^1]);
+        
+        if (_conveyors.Count == 0)
+        {
+            Debug.LogError("Remove Failed");
+            return;
         }
         
-        return false;
+        _conveyors[^1].SetActiveInputsOutputs(false);
+        FactorySystem.Instance.Release(_conveyors[^1]);
+        _conveyors.RemoveAt(_conveyors.Count - 1);
     }
     
     private static void ActivateAllowedOutputs(Conveyor conveyor)
@@ -207,7 +215,6 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         var newConveyor = InstantiateEntity();
         FactorySystem.Instance.Place(newConveyor, gridPos);
         FactorySystem.Instance.MakeConveyorsConnexions(from, newConveyor, OnConveyorReplaced);
-        ActivateAllowedOutputs(newConveyor);
         return newConveyor;
     }
     

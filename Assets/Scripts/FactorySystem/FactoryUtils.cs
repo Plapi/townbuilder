@@ -46,6 +46,11 @@ public static class FactoryUtils
         }
         return false;
     }
+
+    public static bool AreNeighbour(Vector2Int a, Vector2Int b)
+    {
+        return AreAdjacent(a, b) || AreDiagonals(a, b);
+    }
     
     public static bool AreAdjacent(Vector2Int a, Vector2Int b)
     {
