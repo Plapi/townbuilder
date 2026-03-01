@@ -49,14 +49,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ConveyorStraight
   _id: ConveyorStraight
   _size: {x: 1, y: 1}
-  _gridPos: {x: 0, y: 0}
   _inputs: []
-  _outputs:
-  - {fileID: 4874725309714394567}
-  - {fileID: 806849931918510792}
-  - {fileID: 1514510145626611158}
-  - {fileID: 6508822614311694111}
+  _outputs: []
+  _gridPos: {x: 0, y: 0}
   _graphic: {fileID: 4458885312854341160}
+  _entityHighlightObject: {fileID: 0}
   _pillar: {fileID: 4400281505660226804}
   _prevConveyor: {fileID: 0}
   _nextConveyor: {fileID: 0}

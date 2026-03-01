@@ -21,6 +21,7 @@ public class MeshCreator : MonoBehaviour
     [SerializeField] private Material _material;
     [SerializeField] private List<Vector3> _vertices;
     [SerializeField] private List<Vector3> _triangles;
+    [SerializeField] private List<Color> _colors;
     
     [Header("Source")]
     [SerializeField] private MeshFilter _sourceMeshFilter;
@@ -64,6 +65,9 @@ public class MeshCreator : MonoBehaviour
         }
         
         _mesh.SetTriangles(_trianglesInt, 0);
+        
+        if (_colors != null && _colors.Count > 0)
+            _mesh.SetColors(_colors);
         
         _mesh.RecalculateNormals();
         _mesh.RecalculateBounds();

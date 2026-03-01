@@ -22,10 +22,9 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
         if (cancellationToken.IsCancellationRequested)
             return;
         
-        _entity.gameObject.SetLayerRecursively(0);
-        _entity.SetActiveInputsOutputs(false);
-        
-        if (_buildPanel.SelectedButton == UIButtonType.Close)
+        if (_buildPanel.SelectedButton == UIButtonType.Confirm)
+            _entity.OnConfirmPlacement();
+        else 
             FactorySystem.Instance.Release(_entity);
         
         await _buildPanel.Close(true, cancellationToken);

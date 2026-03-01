@@ -65,6 +65,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
             
             var newFromConveyor = InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
             Replace(from, newFromConveyor);
+            newFromConveyor.ReleaseHighlightObject();
             fromPrev.Connect(newFromConveyor);
             
             newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
@@ -108,14 +109,6 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         return true;
     }
     
-    private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
-    {
-        Release(replacedConveyor);
-        replacementConveyor.gameObject.SetLayerRecursively(Layers.InteractableLayer);
-        replacementConveyor.SnapToGrid(replacedConveyor.GridPos);
-        SetEntities(replacementConveyor);
-    }
-    
     private void SetEntities(Entity entity)
     {
         foreach (var gridPos in entity.GridPositions)
@@ -142,6 +135,14 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         entity.ApplyCorrectPlacement(entity.HasCorrectPlacement(_entities));
         
         _debugCells.UpdateDebugCells(_entities);
+    }
+    
+    private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
+    {
+        Release(replacedConveyor);
+        replacementConveyor.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+        replacementConveyor.SnapToGrid(replacedConveyor.GridPos);
+        SetEntities(replacementConveyor);
     }
     
     public void Release(FactoryEntity entity)

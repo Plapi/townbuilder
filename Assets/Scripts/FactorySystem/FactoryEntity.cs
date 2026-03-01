@@ -4,6 +4,9 @@ public abstract class FactoryEntity : Entity
 {
     [SerializeField] protected GameObject _graphic;
     
+    [Header("Runtime Properties")]
+    [SerializeField] private EntityHighlightObject _entityHighlightObject;
+    
     public bool IsCorrectlyPlaced { get; private set; }
     
     protected override void Awake()
@@ -15,6 +18,11 @@ public abstract class FactoryEntity : Entity
     public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
     {
         IsCorrectlyPlaced = hasCorrectPlacement;
+        
+        if (_entityHighlightObject == null)
+            _entityHighlightObject = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME, transform.parent);
+        
+        _entityHighlightObject.Place(this, hasCorrectPlacement ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor);
     }
     
     public void SetActiveInputsOutputs(bool active)
@@ -23,5 +31,30 @@ public abstract class FactoryEntity : Entity
             input.gameObject.SetActive(active);
         foreach (var output in _outputs)
             output.gameObject.SetActive(active);
+    }
+
+    public override void OnConfirmPlacement()
+    {
+        base.OnConfirmPlacement();
+        SetActiveInputsOutputs(false);
+        ReleaseHighlightObject();
+        gameObject.SetLayerRecursively(0);
+    }
+    
+    public override void OnRelease()
+    {
+        base.OnRelease();
+        SetActiveInputsOutputs(false);
+        ReleaseHighlightObject();
+        gameObject.SetLayerRecursively(0);
+    }
+    
+    public void ReleaseHighlightObject()
+    {
+        if (_entityHighlightObject != null)
+        {
+            ObjectPoolingSystem.Instance.ReleaseObject(_entityHighlightObject);
+            _entityHighlightObject = null;
+        }
     }
 }

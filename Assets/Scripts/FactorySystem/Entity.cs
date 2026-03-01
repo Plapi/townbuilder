@@ -101,11 +101,39 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
             colliders[i].AddComponent<EntityCollider>().SetEntity(this);
     }
     
+    protected List<Vector2Int> GetAdjacentGridPositions()
+    {
+        HashSet<Vector2Int> result = new HashSet<Vector2Int>();
+        Vector2Int[] directions =
+        {
+            Vector2Int.up,
+            Vector2Int.down,
+            Vector2Int.left,
+            Vector2Int.right
+        };
+        foreach (var pos in GridPositions)
+        {
+            foreach (var dir in directions)
+            {
+                Vector2Int adjacent = pos + dir;
+                if (!GridPositions.Contains(adjacent))
+                    result.Add(adjacent);
+            }
+        }
+        
+        return new List<Vector2Int>(result);
+    }
+    
     public abstract void ApplyCorrectPlacement(bool hasCorrectPlacement);
     
     public virtual bool HasCorrectPlacement(Dictionary<Vector2Int, Entity> map)
     {
         return Size.x * Size.y == GridPositions.Count;
+    }
+
+    public virtual void OnConfirmPlacement()
+    {
+        
     }
     
     public virtual void OnRelease()

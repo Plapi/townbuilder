@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Conveyor : FactoryEntity
@@ -9,6 +9,7 @@ public abstract class Conveyor : FactoryEntity
     [Header("Runtime Properties")]
     [SerializeField] private Conveyor _prevConveyor;
     [SerializeField] private Conveyor _nextConveyor;
+    [SerializeField] private List<EntityHighlightObject> _allowedHighlightObjects;
     
     public Conveyor PrevConveyor => _prevConveyor;
     public Conveyor NextConveyor => _nextConveyor;
@@ -36,12 +37,39 @@ public abstract class Conveyor : FactoryEntity
     {
         _pillar.SetActive(active);
     }
+
+    public void ShowAllowedHighlights()
+    {
+        var adjacentPositions = GetAdjacentGridPositions();
+        foreach (var gridPos in adjacentPositions)
+        {
+            if (FactorySystem.Instance.HasEntity(gridPos))
+                continue;
+            var allowedHighlight = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME);
+            allowedHighlight.Place(gridPos, FactoryConfig.Instance.previewColor);
+            _allowedHighlightObjects.Add(allowedHighlight);
+        }
+    }
+    
+    public void ReleaseAllowedHighlights()
+    {
+        foreach (var allowedHighlight in _allowedHighlightObjects)
+            ObjectPoolingSystem.Instance.ReleaseObject(allowedHighlight);
+        _allowedHighlightObjects.Clear();
+    }
+
+    public override void OnConfirmPlacement()
+    {
+        base.OnConfirmPlacement();
+        ReleaseAllowedHighlights();
+    }
     
     public override void OnRelease()
     {
         base.OnRelease();
         _prevConveyor = null;
         _nextConveyor = null;
+        ReleaseAllowedHighlights();
     }
     
     private void OnDrawGizmos()
