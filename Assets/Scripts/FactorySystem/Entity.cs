@@ -4,11 +4,14 @@ using UnityEngine;
 
 public abstract class Entity : MonoBehaviour, IPoolableObject
 {
+    [Space]
     [SerializeField] private string _id;
     [SerializeField] private Vector2Int _size = Vector2Int.one;
-    [SerializeField] private Vector2Int _gridPos;
     [SerializeField] protected Transform[] _inputs;
     [SerializeField] protected Transform[] _outputs;
+    
+    [Header("Runtime Properties")]
+    [SerializeField] private Vector2Int _gridPos;
     
     public Transform[] Inputs => _inputs;
     public Transform[] Outputs => _outputs;
@@ -103,6 +106,11 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
     public virtual bool HasCorrectPlacement(Dictionary<Vector2Int, Entity> map)
     {
         return Size.x * Size.y == GridPositions.Count;
+    }
+    
+    public virtual void OnRelease()
+    {
+        GridPositions.Clear();
     }
     
     private void OnDrawGizmos()

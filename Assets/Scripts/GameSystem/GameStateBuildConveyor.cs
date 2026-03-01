@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Context, Conveyor>
 {
-    private Vector2Int _adjacentGridPos;
-    private List<Conveyor> _conveyors;
+    [Header("Runtime Properties")]
+    [SerializeField] private List<Conveyor> _conveyors;
     
     public override async UniTask Run(CancellationToken cancellationToken)
     {
@@ -31,7 +30,6 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (_confirmEntityPlacement == false)
         {
             FactorySystem.Instance.Release(_entity);
-            ObjectPoolingSystem.Instance.ReleaseObject(_entity);
             await _buildPanel.Close(true, cancellationToken);
             return;
         }
@@ -42,7 +40,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
-            { WaitingForDragStartFromAdjacentGridPos, ProcessDraggingFromAdjacentGridPos },
+            { WaitingForDragStart, ProcessDragging },
             { WaitForCameraMovement, ProcessCameraMovement },
             { WaitForSelectedButton, ProcessSelectedButtonPreview }
         }, cancellationToken);
@@ -54,28 +52,28 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         await _buildPanel.Close(true, cancellationToken);
     }
     
-    private async UniTask WaitingForDragStartFromAdjacentGridPos(CancellationToken cancellationToken)
+    private async UniTask WaitingForDragStart(CancellationToken cancellationToken)
     {
         await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && Utils.MouseIsOverUI() == false && 
-                                      TryGetAdjacentGridPos(_conveyors[^1], out _adjacentGridPos), cancellationToken: cancellationToken);
+                                      (TryGetAdjacentGridPos(_conveyors[^1], out _) || 
+                                       _conveyors.Count > 1 && Layers.Raycast(_camera, Layers.InteractableLayer, out _)), 
+            cancellationToken: cancellationToken);
     }
     
-    private async UniTask ProcessDraggingFromAdjacentGridPos(CancellationToken cancellationToken)
+    private async UniTask ProcessDragging(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.SetEnabled(false);
-        
-        _conveyors[^1].SetActiveInputsOutputs(false);
-        _conveyors.Add(CreateNewConveyor(_conveyors[^1], _adjacentGridPos));
+        var adjacentGridPos = (Vector2Int?)null;
         
         while (cancellationToken.IsCancellationRequested == false && Input.GetMouseButton(0))
         {
             await UniTask.NextFrame(cancellationToken: cancellationToken);
             
-            if (TryGetAdjacentGridPos(_conveyors[^1], out var gridPos) && _adjacentGridPos != gridPos)
+            if (TryGetAdjacentGridPos(_conveyors[^1], out var gridPos) && adjacentGridPos != gridPos)
             {
                 _conveyors[^1].SetActiveInputsOutputs(false);
                 _conveyors.Add(CreateNewConveyor(_conveyors[^1], gridPos));
-                _adjacentGridPos = gridPos;    
+                adjacentGridPos = gridPos;  
             }
             else
             if (_conveyors.Count > 1 && Layers.Raycast(_camera, Layers.InteractableLayer, out var hit))
@@ -90,23 +88,46 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
                         continue;
                     
                     while (_conveyors.Count > 1 && _conveyors.Count > i + 1)
+                        RemoveLastConveyor();
+                    
+                    if (_conveyors[^1] is ConveyorCorner)
                     {
-                        _conveyors[^2].Disconnect(_conveyors[^1]);
-                        _conveyors[^1].SetActiveInputsOutputs(false);
-                        FactorySystem.Instance.Release(_conveyors[^1]);
-                        ObjectPoolingSystem.Instance.ReleaseObject(_conveyors[^1]);
-                        _conveyors.RemoveAt(_conveyors.Count - 1);
-                        
-                        if (_conveyors[^1] is ConveyorCorner conveyorCorner)
-                        {
-                            Debug.LogError("ConveyorCorner");
-                        }
+                        var lastConveyorGridPos = _conveyors[^1].GridPos;
+                        RemoveLastConveyor();
+                        if (_conveyors.Count > 0)
+                            _conveyors.Add(CreateNewConveyor(_conveyors[^1], lastConveyorGridPos));
                     }
+                    
                     ActivateAllowedOutputs(_conveyors[^1]);
+                    adjacentGridPos = null;
                     break;
                 }
             }
         }
+    }
+    
+    private void RemoveLastConveyor()
+    {
+        if (_conveyors.Count > 1)
+            _conveyors[^2].Disconnect(_conveyors[^1]);
+
+        if (_conveyors.Count == 0)
+        {
+            Debug.LogError("Remove Failed");
+            return;
+        }
+        
+        _conveyors[^1].SetActiveInputsOutputs(false);
+        FactorySystem.Instance.Release(_conveyors[^1]);
+        _conveyors.RemoveAt(_conveyors.Count - 1);
+    }
+    
+    [ContextMenu("Test")]
+    private void Test()
+    {
+        while (_conveyors.Count > 1)
+            RemoveLastConveyor();
+        ActivateAllowedOutputs(_conveyors[^1]);
     }
     
     private UniTask ProcessSelectedButtonPreview(CancellationToken cancellationToken)
@@ -140,11 +161,18 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     {
         var newConveyor = InstantiateEntity();
         FactorySystem.Instance.Place(newConveyor, gridPos);
-        FactorySystem.Instance.MakeConveyorsConnexions(from, newConveyor);
+        FactorySystem.Instance.MakeConveyorsConnexions(from, newConveyor, OnConveyorReplaced);
         ActivateAllowedOutputs(newConveyor);
         return newConveyor;
     }
-
+    
+    private void OnConveyorReplaced(Conveyor replacedConveyor, Conveyor replacementConveyor)
+    {
+        for (int i = 0; i < _conveyors.Count; i++)
+            if (_conveyors[i] == replacedConveyor)
+                _conveyors[i] = replacementConveyor;
+    }
+    
     private bool TryGetAdjacentGridPos(Conveyor conveyor, out Vector2Int gridPos)
     {
         if (Layers.Raycast(_camera, Layers.GroundLayer, out var hit))

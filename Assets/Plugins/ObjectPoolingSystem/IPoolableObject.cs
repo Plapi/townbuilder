@@ -7,4 +7,5 @@ public interface IPoolableObject
     string Id { get; }
     MonoBehaviour Behaviour { get; }
     int CacheCount => DEFAULT_POOL_SIZE;
+    void OnRelease();
 }

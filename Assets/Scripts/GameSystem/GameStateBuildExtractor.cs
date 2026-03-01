@@ -32,7 +32,6 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
         else
         {
             FactorySystem.Instance.Release(_entity);
-            ObjectPoolingSystem.Instance.ReleaseObject(_entity);
         }
         
         await _buildPanel.Close(true, cancellationToken);

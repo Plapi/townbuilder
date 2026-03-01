@@ -3,7 +3,10 @@ using UnityEngine;
 
 public abstract class Conveyor : FactoryEntity
 {
+    [Space]
     [SerializeField] private GameObject _pillar;
+    
+    [Header("Runtime Properties")]
     [SerializeField] private Conveyor _prevConveyor;
     [SerializeField] private Conveyor _nextConveyor;
     
@@ -27,6 +30,12 @@ public abstract class Conveyor : FactoryEntity
         
         _nextConveyor = null;
         next._prevConveyor = null;
+    }
+
+    public override void OnRelease()
+    {
+        _prevConveyor = null;
+        _nextConveyor = null;
     }
     
     private void OnDrawGizmos()

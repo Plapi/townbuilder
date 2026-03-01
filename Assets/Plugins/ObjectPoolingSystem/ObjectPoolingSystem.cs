@@ -71,6 +71,8 @@ public class ObjectPoolingSystem : MonoBehaviourSingleton<ObjectPoolingSystem>
         obj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         obj.gameObject.SetActive(false);
         queue.Enqueue(poolableObject);
+        
+        poolableObject.OnRelease();
     }
     
     private bool TryGetItem(string id, out MonoBehaviour obj)
