@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,7 +58,7 @@ public abstract class Conveyor : FactoryEntity
             ObjectPoolingSystem.Instance.ReleaseObject(allowedHighlight);
         _allowedHighlightObjects.Clear();
     }
-
+    
     public override void OnConfirmPlacement()
     {
         base.OnConfirmPlacement();
@@ -70,6 +71,16 @@ public abstract class Conveyor : FactoryEntity
         _prevConveyor = null;
         _nextConveyor = null;
         ReleaseAllowedHighlights();
+    }
+
+    public bool TryGetAjdConveyor(Func<Conveyor, bool> func, out Conveyor conveyor)
+    {
+        conveyor = null;
+        var adjacentPositions = GetAdjacentGridPositions();
+        foreach (var gridPos in adjacentPositions)
+            if (FactorySystem.Instance.TryGetEntity(gridPos, out conveyor) && func(conveyor))
+                return true;
+        return false;
     }
     
     private void OnDrawGizmos()

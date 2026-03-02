@@ -41,6 +41,12 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         _entity.ShowAllowedHighlights();
         
         _conveyors.Add(_entity);
+        if (_entity.TryGetAjdConveyor(c => c.NextConveyor == null, out Conveyor firstConveyor))
+        {
+            _conveyors.Insert(0, firstConveyor);
+            FactorySystem.Instance.MakeConveyorsConnexions(firstConveyor, _entity, OnConveyorReplaced);
+            _entity = firstConveyor;
+        }
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
@@ -60,6 +66,9 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             foreach (var conveyor in _conveyors)
                 FactorySystem.Instance.Release(conveyor);
         }
+
+        if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor))
+            FactorySystem.Instance.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
         
         _conveyors.Clear();
         
@@ -127,12 +136,11 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             while (_conveyors.Count > 1 && _conveyors.Count > index + 1)
                 RemoveLastConveyor();
             
-            if (_conveyors[^1] is ConveyorCorner)
+            if (_conveyors[^1] is ConveyorCorner && _conveyors.Count > 1)
             {
                 var lastConveyorGridPos = _conveyors[^1].GridPos;
                 RemoveLastConveyor();
-                if (_conveyors.Count > 0)
-                    _conveyors.Add(CreateNewConveyor(_conveyors[^1], lastConveyorGridPos));
+                _conveyors.Add(CreateNewConveyor(_conveyors[^1], lastConveyorGridPos));
             }
         }
         
@@ -152,6 +160,9 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             if (FactorySystem.Instance.TryGetEntity(gridPos, out Conveyor removeConveyor) && 
                 _conveyors[^1] != removeConveyor && _conveyors.Contains(removeConveyor))
             {
+                if (removeConveyor is ConveyorCorner && _conveyors.IndexOf(removeConveyor) == 0)
+                    return false;
+                
                 _nextBuildStep = new BuildStep
                 {
                     build = false,
