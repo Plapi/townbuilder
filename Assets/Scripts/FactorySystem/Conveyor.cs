@@ -34,6 +34,27 @@ public abstract class Conveyor : FactoryEntity
         next._prevConveyor = null;
     }
 
+    public void Disconnect()
+    {
+        if (_prevConveyor != null)
+        {
+            if (_prevConveyor._nextConveyor == this)
+                _prevConveyor._nextConveyor = null;
+            else
+                Debug.LogError("Error on release");
+        }
+        _prevConveyor = null;
+        
+        if (_nextConveyor != null)
+        {
+            if (_nextConveyor._prevConveyor == this)
+                _nextConveyor._prevConveyor = null;
+            else
+                Debug.LogError("Error on release");
+        }
+        _nextConveyor = null;
+    }
+
     public void SetPillarActive(bool active)
     {
         _pillar.SetActive(active);
@@ -68,8 +89,7 @@ public abstract class Conveyor : FactoryEntity
     public override void OnRelease()
     {
         base.OnRelease();
-        _prevConveyor = null;
-        _nextConveyor = null;
+        Disconnect();
         ReleaseAllowedHighlights();
     }
 

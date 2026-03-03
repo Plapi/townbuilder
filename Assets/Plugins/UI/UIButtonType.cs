@@ -5,5 +5,6 @@ public enum UIButtonType
     Extractor,
     Conveyor,
     Crafting,
-    Rotate,
+    RotateLeft,
+    RotateRight
 }

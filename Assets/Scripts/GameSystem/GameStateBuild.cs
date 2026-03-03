@@ -7,9 +7,6 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     where TContext : GameStateBuild<TContext, TFactoryEntity>.Context
     where TFactoryEntity : FactoryEntity
 {
-
-    private const float TAP_MAX_TIME = 0.2f;
-    
     [SerializeField] protected Camera _camera;
     [SerializeField] protected MobileTouchCamera _mobileTouchCamera;
     
@@ -19,6 +16,13 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     private void Start()
     {
         _buildPanel = UISystem.Instance.GetPanel<UIBuildPanel>();
+    }
+    
+    protected UniTask ProcessTap(CancellationToken cancellationToken)
+    {
+        if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
+            FactorySystem.Instance.PlaceOnCenter(_entity, gridPos);
+        return UniTask.CompletedTask;
     }
     
     protected async UniTask WaitForTouchOnEntity(CancellationToken cancellationToken)
@@ -68,7 +72,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         await UniTask.WaitUntil(() => _buildPanel.SelectedButton != null, cancellationToken: cancellationToken);
     }
     
-    protected virtual UniTask ProcessSelectedButton(CancellationToken cancellationToken)
+    protected UniTask ProcessSelectedButton(CancellationToken cancellationToken)
     {
         _mobileTouchCamera.SetEnabled(false);
         
@@ -79,9 +83,13 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
                 ExitBaseRun = true;
             }
         }
-        else if (_buildPanel.SelectedButton == UIButtonType.Rotate)
+        else if (_buildPanel.SelectedButton == UIButtonType.RotateLeft)
         {
-            FactorySystem.Instance.Rotate(_entity);
+            FactorySystem.Instance.Rotate(_entity, -90);
+        }
+        else if (_buildPanel.SelectedButton == UIButtonType.RotateRight)
+        {
+            FactorySystem.Instance.Rotate(_entity, 90);
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
@@ -89,19 +97,6 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         }
         
         return UniTask.CompletedTask;
-    }
-
-    protected async UniTask WaitingForTap(CancellationToken cancellationToken)
-    {
-        while (cancellationToken.IsCancellationRequested == false)
-        {
-            await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && Utils.MouseIsOverUI() == false, cancellationToken: cancellationToken);
-            float time = Time.time;
-            await UniTask.WaitUntil(() => Time.time > time + TAP_MAX_TIME || Input.GetMouseButtonUp(0) || _mobileTouchCamera.HasInteraction, 
-                cancellationToken: cancellationToken);
-            if (_mobileTouchCamera.HasInteraction == false && Time.time <= time + TAP_MAX_TIME)
-                return;
-        }
     }
 
     protected bool TryPlaceEntity()

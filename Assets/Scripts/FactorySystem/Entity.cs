@@ -72,9 +72,9 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
         FactoryUtils.PlaceToGrid(this);
     }
     
-    public void Rotate()
+    public void Rotate(int rotAngleY)
     {
-        transform.Rotate(0f, 90f, 0f);
+        transform.Rotate(0f, rotAngleY, 0f);
         
         Vector2Int offset = Vector2Int.zero;
         var angleY = AngleY;

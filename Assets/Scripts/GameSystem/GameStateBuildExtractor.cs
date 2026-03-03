@@ -7,13 +7,24 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
 {
     public override async UniTask Run(CancellationToken cancellationToken)
     {
-        if (TryPlaceEntity() == false)
-            return;
+        if (context.extractor == null)
+        {
+            if (TryPlaceEntity() == false)
+                return;    
+        }
+        else
+        {
+            _entity = context.extractor;
+            _entity.SetActiveInputsOutputs(true);
+            _entity.ApplyCorrectPlacement(_entity.IsCorrectlyPlaced);
+            _entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+        }
         
         await _buildPanel.Show(cancellationToken);
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
+            { ct => GameStateUtils.WaitingForTap(_mobileTouchCamera, ct), ProcessTap },
             { WaitForTouchOnEntity, ProcessEntityPlacement },
             { WaitForCameraMovement, ProcessCameraMovement },
             { WaitForSelectedButton, ProcessSelectedButton }
@@ -32,6 +43,6 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
     
     public new class Context : GameStateBuild<Context, Extractor>.Context
     {
-        
+        public Extractor extractor;
     }
 }

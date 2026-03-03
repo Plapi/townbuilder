@@ -43,15 +43,24 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
         SetEntities(entity);
     }
     
+    public void PlaceOnCenter(Entity entity, Vector2Int gridPos)
+    {
+        Vector2Int right = entity.Right;
+        Vector2Int forward = entity.Forward;
+        Vector2Int halfSize = new Vector2Int((entity.Size.x - 1) / 2, (entity.Size.y - 1) / 2);
+        Vector2Int origin = gridPos - right * halfSize.x - forward * halfSize.y;
+        Place(entity, origin);
+    }
+    
     public void Place(Entity entity, Vector2Int gridPos)
     {
         entity.SnapToGrid(gridPos);
         SetEntities(entity);
     }
     
-    public void Rotate(Entity entity)
+    public void Rotate(Entity entity, int rotAngleY)
     {
-        entity.Rotate();
+        entity.Rotate(rotAngleY);
         SetEntities(entity);
     }
     

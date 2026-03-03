@@ -7,8 +7,9 @@ using UnityEngine;
 
 public class GameStateMain : GameState<GameStateMain.Context>
 {
+    [SerializeField] private Camera _camera;
     [SerializeField] private MobileTouchCamera _mobileTouchCamera;
-
+    
     private UIMainPanel _mainPanel;
     
     public new class Context : GameStateBase.Context
@@ -35,9 +36,27 @@ public class GameStateMain : GameState<GameStateMain.Context>
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>
         {
+            { ct => GameStateUtils.WaitingForTap(_mobileTouchCamera, ct), ProcessTap },
             { WaitForSelectedButton, ProcessSelectedButton },
             { WaitForCameraMovement, ProcessCameraMovement }
         }, cancellationToken);
+    }
+    
+    private async UniTask ProcessTap(CancellationToken cancellationToken)
+    {
+        if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && FactorySystem.Instance.TryGetEntity(gridPos, out FactoryEntity entity))
+        {
+            if (entity is Extractor extractor)
+            {
+                await _mainPanel.Close(true, cancellationToken: cancellationToken);
+                EnqueueGameStateBuildExtractor(extractor);
+            }
+            else if (entity is Conveyor conveyor)
+            {
+                await _mainPanel.Close(true, cancellationToken: cancellationToken);
+                EnqueueGameStateBuildConveyor(conveyor);
+            }
+        }
     }
     
     private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
@@ -64,22 +83,36 @@ public class GameStateMain : GameState<GameStateMain.Context>
         if (_mainPanel.SelectedButton == UIButtonType.Extractor)
         {
             await _mainPanel.Close(true, cancellationToken: cancellationToken);
-            GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(new GameStateBuildExtractor.Context()
-            {
-                id = FactoryConstants.EXTRACTOR_NAME
-            }, false);
+            EnqueueGameStateBuildExtractor(null);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Conveyor)
         {
             await _mainPanel.Close(true, cancellationToken: cancellationToken);
-            GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(new GameStateBuildConveyor.Context()
-            {
-                id = FactoryConstants.CONVEYOR_STRAIGHT_NAME
-            }, false);
+            EnqueueGameStateBuildConveyor(null);
         }
         else if (_mainPanel.SelectedButton == UIButtonType.Crafting)
         {
             
         }
+    }
+
+    private static void EnqueueGameStateBuildExtractor(Extractor extractor)
+    {
+        var context = new GameStateBuildExtractor.Context()
+        {
+            id = FactoryConstants.EXTRACTOR_NAME,
+            extractor = extractor
+        };
+        GameSystem.Instance.EnqueueState<GameStateBuildExtractor, GameStateBuildExtractor.Context>(context, false);
+    }
+
+    private static void EnqueueGameStateBuildConveyor(Conveyor conveyor)
+    {
+        var context = new GameStateBuildConveyor.Context()
+        {
+            id = FactoryConstants.CONVEYOR_STRAIGHT_NAME,
+            conveyor = conveyor
+        };
+        GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(context, false);
     }
 }

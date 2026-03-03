@@ -13,15 +13,28 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     
     public override async UniTask Run(CancellationToken cancellationToken)
     {
-        if (TryPlaceEntity() == false)
-            return;
+        if (context.conveyor == null)
+        {
+            if (TryPlaceEntity() == false)
+                return;
+            _entity.SetPillarActive(true);
+        }
+        else
+        {
+            _entity = context.conveyor;
+            _entity.Disconnect();
+            _entity.ApplyCorrectPlacement(_entity.IsCorrectlyPlaced);
+            _entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+            _buildPanel.UpdateCancelButton(false);
+        }
+        
         _entity.SetActiveInputsOutputs(false);
-        _entity.SetPillarActive(true);
         
         await _buildPanel.Show(cancellationToken);
         
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
+            { ct => GameStateUtils.WaitingForTap(_mobileTouchCamera, ct), ProcessTap },
             { WaitForTouchOnEntity, ProcessEntityPlacement },
             { WaitForCameraMovement, ProcessCameraMovement },
             { WaitForSelectedButton, ProcessSelectedButton }
@@ -34,13 +47,22 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         {
             FactorySystem.Instance.Release(_entity);
             await _buildPanel.Close(true, cancellationToken);
+            _buildPanel.UpdateCancelButton(true);
             return;
+        }
+        
+        if (_entity is ConveyorCorner)
+        {
+            var gridPos = _entity.GridPos;
+            FactorySystem.Instance.Release(_entity);
+            _entity = InstantiateEntity();
+            FactorySystem.Instance.Place(_entity, gridPos);
         }
         
         _entity.ReleaseHighlightObject();
         _entity.ShowAllowedHighlights();
-        
         _conveyors.Add(_entity);
+        
         if (_entity.TryGetAjdConveyor(c => c.NextConveyor == null, out Conveyor firstConveyor))
         {
             _conveyors.Insert(0, firstConveyor);
@@ -48,11 +70,13 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             _entity = firstConveyor;
         }
         
+        _buildPanel.SetRotateButtonsInteractable(false);
+        
         await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>()
         {
             { WaitingForDragStart, ProcessDragging },
             { WaitForCameraMovement, ProcessCameraMovement },
-            { WaitForSelectedButton, ProcessSelectedButton }
+            { WaitForSelectedButton, ProcessSelectedButton1 }
         }, cancellationToken);
         
         if (cancellationToken.IsCancellationRequested)
@@ -67,12 +91,16 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
                 FactorySystem.Instance.Release(conveyor);
         }
 
-        if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor))
+        if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
+            _conveyors[^1].PrevConveyor != lastConveyor)
             FactorySystem.Instance.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
         
         _conveyors.Clear();
         
         await _buildPanel.Close(true, cancellationToken);
+        
+        _buildPanel.SetRotateButtonsInteractable(true);
+        _buildPanel.UpdateCancelButton(true);
     }
     
     private async UniTask WaitingForDragStart(CancellationToken cancellationToken)
@@ -101,17 +129,10 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         }
     }
     
-    protected override UniTask ProcessSelectedButton(CancellationToken cancellationToken)
+    private UniTask ProcessSelectedButton1(CancellationToken cancellationToken)
     {
-        if (_buildPanel.SelectedButton == UIButtonType.Confirm)
-        {
+        if (_buildPanel.SelectedButton == UIButtonType.Confirm || _buildPanel.SelectedButton == UIButtonType.Close)
             ExitBaseRun = true;
-        }
-        else if (_buildPanel.SelectedButton == UIButtonType.Close)
-        {
-            ExitBaseRun = true;
-        }
-        
         return UniTask.CompletedTask;
     }
     
@@ -224,7 +245,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     
     public new class Context : GameStateBuild<Context, Conveyor>.Context
     {
-        
+        public Conveyor conveyor;
     }
     
     private class BuildStep
