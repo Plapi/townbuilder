@@ -281,7 +281,7 @@ GameObject:
   - component: {fileID: 4364056996291755105}
   - component: {fileID: 1989250497171595865}
   m_Layer: 9
-  m_Name: MaterialEntity
+  m_Name: Forest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -319,7 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c101794d170d041b7b6ef313e542fa33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialEntity
-  _id: 
+  _id: Forest
   _size: {x: 4, y: 4}
   _inputs: []
   _outputs: []

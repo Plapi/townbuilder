@@ -1,11 +1,14 @@
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public static class ButtonExtensions
+namespace com.Plapamaru.Extensions
 {
-    public static void SetExclusiveListener(this Button button, UnityAction action)
+    public static class ButtonExtensions
     {
-        button.onClick = new Button.ButtonClickedEvent();
-        button.onClick.AddListener(action);
+        public static void SetExclusiveListener(this Button button, UnityAction action)
+        {
+            button.onClick = new Button.ButtonClickedEvent();
+            button.onClick.AddListener(action);
+        }
     }
 }

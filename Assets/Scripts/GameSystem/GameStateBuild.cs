@@ -1,5 +1,8 @@
 using System.Threading;
 using BitBenderGames;
+using com.Plapamaru.TownCrafter.Factory;
+using com.Plapamaru.TownCrafter.Layers;
+using com.Plapamaru.Utils;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -9,6 +12,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
 {
     [SerializeField] protected Camera _camera;
     [SerializeField] protected MobileTouchCamera _mobileTouchCamera;
+    [SerializeField] protected FactorySystem _factorySystem;
     
     protected TFactoryEntity _entity;
     protected UIBuildPanel _buildPanel;
@@ -21,7 +25,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     protected UniTask ProcessTap(CancellationToken cancellationToken)
     {
         if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
-            FactorySystem.Instance.PlaceOnCenter(_entity, gridPos);
+            _factorySystem.PlaceOnCenter(_entity, gridPos);
         return UniTask.CompletedTask;
     }
     
@@ -49,7 +53,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
             if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
             {
                 var translation = gridPos - firstGridPos;
-                FactorySystem.Instance.Place(_entity, entityStartGridPos + translation);
+                _factorySystem.Place(_entity, entityStartGridPos + translation);
             }
             await UniTask.NextFrame(cancellationToken: cancellationToken);
         }
@@ -85,11 +89,11 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         }
         else if (_buildPanel.SelectedButton == UIButtonType.RotateLeft)
         {
-            FactorySystem.Instance.Rotate(_entity, -90);
+            _factorySystem.Rotate(_entity, -90);
         }
         else if (_buildPanel.SelectedButton == UIButtonType.RotateRight)
         {
-            FactorySystem.Instance.Rotate(_entity, 90);
+            _factorySystem.Rotate(_entity, 90);
         }
         else if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
@@ -107,14 +111,14 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         
         _entity = InstantiateEntity();
         _entity.SetActiveInputsOutputs(true);
-        FactorySystem.Instance.PlaceOnCenter(_entity, hit.point);
+        _factorySystem.PlaceOnCenter(_entity, hit.point);
         
         return true;
     }
 
     protected TFactoryEntity InstantiateEntity()
     {
-        var entity = FactorySystem.Instance.InstantiateEntity<TFactoryEntity>(context.id);
+        var entity = _factorySystem.InstantiateEntity<TFactoryEntity>(context.id);
         entity.SetLayer(LayerType.Interactable);
         return entity;
     }

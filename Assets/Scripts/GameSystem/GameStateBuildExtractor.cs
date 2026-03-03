@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using com.Plapamaru.TownCrafter.Factory;
+using com.Plapamaru.TownCrafter.Layers;
 using Cysharp.Threading.Tasks;
 
 public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Context, Extractor>
@@ -36,7 +38,7 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
         if (_buildPanel.SelectedButton == UIButtonType.Confirm)
             _entity.OnConfirmPlacement();
         else 
-            FactorySystem.Instance.Release(_entity);
+            _factorySystem.Release(_entity);
         
         await _buildPanel.Close(true, cancellationToken);
     }

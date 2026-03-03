@@ -1,30 +1,41 @@
 ﻿using UnityEngine;
 
-public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour {
+namespace com.Plapamaru.Singletons
+{
+	public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour
+	{
 
-	private static T instance;
+		private static T instance;
 
-	public static T Instance {
-		get {
-			if (instance == null) {
-				instance = FindFirstObjectByType<T>();
-				if (instance == null) {
-					instance = new GameObject(typeof(T).ToString()).AddComponent<T>();
+		public static T Instance
+		{
+			get
+			{
+				if (instance == null)
+				{
+					instance = FindFirstObjectByType<T>();
+					if (instance == null)
+					{
+						instance = new GameObject(typeof(T).ToString()).AddComponent<T>();
+					}
 				}
+				return instance;
 			}
-			return instance;
 		}
-	}
-	
-	public static bool HasInstance() {
-		return instance != null;
-	}
 
-	protected virtual void Awake() {
-		instance = this as T;
-	}
+		public static bool HasInstance()
+		{
+			return instance != null;
+		}
 
-	private void OnDestroy() {
-		instance = null;
+		protected virtual void Awake()
+		{
+			instance = this as T;
+		}
+
+		private void OnDestroy()
+		{
+			instance = null;
+		}
 	}
 }

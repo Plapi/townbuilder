@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using com.Plapamaru.Singletons;
 using UnityEngine;
 
 public class GizmosController : MonoBehaviourSingleton<GizmosController> {

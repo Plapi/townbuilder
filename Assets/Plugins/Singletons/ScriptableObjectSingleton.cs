@@ -1,22 +1,24 @@
 using UnityEngine;
 
-
-public abstract class ScriptableObjectSingleton<T> : ScriptableObject where T : ScriptableObject
+namespace com.Plapamaru.Singletons
 {
-    private static T instance;
-    public static T Instance
+    public abstract class ScriptableObjectSingleton<T> : ScriptableObject where T : ScriptableObject
     {
-        get
+        private static T instance;
+        public static T Instance
         {
-            if (instance == null)
+            get
             {
-                instance = Resources.Load<T>(typeof(T).ToString());
-                (instance as ScriptableObjectSingleton<T>).OnInitialize();
+                if (instance == null)
+                {
+                    instance = Resources.Load<T>(typeof(T).Name);
+                    (instance as ScriptableObjectSingleton<T>).OnInitialize();
+                }
+                return instance;
             }
-            return instance;
         }
-    }
 
-    // Optional overridable method for initializing the instance.
-    protected virtual void OnInitialize() { }
+        // Optional overridable method for initializing the instance.
+        protected virtual void OnInitialize() { }
+    }
 }

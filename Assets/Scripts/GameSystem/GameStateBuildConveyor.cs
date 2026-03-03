@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using com.Plapamaru.Utils;
+using com.Plapamaru.TownCrafter.Factory;
+using com.Plapamaru.TownCrafter.Layers;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -45,7 +48,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         
         if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
-            FactorySystem.Instance.Release(_entity);
+            _factorySystem.Release(_entity);
             await _buildPanel.Close(true, cancellationToken);
             _buildPanel.UpdateCancelButton(true);
             return;
@@ -54,19 +57,19 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (_entity is ConveyorCorner)
         {
             var gridPos = _entity.GridPos;
-            FactorySystem.Instance.Release(_entity);
+            _factorySystem.Release(_entity);
             _entity = InstantiateEntity();
-            FactorySystem.Instance.Place(_entity, gridPos);
+            _factorySystem.Place(_entity, gridPos);
         }
         
         _entity.ReleaseHighlightObject();
-        _entity.ShowAllowedHighlights();
+        _entity.ShowAllowedHighlights(_factorySystem.HasEntity);
         _conveyors.Add(_entity);
         
-        if (_entity.TryGetAjdConveyor(c => c.NextConveyor == null, out Conveyor firstConveyor))
+        if (_entity.TryGetAjdConveyor(_factorySystem.GetEntity, c => c.NextConveyor == null, out Conveyor firstConveyor))
         {
             _conveyors.Insert(0, firstConveyor);
-            FactorySystem.Instance.MakeConveyorsConnexions(firstConveyor, _entity, OnConveyorReplaced);
+            _factorySystem.MakeConveyorsConnexions(firstConveyor, _entity, OnConveyorReplaced);
             _entity = firstConveyor;
         }
         
@@ -88,12 +91,12 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
         if (_buildPanel.SelectedButton == UIButtonType.Close)
         {
             foreach (var conveyor in _conveyors)
-                FactorySystem.Instance.Release(conveyor);
+                _factorySystem.Release(conveyor);
         }
 
-        if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
+        if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(_factorySystem.GetEntity, c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
             _conveyors[^1].PrevConveyor != lastConveyor)
-            FactorySystem.Instance.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
+            _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
         
         _conveyors.Clear();
         
@@ -140,7 +143,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     {
         if (_nextBuildStep.build)
         {
-            if (FactorySystem.Instance.TryFindPath(_conveyors[^1], _nextBuildStep.gridPos, out var path) == false)
+            if (_factorySystem.TryFindPath(_conveyors[^1], _nextBuildStep.gridPos, out var path) == false)
                 return;
             
             _conveyors[^1].ReleaseAllowedHighlights();
@@ -165,7 +168,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             }
         }
         
-        _conveyors[^1].ShowAllowedHighlights();
+        _conveyors[^1].ShowAllowedHighlights(_factorySystem.HasEntity);
     }
     
     private bool UpdateNextBuildingStep(bool onlyAdjacent)
@@ -176,9 +179,9 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             return false;
         
         var gridPos = FactoryUtils.WorldToGrid(hit.point, RoundType.Floor);
-        if (FactorySystem.Instance.HasEntity(gridPos))
+        if (_factorySystem.HasEntity(gridPos))
         {
-            if (FactorySystem.Instance.TryGetEntity(gridPos, out Conveyor removeConveyor) && 
+            if (_factorySystem.TryGetEntity(gridPos, out Conveyor removeConveyor) && 
                 _conveyors[^1] != removeConveyor && _conveyors.Contains(removeConveyor))
             {
                 if (removeConveyor is ConveyorCorner && _conveyors.IndexOf(removeConveyor) == 0)
@@ -223,15 +226,15 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             return;
         }
         
-        FactorySystem.Instance.Release(_conveyors[^1]);
+        _factorySystem.Release(_conveyors[^1]);
         _conveyors.RemoveAt(_conveyors.Count - 1);
     }
     
     private Conveyor CreateNewConveyor(Conveyor from, Vector2Int gridPos)
     {
         var newConveyor = InstantiateEntity();
-        FactorySystem.Instance.Place(newConveyor, gridPos);
-        FactorySystem.Instance.MakeConveyorsConnexions(from, newConveyor, OnConveyorReplaced);
+        _factorySystem.Place(newConveyor, gridPos);
+        _factorySystem.MakeConveyorsConnexions(from, newConveyor, OnConveyorReplaced);
         newConveyor.ReleaseHighlightObject();
         return newConveyor;
     }

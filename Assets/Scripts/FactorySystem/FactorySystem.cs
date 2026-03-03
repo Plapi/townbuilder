@@ -1,166 +1,177 @@
 using System;
 using System.Collections.Generic;
+using com.Plapamaru.Extensions;
+using com.Plapamaru.Pooling;
+using com.Plapamaru.TownCrafter.Layers;
 using UnityEngine;
 
-public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
+namespace com.Plapamaru.TownCrafter.Factory
 {
-    [SerializeField] private DebugCells _debugCells;
-    
-    private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
-    
-    private void Start()
+    public class FactorySystem : MonoBehaviour
     {
-        var materialEntities = GetComponentsInChildren<MaterialEntity>();
-        foreach (var materialEntity in materialEntities)
-            SetEntities(materialEntity);
-    }
-    
-    public bool HasEntity(Vector2Int gridPos)
-    {
-        return _entities.ContainsKey(gridPos);
-    }
-    
-    public bool TryGetEntity<T>(Vector2Int gridPos, out T entity) where T : Entity
-    {
-        if (_entities.TryGetValue(gridPos, out var baseEntity) && baseEntity is T typedEntity)
+        [SerializeField] private DebugCells _debugCells;
+
+        private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
+
+        private void Start()
         {
-            entity = typedEntity;
+            var resourceNodes = GetComponentsInChildren<ResourceNode>();
+            foreach (var resourceNode in resourceNodes)
+                SetEntities(resourceNode);
+        }
+
+        public bool HasEntity(Vector2Int gridPos)
+        {
+            return _entities.ContainsKey(gridPos);
+        }
+
+        public bool TryGetEntity<T>(Vector2Int gridPos, out T entity) where T : Entity
+        {
+            if (_entities.TryGetValue(gridPos, out var baseEntity) && baseEntity is T typedEntity)
+            {
+                entity = typedEntity;
+                return true;
+            }
+            entity = null;
+            return false;
+        }
+
+        public Entity GetEntity(Vector2Int gridPos)
+        {
+            return TryGetEntity(gridPos, out Entity entity) ? entity : null;
+        }
+
+        public T InstantiateEntity<T>(string id) where T : Entity
+        {
+            var entity = ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
+            return entity;
+        }
+
+        public void PlaceOnCenter(Entity entity, Vector3 worldPos)
+        {
+            entity.SnapToGridOnCenter(worldPos);
+            SetEntities(entity);
+        }
+
+        public void PlaceOnCenter(Entity entity, Vector2Int gridPos)
+        {
+            Vector2Int right = entity.Right;
+            Vector2Int forward = entity.Forward;
+            Vector2Int halfSize = new Vector2Int((entity.Size.x - 1) / 2, (entity.Size.y - 1) / 2);
+            Vector2Int origin = gridPos - right * halfSize.x - forward * halfSize.y;
+            Place(entity, origin);
+        }
+
+        public void Place(Entity entity, Vector2Int gridPos)
+        {
+            entity.SnapToGrid(gridPos);
+            SetEntities(entity);
+        }
+
+        public void Rotate(Entity entity, int rotAngleY)
+        {
+            entity.Rotate(rotAngleY);
+            SetEntities(entity);
+        }
+
+        public void MakeConveyorsConnexions(Conveyor from, Conveyor to, Action<Conveyor, Conveyor> onConveyorReplaced)
+        {
+            var fromPrev = from.PrevConveyor;
+            if (fromPrev != null && FactoryUtils.AreDiagonals(fromPrev.GridPos, to.GridPos))
+            {
+                var inDir = from.GridPos - fromPrev.GridPos;
+                var outDir = to.GridPos - from.GridPos;
+
+                var newFromConveyor = InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
+                Replace(from, newFromConveyor);
+                newFromConveyor.ReleaseHighlightObject();
+                fromPrev.Connect(newFromConveyor);
+
+                newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
+                newFromConveyor.SetSpeedSign(speedSign);
+
+                to.transform.SetLocalAngleY(ConveyorHelper.GetStraightAngle(to.GridPos - newFromConveyor.GridPos));
+
+                onConveyorReplaced?.Invoke(from, newFromConveyor);
+                from = newFromConveyor;
+            }
+            else
+            {
+                var angleY = ConveyorHelper.GetStraightAngle(to.GridPos - from.GridPos);
+                from.transform.SetLocalAngleY(angleY);
+                to.transform.SetLocalAngleY(angleY);
+            }
+
+            from.SnapToGrid(from.GridPos);
+            to.SnapToGrid(to.GridPos);
+
+            from.Connect(to);
+        }
+
+        public bool TryFindPath(Conveyor conveyor, Vector2Int gridPos, out List<Vector2Int> path)
+        {
+            path = new List<Vector2Int>();
+
+            var fPath = GridPathfinder.FindPath(conveyor.GridPos, gridPos, _entities);
+            if (fPath == null || fPath.Count == 0)
+                return false;
+
+            fPath.RemoveAt(0);
+
+            foreach (var pos in fPath)
+            {
+                if (_entities.ContainsKey(pos))
+                    break;
+                path.Add(pos);
+            }
+
             return true;
         }
-        entity = null;
-        return false;
-    }
 
-    public T InstantiateEntity<T>(string id) where T : Entity
-    {
-        var entity = ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
-        return entity;
-    }
-    
-    public void PlaceOnCenter(Entity entity, Vector3 worldPos)
-    {
-        entity.SnapToGridOnCenter(worldPos);
-        SetEntities(entity);
-    }
-    
-    public void PlaceOnCenter(Entity entity, Vector2Int gridPos)
-    {
-        Vector2Int right = entity.Right;
-        Vector2Int forward = entity.Forward;
-        Vector2Int halfSize = new Vector2Int((entity.Size.x - 1) / 2, (entity.Size.y - 1) / 2);
-        Vector2Int origin = gridPos - right * halfSize.x - forward * halfSize.y;
-        Place(entity, origin);
-    }
-    
-    public void Place(Entity entity, Vector2Int gridPos)
-    {
-        entity.SnapToGrid(gridPos);
-        SetEntities(entity);
-    }
-    
-    public void Rotate(Entity entity, int rotAngleY)
-    {
-        entity.Rotate(rotAngleY);
-        SetEntities(entity);
-    }
-    
-    public void MakeConveyorsConnexions(Conveyor from, Conveyor to, Action<Conveyor, Conveyor> onConveyorReplaced)
-    {
-        var fromPrev = from.PrevConveyor;
-        if (fromPrev != null && FactoryUtils.AreDiagonals(fromPrev.GridPos, to.GridPos))
+        private void SetEntities(Entity entity)
         {
-            var inDir  = from.GridPos - fromPrev.GridPos;
-            var outDir = to.GridPos - from.GridPos;
-            
-            var newFromConveyor = InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
-            Replace(from, newFromConveyor);
-            newFromConveyor.ReleaseHighlightObject();
-            fromPrev.Connect(newFromConveyor);
-            
-            newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
-            newFromConveyor.SetSpeedSign(speedSign);
-            
-            to.transform.SetLocalAngleY(ConveyorHelper.GetStraightAngle(to.GridPos - newFromConveyor.GridPos));
-            
-            onConveyorReplaced?.Invoke(from, newFromConveyor);
-            from = newFromConveyor;
-        }
-        else
-        {
-            var angleY = ConveyorHelper.GetStraightAngle(to.GridPos - from.GridPos);
-            from.transform.SetLocalAngleY(angleY);
-            to.transform.SetLocalAngleY(angleY);
-        }
-        
-        from.SnapToGrid(from.GridPos);
-        to.SnapToGrid(to.GridPos);
-        
-        from.Connect(to);
-    }
+            foreach (var gridPos in entity.GridPositions)
+                _entities.Remove(gridPos);
+            entity.GridPositions.Clear();
 
-    public bool TryFindPath(Conveyor conveyor, Vector2Int gridPos, out List<Vector2Int> path)
-    {
-        path = new List<Vector2Int>();
-        
-        var fPath = GridPathfinder.FindPath(conveyor.GridPos, gridPos, _entities);
-        if (fPath == null || fPath.Count == 0)
-            return false;
-        
-        fPath.RemoveAt(0);
-        
-        foreach (var pos in fPath)
-        {
-            if (_entities.ContainsKey(pos))
-                break;
-            path.Add(pos);
-        }
-        
-        return true;
-    }
-    
-    private void SetEntities(Entity entity)
-    {
-        foreach (var gridPos in entity.GridPositions)
-            _entities.Remove(gridPos);
-        entity.GridPositions.Clear();
-        
-        Vector2Int right = entity.Right;
-        Vector2Int forward = entity.Forward;
-        Vector2Int origin = entity.GridPos;
-        
-        for (int x = 0; x < entity.Size.x; x++)
-        {
-            for (int y = 0; y < entity.Size.y; y++)
+            Vector2Int right = entity.Right;
+            Vector2Int forward = entity.Forward;
+            Vector2Int origin = entity.GridPos;
+
+            for (int x = 0; x < entity.Size.x; x++)
             {
-                Vector2Int gridPos = origin + right * x + forward * y;
-                if (_entities.ContainsKey(gridPos) == false)
+                for (int y = 0; y < entity.Size.y; y++)
                 {
-                    entity.GridPositions.Add(gridPos);
-                    _entities.Add(gridPos, entity);
+                    Vector2Int gridPos = origin + right * x + forward * y;
+                    if (_entities.ContainsKey(gridPos) == false)
+                    {
+                        entity.GridPositions.Add(gridPos);
+                        _entities.Add(gridPos, entity);
+                    }
                 }
             }
+
+            entity.ApplyCorrectPlacement(entity.HasCorrectPlacement(_entities));
+
+            _debugCells.UpdateDebugCells(_entities);
         }
-        
-        entity.ApplyCorrectPlacement(entity.HasCorrectPlacement(_entities));
-        
-        _debugCells.UpdateDebugCells(_entities);
-    }
-    
-    private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
-    {
-        Release(replacedConveyor);
-        replacementConveyor.SetLayer(LayerType.Interactable);
-        replacementConveyor.SnapToGrid(replacedConveyor.GridPos);
-        SetEntities(replacementConveyor);
-    }
-    
-    public void Release(FactoryEntity entity)
-    {
-        foreach (var gridPos in entity.GridPositions)
-            _entities.Remove(gridPos);
-        
-        _debugCells.UpdateDebugCells(_entities);
-        
-        ObjectPoolingSystem.Instance.ReleaseObject(entity);
+
+        private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
+        {
+            Release(replacedConveyor);
+            replacementConveyor.SetLayer(LayerType.Interactable);
+            replacementConveyor.SnapToGrid(replacedConveyor.GridPos);
+            SetEntities(replacementConveyor);
+        }
+
+        public void Release(FactoryEntity entity)
+        {
+            foreach (var gridPos in entity.GridPositions)
+                _entities.Remove(gridPos);
+
+            _debugCells.UpdateDebugCells(_entities);
+
+            ObjectPoolingSystem.Instance.ReleaseObject(entity);
+        }
     }
 }

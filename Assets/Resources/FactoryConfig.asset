@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e5a2ecbaddb74fa4ba08581f76baea7, type: 3}
   m_Name: FactoryConfig
-  m_EditorClassIdentifier: Assembly-CSharp::FactoryConfig
-  correctColor: {r: 0.3915094, g: 1, b: 0.3915094, a: 1}
-  wrongColor: {r: 1, g: 0.28773582, b: 0.28773582, a: 1}
+  m_EditorClassIdentifier: Assembly-CSharp::com.Plapamaru.TownCrafter.Factory.FactoryConfig
+  correctColor: {r: 0.39215687, g: 1, b: 0.39215687, a: 1}
+  wrongColor: {r: 1, g: 0.28627452, b: 0.28627452, a: 1}
   previewColor: {r: 0.12941177, g: 0.07058824, b: 1, a: 1}

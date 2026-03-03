@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using BitBenderGames;
+using com.Plapamaru.TownCrafter.Factory;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
 {
     [SerializeField] private Camera _camera;
     [SerializeField] private MobileTouchCamera _mobileTouchCamera;
+    [SerializeField] private FactorySystem _factorySystem;
     
     private UIMainPanel _mainPanel;
     
@@ -44,7 +46,7 @@ public class GameStateMain : GameState<GameStateMain.Context>
     
     private async UniTask ProcessTap(CancellationToken cancellationToken)
     {
-        if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && FactorySystem.Instance.TryGetEntity(gridPos, out FactoryEntity entity))
+        if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && _factorySystem.TryGetEntity(gridPos, out FactoryEntity entity))
         {
             if (entity is Extractor extractor)
             {

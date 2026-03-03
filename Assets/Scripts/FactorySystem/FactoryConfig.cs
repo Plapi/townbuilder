@@ -1,9 +1,13 @@
+using com.Plapamaru.Singletons;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "FactoryConfig", menuName = "Scriptable Objects/FactoryConfig")]
-public class FactoryConfig : ScriptableObjectSingleton<FactoryConfig>
+namespace com.Plapamaru.TownCrafter.Factory
 {
-    public Color correctColor;
-    public Color wrongColor;
-    public Color previewColor;
+    [CreateAssetMenu(fileName = "FactoryConfig", menuName = "Scriptable Objects/FactoryConfig")]
+    public class FactoryConfig : ScriptableObjectSingleton<FactoryConfig>
+    {
+        public Color correctColor;
+        public Color wrongColor;
+        public Color previewColor;
+    }
 }

@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public interface IPoolableObject
+namespace com.Plapamaru.Pooling
 {
-    private const int DEFAULT_POOL_SIZE = 10;
-    
-    string Id { get; }
-    MonoBehaviour Behaviour { get; }
-    int CacheCount => DEFAULT_POOL_SIZE;
-    void OnRelease();
+    public interface IPoolableObject
+    {
+        private const int DEFAULT_POOL_SIZE = 10;
+
+        string Id { get; }
+        MonoBehaviour Behaviour { get; }
+        int CacheCount => DEFAULT_POOL_SIZE;
+        void OnRelease();
+    }
 }

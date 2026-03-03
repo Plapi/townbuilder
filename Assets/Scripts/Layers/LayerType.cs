@@ -1,8 +1,11 @@
-public enum LayerType
+namespace com.Plapamaru.TownCrafter.Layers
 {
-    Ground,
-    Grid,
-    Environment,
-    Interactable,
-    Highlight
+    public enum LayerType
+    {
+        Ground,
+        Grid,
+        Environment,
+        Interactable,
+        Highlight
+    }
 }
