@@ -17,7 +17,7 @@ public class GameStateBuildExtractor : GameStateBuild<GameStateBuildExtractor.Co
             _entity = context.extractor;
             _entity.SetActiveInputsOutputs(true);
             _entity.ApplyCorrectPlacement(_entity.IsCorrectlyPlaced);
-            _entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+            _entity.SetLayer(LayerType.Interactable);
         }
         
         await _buildPanel.Show(cancellationToken);

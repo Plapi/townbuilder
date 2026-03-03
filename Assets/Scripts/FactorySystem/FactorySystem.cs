@@ -149,7 +149,7 @@ public class FactorySystem : MonoBehaviourSingleton<FactorySystem>
     private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
     {
         Release(replacedConveyor);
-        replacementConveyor.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+        replacementConveyor.SetLayer(LayerType.Interactable);
         replacementConveyor.SnapToGrid(replacedConveyor.GridPos);
         SetEntities(replacementConveyor);
     }

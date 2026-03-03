@@ -38,7 +38,7 @@ public abstract class FactoryEntity : Entity
         base.OnConfirmPlacement();
         SetActiveInputsOutputs(false);
         ReleaseHighlightObject();
-        gameObject.SetLayerRecursively(0);
+        SetLayer(LayerType.Environment);
     }
     
     public override void OnRelease()
@@ -46,7 +46,7 @@ public abstract class FactoryEntity : Entity
         base.OnRelease();
         SetActiveInputsOutputs(false);
         ReleaseHighlightObject();
-        gameObject.SetLayerRecursively(0);
+        SetLayer(LayerType.Environment);
     }
     
     public void ReleaseHighlightObject()

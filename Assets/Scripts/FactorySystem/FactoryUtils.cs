@@ -39,7 +39,7 @@ public static class FactoryUtils
     public static bool TryGetMouseGridPosition(Camera camera, out Vector2Int gridPos)
     {
         gridPos = Vector2Int.zero;
-        if (Layers.Raycast(camera, Layers.GroundLayer, out var hit))
+        if (LayersUtils.Raycast(camera, LayerType.Ground, out var hit))
         {
             gridPos = WorldToGrid(hit.point, RoundType.Floor);
             return true;

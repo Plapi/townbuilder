@@ -31,7 +31,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
         {
             if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
                 return false;
-            return Layers.Raycast(_camera, Layers.InteractableLayer, out _);
+            return LayersUtils.Raycast(_camera, LayerType.Interactable, out _);
         }, cancellationToken: cancellationToken);
     }
     
@@ -102,7 +102,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     protected bool TryPlaceEntity()
     {
         var center = new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
-        if (Layers.Raycast(_camera, Layers.GroundLayer, center, out var hit) == false)
+        if (LayersUtils.Raycast(_camera, LayerType.Ground, center, out var hit) == false)
             return false;
         
         _entity = InstantiateEntity();
@@ -115,7 +115,7 @@ public abstract class GameStateBuild<TContext, TFactoryEntity> : GameState<TCont
     protected TFactoryEntity InstantiateEntity()
     {
         var entity = FactorySystem.Instance.InstantiateEntity<TFactoryEntity>(context.id);
-        entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+        entity.SetLayer(LayerType.Interactable);
         return entity;
     }
     

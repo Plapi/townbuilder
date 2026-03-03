@@ -24,7 +24,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
             _entity = context.conveyor;
             _entity.Disconnect();
             _entity.ApplyCorrectPlacement(_entity.IsCorrectlyPlaced);
-            _entity.gameObject.SetLayerRecursively(Layers.InteractableLayer);
+            _entity.SetLayer(LayerType.Interactable);
             _buildPanel.UpdateCancelButton(false);
         }
         
@@ -172,7 +172,7 @@ public class GameStateBuildConveyor : GameStateBuild<GameStateBuildConveyor.Cont
     {
         _nextBuildStep = null;
         
-        if (Layers.Raycast(_camera, Layers.GroundLayer, out var hit) == false)
+        if (LayersUtils.Raycast(_camera, LayerType.Ground, out var hit) == false)
             return false;
         
         var gridPos = FactoryUtils.WorldToGrid(hit.point, RoundType.Floor);

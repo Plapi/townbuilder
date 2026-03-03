@@ -94,6 +94,11 @@ public abstract class Entity : MonoBehaviour, IPoolableObject
         FactoryUtils.PlaceToGrid(this);
     }
 
+    public void SetLayer(LayerType layerType)
+    {
+        gameObject.SetLayerRecursively(LayersUtils.GetLayer(layerType));
+    }
+
     private void SetEntityColliders()
     {
         var colliders = transform.GetComponentsInChildren<Collider>();
