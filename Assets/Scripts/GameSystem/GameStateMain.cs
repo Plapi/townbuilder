@@ -17,26 +17,10 @@ namespace com.Plapamaru.TownCrafter.Game
 
         private UIMainPanel _mainPanel;
 
-        public new class Context : GameStateBase.Context
-        {
-
-        }
-
-        private void Start()
-        {
-            InitUI();
-            GameSystem.Instance.EnqueueState<GameStateMain, Context>(new Context(), true);
-        }
-
-        private void InitUI()
-        {
-            _mainPanel = UISystem.Instance.GetPanel<UIMainPanel>();
-            _mainPanel.Init(new UIMainPanel.Data());
-            UISystem.Instance.GetPanel<UIBuildPanel>().Init(new UIBuildPanel.Data());
-        }
-
         public override async UniTask Run(CancellationToken cancellationToken)
         {
+            InitUI();
+            
             await _mainPanel.Show(cancellationToken);
 
             await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>
@@ -45,6 +29,13 @@ namespace com.Plapamaru.TownCrafter.Game
                 { WaitForSelectedButton, ProcessSelectedButton },
                 { WaitForCameraMovement, ProcessCameraMovement }
             }, cancellationToken);
+        }
+
+        private void InitUI()
+        {
+            _mainPanel = UISystem.Instance.GetPanel<UIMainPanel>();
+            _mainPanel.Init(new UIMainPanel.Data());
+            UISystem.Instance.GetPanel<UIBuildPanel>().Init(new UIBuildPanel.Data());
         }
 
         private async UniTask ProcessTap(CancellationToken cancellationToken)
@@ -119,6 +110,11 @@ namespace com.Plapamaru.TownCrafter.Game
                 conveyor = conveyor
             };
             GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(context, false);
+        }
+        
+        public new class Context : GameStateBase.Context
+        {
+
         }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace com.Plapamaru.Utils
+namespace com.Plapamaru.Utilities
 {
 	public struct PosAndRot
 	{

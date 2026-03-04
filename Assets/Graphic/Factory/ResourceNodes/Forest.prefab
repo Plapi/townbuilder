@@ -324,6 +324,7 @@ MonoBehaviour:
   _inputs: []
   _outputs: []
   _gridPos: {x: 0, y: 0}
+  _outputResourceType: 3
 --- !u!1 &8743550598820787561
 GameObject:
   m_ObjectHideFlags: 0

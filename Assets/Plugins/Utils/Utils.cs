@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Random = System.Random;
 
-namespace com.Plapamaru.Utils
+namespace com.Plapamaru.Utilities
 {
 	public static class Utils
 	{

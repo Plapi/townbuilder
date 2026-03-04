@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace com.Plapamaru.Utils
+namespace com.Plapamaru.Utilities
 {
 	public static class GeometryUtils
 	{

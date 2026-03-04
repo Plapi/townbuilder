@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using com.Plapamaru.Utils;
+using com.Plapamaru.Utilities;
 using com.Plapamaru.TownCrafter.Factory;
 using com.Plapamaru.TownCrafter.Layers;
 using com.Plapamaru.TownCrafter.UI;
@@ -112,7 +112,7 @@ namespace com.Plapamaru.TownCrafter.Game
         private async UniTask WaitingForDragStart(CancellationToken cancellationToken)
         {
             await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) &&
-                                          Utils.Utils.MouseIsOverUI() == false &&
+                                          Utils.MouseIsOverUI() == false &&
                                           UpdateNextBuildingStep(true),
                 cancellationToken: cancellationToken);
         }

@@ -1,5 +1,6 @@
 using System.Threading;
 using BitBenderGames;
+using com.Plapamaru.Utilities;
 using com.Plapamaru.TownCrafter.Factory;
 using com.Plapamaru.TownCrafter.Layers;
 using com.Plapamaru.TownCrafter.UI;
@@ -26,6 +27,8 @@ namespace com.Plapamaru.TownCrafter.Game
 
         protected UniTask ProcessTap(CancellationToken cancellationToken)
         {
+            _mobileTouchCamera.SetEnabled(false);
+            
             if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
                 _factorySystem.PlaceOnCenter(_entity, gridPos);
             return UniTask.CompletedTask;
@@ -35,7 +38,7 @@ namespace com.Plapamaru.TownCrafter.Game
         {
             await UniTask.WaitUntil(() =>
             {
-                if (Input.GetMouseButton(0) == false || Utils.Utils.MouseIsOverUI())
+                if (Input.GetMouseButton(0) == false || Utils.MouseIsOverUI())
                     return false;
                 return LayersUtils.Raycast(_camera, LayerType.Interactable, out _);
             }, cancellationToken: cancellationToken);

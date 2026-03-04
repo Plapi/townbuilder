@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace com.Plapamaru.Utils
+namespace com.Plapamaru.Utilities
 {
     public static class UniTaskUtils
     {

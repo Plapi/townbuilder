@@ -117,7 +117,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 var from = new Vector3(GridPos.x, 0f, GridPos.y) + new Vector3(0.5f, 1f, 0.5f);
                 var to = new Vector3(_nextConveyor.GridPos.x, 0f, _nextConveyor.GridPos.y) + new Vector3(0.5f, 1.1f, 0.5f);
                 Gizmos.DrawLine(from, to);
-                Utils.Utils.DrawArrowHead(from, to, 0.5f);
+                Utilities.Utils.DrawArrowHead(from, to, 0.5f);
             }
         }
     }

@@ -39,6 +39,11 @@ namespace com.Plapamaru.TownCrafter.Game
             Run().Forget();
         }
 
+        private void Start()
+        {
+            EnqueueState<GameStateMain, GameStateMain.Context>(new GameStateMain.Context(), true);
+        }
+
         private async UniTask Run()
         {
             while (_cancellationTokenSource.IsCancellationRequested == false)

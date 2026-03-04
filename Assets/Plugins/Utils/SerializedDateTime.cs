@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace com.Plapamaru.Utils
+namespace com.Plapamaru.Utilities
 {
 	[Serializable]
 	public class SerializedDateTime

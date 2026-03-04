@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class FactorySystem : MonoBehaviour
+    public class FactorySystem : MonoBehaviour, IFactorySystem
     {
         [SerializeField] private DebugCells _debugCells;
 

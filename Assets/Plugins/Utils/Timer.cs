@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
-namespace com.Plapamaru.Utils
+namespace com.Plapamaru.Utilities
 {
 	public class Timer : MonoBehaviour
 	{

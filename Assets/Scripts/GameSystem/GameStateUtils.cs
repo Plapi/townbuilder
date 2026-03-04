@@ -1,7 +1,7 @@
 using System.Threading;
 using BitBenderGames;
 using Cysharp.Threading.Tasks;
-using com.Plapamaru.Utils;
+using com.Plapamaru.Utilities;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Game
@@ -14,7 +14,7 @@ namespace com.Plapamaru.TownCrafter.Game
         {
             while (cancellationToken.IsCancellationRequested == false)
             {
-                await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && Utils.Utils.MouseIsOverUI() == false, cancellationToken: cancellationToken);
+                await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0) && Utils.MouseIsOverUI() == false, cancellationToken: cancellationToken);
                 float time = Time.time;
                 await UniTask.WaitUntil(() => Time.time > time + TAP_MAX_TIME || Input.GetMouseButtonUp(0) || mobileTouchCamera.HasInteraction,
                     cancellationToken: cancellationToken);
