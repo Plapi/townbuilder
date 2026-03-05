@@ -1,4 +1,4 @@
-using com.Plapamaru.Extensions;
+using com.Plapamaru.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 

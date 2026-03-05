@@ -64,11 +64,14 @@ namespace com.Plapamaru.TownCrafter.Game
 
                 try
                 {
-                    await UniTask.WhenAny(
+                    var race = await UniTask.WhenAny(
                         _currentState.state.Run(linkedToken),
                         UniTask.WaitUntil(() => _newState != null, cancellationToken: _cancellationTokenSource.Token),
                         UniTask.WaitUntil(() => Input.GetKeyUp(KeyCode.R), cancellationToken: _cancellationTokenSource.Token)
                     );
+                    
+                    if (race == 0)
+                        await _currentState.state.Exit(linkedToken);
                 }
                 catch (OperationCanceledException) when (_cancellationTokenSource.IsCancellationRequested) { }
                 catch (Exception e)

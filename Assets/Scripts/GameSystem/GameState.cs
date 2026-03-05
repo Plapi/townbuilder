@@ -27,6 +27,8 @@ namespace com.Plapamaru.TownCrafter.Game
         public abstract void SetContext(Context context);
 
         public abstract UniTask Run(CancellationToken cancellationToken);
+        
+        public abstract UniTask Exit(CancellationToken cancellationToken);
 
         protected async UniTask BaseRun(Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>> raceTasks, CancellationToken cancellationToken)
         {

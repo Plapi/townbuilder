@@ -4,7 +4,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 {
     public class Construction : Entity
     {
-        public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
+        public override void SetCorrectlyPlaced(bool hasCorrectPlacement)
         {
             
         }

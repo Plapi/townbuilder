@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class FactorySimulation : MonoBehaviour
+    public class FactorySimulationSystem : MonoBehaviour, IFactoryListener
     {
-        
         public async UniTask Run(CancellationToken cancellationToken)
         {
             while (cancellationToken.IsCancellationRequested == false)
@@ -14,8 +13,13 @@ namespace com.Plapamaru.TownCrafter.Factory
                 await UniTask.NextFrame(cancellationToken: cancellationToken);
             }
         }
-
-        public void UpdateEntities()
+        
+        public void OnEntityPlaced(Entity entity)
+        {
+            
+        }
+        
+        public void OnEntityRemoved(Entity entity)
         {
             
         }

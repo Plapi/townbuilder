@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using com.Plapamaru.Extensions;
 using com.Plapamaru.Pooling;
+using com.Plapamaru.Utilities;
 using com.Plapamaru.TownCrafter.Layers;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -153,7 +152,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             return new List<Vector2Int>(result);
         }
 
-        public abstract void ApplyCorrectPlacement(bool hasCorrectPlacement);
+        public abstract void SetCorrectlyPlaced(bool hasCorrectPlacement);
 
         public virtual bool HasCorrectPlacement(Dictionary<Vector2Int, Entity> map)
         {

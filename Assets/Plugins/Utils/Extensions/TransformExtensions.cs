@@ -1,11 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace com.Plapamaru.Extensions
+namespace com.Plapamaru.Utilities
 {
 	public static partial class TransformExtensions
 	{
-
 		public static void SetX(this Transform transform, float x)
 		{
 			transform.position = new Vector3(x, transform.position.y, transform.position.z);

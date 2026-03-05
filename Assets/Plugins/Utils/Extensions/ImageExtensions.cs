@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace com.Plapamaru.Extensions
+namespace com.Plapamaru.Utilities
 {
 	public static class ImageExtensions
 	{

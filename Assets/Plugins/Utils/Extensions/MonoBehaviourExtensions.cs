@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace com.Plapamaru.Extensions
+namespace com.Plapamaru.Utilities
 {
 	public static class MonoBehaviourExtensions
 	{

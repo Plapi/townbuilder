@@ -1,10 +1,9 @@
 using UnityEngine;
 
-namespace com.Plapamaru.Extensions
+namespace com.Plapamaru.Utilities
 {
 	public static class RectTransformExtensions
 	{
-
 		public static void SetAnchorPosX(this RectTransform rectTransform, float x)
 		{
 			rectTransform.anchoredPosition = new Vector2(x, rectTransform.anchoredPosition.y);

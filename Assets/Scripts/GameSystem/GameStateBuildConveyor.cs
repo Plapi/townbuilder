@@ -29,13 +29,13 @@ namespace com.Plapamaru.TownCrafter.Game
             {
                 _entity = context.conveyor;
                 _entity.Disconnect();
-                _entity.ApplyCorrectPlacement(_entity.IsCorrectlyPlaced);
+                _entity.SetCorrectlyPlaced(_entity.IsCorrectlyPlaced);
                 _entity.SetLayer(LayerType.Interactable);
                 _buildPanel.UpdateCancelButton(false);
             }
 
             _entity.SetActiveInputsOutputs(false);
-            _factorySystem.SetActiveOutputsForExtractors(true);
+            SetActivatePossibleConnexions(true);
 
             await _buildPanel.Show(cancellationToken);
 
@@ -50,13 +50,9 @@ namespace com.Plapamaru.TownCrafter.Game
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            _factorySystem.SetActiveOutputsForExtractors(false);
-            
             if (_buildPanel.SelectedButton == UIButtonType.Close)
             {
                 _factorySystem.Release(_entity);
-                await _buildPanel.Close(true, cancellationToken);
-                _buildPanel.UpdateCancelButton(true);
                 return;
             }
 
@@ -68,7 +64,6 @@ namespace com.Plapamaru.TownCrafter.Game
                 _factorySystem.Place(_entity, gridPos);
             }
 
-            _entity.ReleaseHighlightObject();
             _entity.ShowAllowedHighlights(_factorySystem.HasEntity);
             _conveyors.Add(_entity);
 
@@ -103,13 +98,16 @@ namespace com.Plapamaru.TownCrafter.Game
             if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(_factorySystem.GetEntity, c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
                 _conveyors[^1].PrevConveyor != lastConveyor)
                 _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
+        }
+
+        public override async UniTask Exit(CancellationToken cancellationToken)
+        {
+            await base.Exit(cancellationToken);
 
             _conveyors.Clear();
-
-            await _buildPanel.Close(true, cancellationToken);
-
             _buildPanel.SetRotateButtonsInteractable(true);
             _buildPanel.UpdateCancelButton(true);
+            SetActivatePossibleConnexions(false);
         }
 
         private async UniTask WaitingForDragStart(CancellationToken cancellationToken)
@@ -153,6 +151,7 @@ namespace com.Plapamaru.TownCrafter.Game
                     return;
 
                 _conveyors[^1].ReleaseAllowedHighlights();
+                _conveyors[^1].ReleaseHighlightObject();
 
                 foreach (var gridPos in path)
                     _conveyors.Add(CreateNewConveyor(_conveyors[^1], gridPos));
@@ -175,6 +174,7 @@ namespace com.Plapamaru.TownCrafter.Game
             }
 
             _conveyors[^1].ShowAllowedHighlights(_factorySystem.HasEntity);
+            _conveyors[^1].SetCorrectlyPlaced(_conveyors[^1].IsCorrectlyPlaced);
         }
 
         private bool UpdateNextBuildingStep(bool onlyAdjacent)
@@ -241,7 +241,6 @@ namespace com.Plapamaru.TownCrafter.Game
             var newConveyor = InstantiateEntity();
             _factorySystem.Place(newConveyor, gridPos);
             _factorySystem.MakeConveyorsConnexions(from, newConveyor, OnConveyorReplaced);
-            newConveyor.ReleaseHighlightObject();
             return newConveyor;
         }
 
@@ -250,6 +249,13 @@ namespace com.Plapamaru.TownCrafter.Game
             for (int i = 0; i < _conveyors.Count; i++)
                 if (_conveyors[i] == replacedConveyor)
                     _conveyors[i] = replacementConveyor;
+        }
+
+        private void SetActivatePossibleConnexions(bool active)
+        {
+            _factorySystem.SetActiveInputsOutputs(
+                (false, active, typeof(Extractor)),
+                (true, active, typeof(Construction)));
         }
 
         public new class Context : GameStateBuild<Context, Conveyor>.Context

@@ -7,7 +7,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [SerializeField] private ResourceItemType _outputResourceType;
         
-        public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
+        public override void SetCorrectlyPlaced(bool hasCorrectPlacement)
         {
             
         }

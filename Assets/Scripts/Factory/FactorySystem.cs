@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using com.Plapamaru.Extensions;
+using com.Plapamaru.Utilities;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.TownCrafter.Layers;
 using UnityEngine;
@@ -9,16 +9,36 @@ namespace com.Plapamaru.TownCrafter.Factory
 {
     public class FactorySystem : MonoBehaviour
     {
-        [SerializeField] private FactorySimulation _simulation;
+        [SerializeField] private FactorySaveSystem _saveSystem;
+        [SerializeField] private FactorySimulationSystem _simulationSystem;
         [SerializeField] private DebugCells _debugCells;
 
         private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
+        private readonly List<IFactoryListener> _listeners = new List<IFactoryListener>();
 
         private void Start()
+        {
+            SetStaticEntities();
+            SetSaveEntities();
+            _listeners.Add(_simulationSystem);
+        }
+
+        private void SetStaticEntities()
         {
             var staticEntities = GetComponentsInChildren<Entity>();
             foreach (var entity in staticEntities)
                 SetEntities(entity);
+        }
+
+        private void SetSaveEntities()
+        {
+            var entitiesSave = _saveSystem.Load();
+            foreach (var entitySave in entitiesSave)
+            {
+                var entity = InstantiateEntity<Entity>(entitySave.id);
+                entity.transform.SetAngleY(entitySave.rotationY);
+                Place(entity, entitySave.gridPos);
+            }
         }
 
         public bool HasEntity(Vector2Int gridPos)
@@ -44,8 +64,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public T InstantiateEntity<T>(string id) where T : Entity
         {
-            var entity = ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
-            return entity;
+            return ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
         }
 
         public void PlaceOnCenter(Entity entity, Vector3 worldPos)
@@ -129,15 +148,21 @@ namespace com.Plapamaru.TownCrafter.Factory
             return true;
         }
 
-        public void SetActiveOutputsForExtractors(bool active)
+        public void SetActiveInputsOutputs(params (bool isInput, bool activate, Type type)[] items)
         {
-            var extractors = new List<Extractor>();
-            foreach (var entity in _entities)
+            foreach (var item in items)
             {
-                if (entity.Value is Extractor extractor && !extractors.Contains(extractor))
+                var updatedEntities = new List<Entity>();
+                foreach (var entity in _entities)
                 {
-                    extractors.Add(extractor);
-                    extractor.SetActiveOutputs(active);
+                    if (!updatedEntities.Contains(entity.Value) && entity.Value.GetType() == item.type)
+                    {
+                        updatedEntities.Add(entity.Value);
+                        if (item.isInput)
+                            entity.Value.SetActiveInputs(item.activate);
+                        else
+                            entity.Value.SetActiveOutputs(item.activate);
+                    }
                 }
             }
         }
@@ -165,7 +190,10 @@ namespace com.Plapamaru.TownCrafter.Factory
                 }
             }
 
-            entity.ApplyCorrectPlacement(entity.HasCorrectPlacement(_entities));
+            entity.SetCorrectlyPlaced(entity.HasCorrectPlacement(_entities));
+
+            foreach (var listener in _listeners)
+                listener.OnEntityPlaced(entity);
 
             _debugCells.UpdateDebugCells(_entities);
         }
@@ -185,7 +213,15 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             _debugCells.UpdateDebugCells(_entities);
 
+            foreach (var listener in _listeners)
+                listener.OnEntityRemoved(entity);
+
             ObjectPoolingSystem.Instance.ReleaseObject(entity);
+        }
+
+        public void SaveEntities()
+        {
+            _saveSystem.Save(_entities);
         }
     }
 }

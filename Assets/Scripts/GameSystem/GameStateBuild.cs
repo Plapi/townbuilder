@@ -24,6 +24,12 @@ namespace com.Plapamaru.TownCrafter.Game
         {
             _buildPanel = UISystem.Instance.GetPanel<UIBuildPanel>();
         }
+        
+        public override async UniTask Exit(CancellationToken cancellationToken)
+        {
+            _factorySystem.SaveEntities();
+            await _buildPanel.Close(true, cancellationToken);
+        }
 
         protected UniTask ProcessTap(CancellationToken cancellationToken)
         {

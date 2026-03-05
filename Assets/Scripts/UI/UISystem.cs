@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using com.Plapamaru.Extensions;
 using com.Plapamaru.Singletons;
+using com.Plapamaru.Utilities;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;

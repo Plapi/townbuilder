@@ -13,7 +13,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public bool IsCorrectlyPlaced { get; private set; }
 
-        public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
+        public override void SetCorrectlyPlaced(bool hasCorrectPlacement)
         {
             IsCorrectlyPlaced = hasCorrectPlacement;
 

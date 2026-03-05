@@ -21,7 +21,7 @@ namespace com.Plapamaru.TownCrafter.Game
             {
                 _entity = context.extractor;
                 _entity.SetActiveInputsOutputs(true);
-                _entity.ApplyCorrectPlacement(_entity.IsCorrectlyPlaced);
+                _entity.SetCorrectlyPlaced(_entity.IsCorrectlyPlaced);
                 _entity.SetLayer(LayerType.Interactable);
             }
 
@@ -42,8 +42,6 @@ namespace com.Plapamaru.TownCrafter.Game
                 _entity.OnConfirmPlacement();
             else
                 _factorySystem.Release(_entity);
-
-            await _buildPanel.Close(true, cancellationToken);
         }
 
         public new class Context : GameStateBuild<Context, Extractor>.Context

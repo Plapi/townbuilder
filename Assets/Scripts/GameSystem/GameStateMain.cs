@@ -31,6 +31,11 @@ namespace com.Plapamaru.TownCrafter.Game
             }, cancellationToken);
         }
 
+        public override UniTask Exit(CancellationToken cancellationToken)
+        {
+            return UniTask.CompletedTask;
+        }
+
         private void InitUI()
         {
             _mainPanel = UISystem.Instance.GetPanel<UIMainPanel>();
