@@ -7,17 +7,18 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class FactorySystem : MonoBehaviour, IFactorySystem
+    public class FactorySystem : MonoBehaviour
     {
+        [SerializeField] private FactorySimulation _simulation;
         [SerializeField] private DebugCells _debugCells;
 
         private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
 
         private void Start()
         {
-            var resourceNodes = GetComponentsInChildren<ResourceNode>();
-            foreach (var resourceNode in resourceNodes)
-                SetEntities(resourceNode);
+            var staticEntities = GetComponentsInChildren<Entity>();
+            foreach (var entity in staticEntities)
+                SetEntities(entity);
         }
 
         public bool HasEntity(Vector2Int gridPos)
@@ -126,6 +127,19 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             return true;
+        }
+
+        public void SetActiveOutputsForExtractors(bool active)
+        {
+            var extractors = new List<Extractor>();
+            foreach (var entity in _entities)
+            {
+                if (entity.Value is Extractor extractor && !extractors.Contains(extractor))
+                {
+                    extractors.Add(extractor);
+                    extractor.SetActiveOutputs(active);
+                }
+            }
         }
 
         private void SetEntities(Entity entity)

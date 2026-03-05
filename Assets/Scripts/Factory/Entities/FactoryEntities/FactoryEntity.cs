@@ -13,12 +13,6 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public bool IsCorrectlyPlaced { get; private set; }
 
-        protected override void Awake()
-        {
-            base.Awake();
-            SetActiveInputsOutputs(false);
-        }
-
         public override void ApplyCorrectPlacement(bool hasCorrectPlacement)
         {
             IsCorrectlyPlaced = hasCorrectPlacement;
@@ -29,18 +23,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             _entityHighlightObject.Place(this, hasCorrectPlacement ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor);
         }
 
-        public void SetActiveInputsOutputs(bool active)
-        {
-            foreach (var input in _inputs)
-                input.gameObject.SetActive(active);
-            foreach (var output in _outputs)
-                output.gameObject.SetActive(active);
-        }
-
         public override void OnConfirmPlacement()
         {
             base.OnConfirmPlacement();
-            SetActiveInputsOutputs(false);
             ReleaseHighlightObject();
             SetLayer(LayerType.Environment);
         }
@@ -48,7 +33,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         public override void OnRelease()
         {
             base.OnRelease();
-            SetActiveInputsOutputs(false);
             ReleaseHighlightObject();
             SetLayer(LayerType.Environment);
         }

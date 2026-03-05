@@ -62,6 +62,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             GridPos = FactoryUtils.GetGridPos(transform);
             GridPositions = new List<Vector2Int>();
             SetEntityColliders();
+            SetActiveInputsOutputs(false);
         }
 
         public void SnapToGridOnCenter(Vector3 worldPos)
@@ -104,6 +105,24 @@ namespace com.Plapamaru.TownCrafter.Factory
             gameObject.SetLayerRecursively(LayersUtils.GetLayer(layerType));
         }
 
+        public void SetActiveInputsOutputs(bool active)
+        {
+            SetActiveInputs(active);
+            SetActiveOutputs(active);
+        }
+
+        public void SetActiveInputs(bool active)
+        {
+            foreach (var input in _inputs)
+                input.gameObject.SetActive(active);
+        }
+
+        public void SetActiveOutputs(bool active)
+        {
+            foreach (var output in _outputs)
+                output.gameObject.SetActive(active);
+        }
+
         private void SetEntityColliders()
         {
             var colliders = transform.GetComponentsInChildren<Collider>();
@@ -143,12 +162,13 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public virtual void OnConfirmPlacement()
         {
-
+            SetActiveInputsOutputs(false);
         }
 
         public virtual void OnRelease()
         {
             GridPositions.Clear();
+            SetActiveInputsOutputs(false);
         }
 
         private void OnDrawGizmos()

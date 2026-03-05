@@ -35,6 +35,7 @@ namespace com.Plapamaru.TownCrafter.Game
             }
 
             _entity.SetActiveInputsOutputs(false);
+            _factorySystem.SetActiveOutputsForExtractors(true);
 
             await _buildPanel.Show(cancellationToken);
 
@@ -49,6 +50,8 @@ namespace com.Plapamaru.TownCrafter.Game
             if (cancellationToken.IsCancellationRequested)
                 return;
 
+            _factorySystem.SetActiveOutputsForExtractors(false);
+            
             if (_buildPanel.SelectedButton == UIButtonType.Close)
             {
                 _factorySystem.Release(_entity);
