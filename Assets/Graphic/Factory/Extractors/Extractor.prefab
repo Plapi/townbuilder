@@ -131,7 +131,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1494714634772220697}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: cfbedf7ef03440d4fa4612eada28b8dd, type: 2}
   m_CullingMode: 0
@@ -313,7 +313,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2247075974059257193}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 57023cf4b0648de4c93c639a09280dec, type: 2}
   m_CullingMode: 0
@@ -426,7 +426,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4594232715504180512}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: f935a88c83af3a74199fde0245c3cd1a, type: 2}
   m_CullingMode: 0
@@ -539,7 +539,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5813439953204254593}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 6a8613d669bcc8b469fd7049516e6e6b, type: 2}
   m_CullingMode: 0
@@ -685,7 +685,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7051735025724319953}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: b48e6d9c2138fc345976784e2985952b, type: 2}
   m_CullingMode: 0
@@ -1089,8 +1089,15 @@ MonoBehaviour:
   _outputs:
   - {fileID: 6183382567784103004}
   _gridPos: {x: 0, y: 0}
+  _isCorrectlyPlaced: 0
   _graphic: {fileID: 1782044764480533135}
   _entityHighlightObject: {fileID: 0}
+  _animators:
+  - {fileID: 2362173771789094466}
+  - {fileID: 2331218031069613923}
+  - {fileID: 902327277900484745}
+  - {fileID: 8746417485690835587}
+  - {fileID: 6552911918303086321}
 --- !u!1001 &1839915399639652144
 PrefabInstance:
   m_ObjectHideFlags: 0

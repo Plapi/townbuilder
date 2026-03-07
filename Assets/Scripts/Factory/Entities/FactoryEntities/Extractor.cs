@@ -5,6 +5,9 @@ namespace com.Plapamaru.TownCrafter.Factory
 {
     public class Extractor : FactoryEntity
     {
+        [Space]
+        [SerializeField] private Animator[] _animators;
+
         protected override bool CheckIsCorrectlyPlaced(Dictionary<Vector2Int, Entity> map)
         {
             if (!base.CheckIsCorrectlyPlaced(map))
@@ -18,6 +21,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             return false;
+        }
+
+        public void SetEnabledAnimators(bool enabled)
+        {
+            foreach (var animator in _animators)
+                animator.enabled = enabled;
         }
     }
 }

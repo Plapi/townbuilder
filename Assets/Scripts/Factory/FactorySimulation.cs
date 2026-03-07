@@ -25,14 +25,27 @@ namespace com.Plapamaru.TownCrafter.Factory
             {
                 if (_updateDistributions)
                 {
-                    foreach (var conveyor in _conveyors)
-                        conveyor.SetBeltSpeed(0f);
-
                     UpdateDistributions();
 
+                    var staticExtractors = new List<Extractor>(_extractors);
+                    var staticConveyors = new List<Conveyor>(_conveyors);
+
                     foreach (var distribution in _distributions)
+                    {
+                        distribution.extractor.SetEnabledAnimators(true);
+                        staticExtractors.Remove(distribution.extractor);
+
                         foreach (var conveyor in distribution.conveyors)
+                        {
                             conveyor.SetBeltSpeed(1f);
+                            staticConveyors.Remove(conveyor);
+                        }
+                    }
+
+                    foreach (var extractor in staticExtractors)
+                        extractor.SetEnabledAnimators(false);
+                    foreach (var conveyor in staticConveyors)
+                        conveyor.SetBeltSpeed(0f);
 
                     _updateDistributions = false;
                 }
@@ -43,13 +56,13 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void OnEntityPlaced(Entity entity)
         {
-            if (entity is ResourceNode resourceNode)
+            if (entity is ResourceNode resourceNode && !_resourceNodes.Contains(resourceNode))
                 _resourceNodes.Add(resourceNode);
-            else if (entity is Extractor extractor)
+            else if (entity is Extractor extractor && !_extractors.Contains(extractor))
                 _extractors.Add(extractor);
-            else if (entity is Conveyor conveyor)
+            else if (entity is Conveyor conveyor && !_conveyors.Contains(conveyor))
                 _conveyors.Add(conveyor);
-            else if (entity is Construction construction)
+            else if (entity is Construction construction && !_constructions.Contains(construction))
                 _constructions.Add(construction);
 
             if (_map != null)
