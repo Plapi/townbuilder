@@ -70,7 +70,7 @@ namespace com.Plapamaru.TownCrafter.Game
                         UniTask.WaitUntil(() => Input.GetKeyUp(KeyCode.R), cancellationToken: _cancellationTokenSource.Token)
                     );
                     
-                    if (race == 0)
+                    if (race == 0 && !linkedToken.IsCancellationRequested)
                         await _currentState.state.Exit(linkedToken);
                 }
                 catch (OperationCanceledException) when (_cancellationTokenSource.IsCancellationRequested) { }

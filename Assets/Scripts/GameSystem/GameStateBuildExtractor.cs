@@ -21,7 +21,7 @@ namespace com.Plapamaru.TownCrafter.Game
             {
                 _entity = context.extractor;
                 _entity.SetActiveInputsOutputs(true);
-                _entity.SetCorrectlyPlaced(_entity.IsCorrectlyPlaced);
+                _entity.ShowHighlightObject();
                 _entity.SetLayer(LayerType.Interactable);
             }
 

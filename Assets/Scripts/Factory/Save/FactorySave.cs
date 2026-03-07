@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using com.Plapamaru.Utilities;
 using UnityEngine;
@@ -15,33 +16,43 @@ namespace com.Plapamaru.TownCrafter.Factory
         public void Save(Dictionary<Vector2Int, Entity> entitiesDict)
         {
             var entities = new List<Entity>();
-            var entitiesSaveData = new List<EntitySaveData>();
+            var saveData = new SaveData();
             foreach (var (_, entity) in entitiesDict)
             {
-                if (!entities.Contains(entity) && entity is Conveyor or Extractor)
+                if (!entities.Contains(entity))
                 {
+                    if (entity is Extractor extractor)
+                        saveData.extractors.Add(EntityToSaveData<EntitySaveData>(extractor));
+                    else if (entity is Conveyor conveyor)
+                    {
+                        var conveyorSaveData = EntityToSaveData<ConveyorSaveData>(conveyor);
+                        if (conveyor.NextConveyor != null)
+                            conveyorSaveData.nextConveyorGridPos = conveyor.NextConveyor.GridPos;
+                        conveyorSaveData.beltDirection = conveyor.BeltDirection;
+                        saveData.conveyors.Add(conveyorSaveData);
+                    }
+
                     entities.Add(entity);
-                    entitiesSaveData.Add(EntityToSaveData(entity));
                 }
             }
 
-            var json = prettyJson ? entitiesSaveData.AsPrettyJson() : entitiesSaveData.AsJson();
+            var json = prettyJson ? saveData.AsPrettyJson() : saveData.AsJson();
             PlayerPrefs.SetString(FactoryConstants.FACTORY_SAVE_KEY, json);
             PlayerPrefs.Save();
         }
 
-        public List<EntitySaveData> Load()
+        public SaveData Load()
         {
             if (!PlayerPrefs.HasKey(FactoryConstants.FACTORY_SAVE_KEY))
-                return new List<EntitySaveData>();
+                return new SaveData();
 
             var json = PlayerPrefs.GetString(FactoryConstants.FACTORY_SAVE_KEY);
-            return json.AsModel<List<EntitySaveData>>();
+            return json.AsModel<SaveData>();
         }
 
-        private static EntitySaveData EntityToSaveData(Entity entity)
+        private static T EntityToSaveData<T>(Entity entity) where T : EntitySaveData, new()
         {
-            return new EntitySaveData
+            return new T()
             {
                 id = entity.Id,
                 gridPos = entity.GridPos,
@@ -58,10 +69,32 @@ namespace com.Plapamaru.TownCrafter.Factory
         public static void LogAndCopy()
         {
             var json = PlayerPrefs.GetString(FactoryConstants.FACTORY_SAVE_KEY);
-            json = json.AsModel<List<EntitySaveData>>().AsPrettyJson();
+            json = json.AsModel<SaveData>().AsPrettyJson();
             GUIUtility.systemCopyBuffer = json;
             Debug.Log(json);
         }
+    }
+
+    [Serializable]
+    public class SaveData
+    {
+        public List<EntitySaveData> extractors = new List<EntitySaveData>();
+        public List<ConveyorSaveData> conveyors = new List<ConveyorSaveData>();
+    }
+
+    [Serializable]
+    public class EntitySaveData
+    {
+        public string id;
+        public Vector2Int gridPos;
+        public int rotationY;
+    }
+
+    [Serializable]
+    public class ConveyorSaveData : EntitySaveData
+    {
+        public Vector2Int? nextConveyorGridPos;
+        public int beltDirection;
     }
 
 #if UNITY_EDITOR

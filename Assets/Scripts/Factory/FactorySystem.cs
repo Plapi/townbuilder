@@ -32,12 +32,22 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private void SetSaveEntities()
         {
-            var entitiesSave = _saveSystem.Load();
-            foreach (var entitySave in entitiesSave)
+            var saveData = _saveSystem.Load();
+
+            InstantiateSaveEntities<EntitySaveData, Extractor>(saveData.extractors);
+            var conveyors = InstantiateSaveEntities<ConveyorSaveData, Conveyor>(saveData.conveyors);
+
+            for (var i = 0; i < saveData.conveyors.Count; i++)
             {
-                var entity = InstantiateEntity<Entity>(entitySave.id);
-                entity.transform.SetAngleY(entitySave.rotationY);
-                Place(entity, entitySave.gridPos);
+                if (saveData.conveyors[i].nextConveyorGridPos != null)
+                {
+                    var gridPos = saveData.conveyors[i].nextConveyorGridPos.Value;
+                    if (TryGetEntity(gridPos, out Conveyor nextConveyor))
+                        conveyors[i].Connect(nextConveyor);
+                    else
+                        Debug.LogError($"Failed to find conveyor grid pos at {gridPos}");
+                    conveyors[i].SetBeltDirection(saveData.conveyors[i].beltDirection);
+                }
             }
         }
 
@@ -65,6 +75,22 @@ namespace com.Plapamaru.TownCrafter.Factory
         public T InstantiateEntity<T>(string id) where T : Entity
         {
             return ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
+        }
+
+        private List<U> InstantiateSaveEntities<T, U>(List<T> entitiesSaves)
+            where T : EntitySaveData
+            where U : Entity
+        {
+            var entities = new List<U>();
+            foreach (var entitySave in entitiesSaves)
+            {
+                var entity = InstantiateEntity<U>(entitySave.id);
+                entity.transform.SetAngleY(entitySave.rotationY);
+                entity.SetLayer(LayerType.Environment);
+                Place(entity, entitySave.gridPos);
+                entities.Add(entity);
+            }
+            return entities;
         }
 
         public void PlaceOnCenter(Entity entity, Vector3 worldPos)
@@ -108,7 +134,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 fromPrev.Connect(newFromConveyor);
 
                 newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
-                newFromConveyor.SetSpeedSign(speedSign);
+                newFromConveyor.SetBeltDirection(speedSign);
 
                 to.transform.SetLocalAngleY(ConveyorHelper.GetStraightAngle(to.GridPos - newFromConveyor.GridPos));
 
@@ -190,7 +216,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 }
             }
 
-            entity.SetCorrectlyPlaced(entity.HasCorrectPlacement(_entities));
+            entity.OnPlacementUpdate(_entities);
 
             foreach (var listener in _listeners)
                 listener.OnEntityPlaced(entity);

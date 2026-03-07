@@ -5,9 +5,9 @@ namespace com.Plapamaru.TownCrafter.Factory
 {
     public class Extractor : FactoryEntity
     {
-        public override bool HasCorrectPlacement(Dictionary<Vector2Int, Entity> map)
+        protected override bool CheckIsCorrectlyPlaced(Dictionary<Vector2Int, Entity> map)
         {
-            if (base.HasCorrectPlacement(map) == false)
+            if (!base.CheckIsCorrectlyPlaced(map))
                 return false;
 
             foreach (var input in _inputs)

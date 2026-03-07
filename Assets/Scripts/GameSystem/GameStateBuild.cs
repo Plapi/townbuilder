@@ -123,6 +123,7 @@ namespace com.Plapamaru.TownCrafter.Game
             _entity = InstantiateEntity();
             _entity.SetActiveInputsOutputs(true);
             _factorySystem.PlaceOnCenter(_entity, hit.point);
+            _entity.ShowHighlightObject();
 
             return true;
         }

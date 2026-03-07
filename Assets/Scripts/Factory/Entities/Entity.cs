@@ -16,9 +16,11 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         [Header("Runtime Properties")]
         [SerializeField] private Vector2Int _gridPos;
+        [SerializeField] private bool _isCorrectlyPlaced;
 
         public Transform[] Inputs => _inputs;
         public Transform[] Outputs => _outputs;
+        public bool IsCorrectlyPlaced => _isCorrectlyPlaced;
 
         public string Id => _id;
         public MonoBehaviour Behaviour => this;
@@ -152,9 +154,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             return new List<Vector2Int>(result);
         }
 
-        public abstract void SetCorrectlyPlaced(bool hasCorrectPlacement);
+        public virtual void OnPlacementUpdate(Dictionary<Vector2Int, Entity> map)
+        {
+            _isCorrectlyPlaced = CheckIsCorrectlyPlaced(map);
+        }
 
-        public virtual bool HasCorrectPlacement(Dictionary<Vector2Int, Entity> map)
+        protected virtual bool CheckIsCorrectlyPlaced(Dictionary<Vector2Int, Entity> map)
         {
             return Size.x * Size.y == GridPositions.Count;
         }

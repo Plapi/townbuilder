@@ -17,6 +17,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public Conveyor PrevConveyor => _prevConveyor;
         public Conveyor NextConveyor => _nextConveyor;
+        public virtual int BeltDirection => 1;
 
         public void Connect(Conveyor next)
         {
@@ -56,6 +57,11 @@ namespace com.Plapamaru.TownCrafter.Factory
                     Debug.LogError("Error on release");
             }
             _nextConveyor = null;
+        }
+
+        public virtual void SetBeltDirection(int direction)
+        {
+            
         }
 
         public void SetPillarActive(bool active)

@@ -29,7 +29,7 @@ namespace com.Plapamaru.TownCrafter.Game
             {
                 _entity = context.conveyor;
                 _entity.Disconnect();
-                _entity.SetCorrectlyPlaced(_entity.IsCorrectlyPlaced);
+                _entity.ShowHighlightObject();
                 _entity.SetLayer(LayerType.Interactable);
                 _buildPanel.UpdateCancelButton(false);
             }
@@ -174,7 +174,7 @@ namespace com.Plapamaru.TownCrafter.Game
             }
 
             _conveyors[^1].ShowAllowedHighlights(_factorySystem.HasEntity);
-            _conveyors[^1].SetCorrectlyPlaced(_conveyors[^1].IsCorrectlyPlaced);
+            _conveyors[^1].ShowHighlightObject();
         }
 
         private bool UpdateNextBuildingStep(bool onlyAdjacent)

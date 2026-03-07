@@ -6,10 +6,5 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class ResourceNode : Entity
     {
         [SerializeField] private ResourceItemType _outputResourceType;
-        
-        public override void SetCorrectlyPlaced(bool hasCorrectPlacement)
-        {
-            
-        }
     }
 }
