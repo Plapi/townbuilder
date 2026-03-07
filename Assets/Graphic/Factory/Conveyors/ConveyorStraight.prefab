@@ -52,11 +52,15 @@ MonoBehaviour:
   _inputs: []
   _outputs: []
   _gridPos: {x: 0, y: 0}
+  _isCorrectlyPlaced: 0
   _graphic: {fileID: 4458885312854341160}
   _entityHighlightObject: {fileID: 0}
   _pillar: {fileID: 4400281505660226804}
+  _beltRenderer: {fileID: 8241401341742037709}
+  _beltMaterialIndex: 0
   _prevConveyor: {fileID: 0}
   _nextConveyor: {fileID: 0}
+  _allowedHighlightObjects: []
 --- !u!1 &3224904199475369695
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,7 +424,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 56fa1ae13b08744e49ff03e19d5f6fca, type: 2}
+  - {fileID: 2100000, guid: 77e36885e4c8344b49c233dbe2b94eeb, type: 2}
   - {fileID: 2100000, guid: 26858617d43b245eaa5b91efd79703ef, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0

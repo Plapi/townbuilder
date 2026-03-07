@@ -7,5 +7,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public const string CONVEYOR_STRAIGHT_NAME = "ConveyorStraight";
         public const string CONVEYOR_CORNER_NAME = "ConveyorCorner";
         public const string ENTITY_HIGHLIGHT_NAME = "EntityHighlight";
+        
+        public const float PRODUCTION_STEP_TIME = 2f;
     }
 }

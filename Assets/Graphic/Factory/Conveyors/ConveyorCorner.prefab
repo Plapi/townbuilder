@@ -48,13 +48,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ConveyorCorner
   _id: ConveyorCorner
   _size: {x: 1, y: 1}
-  _gridPos: {x: 0, y: 0}
   _inputs: []
   _outputs: []
+  _gridPos: {x: 0, y: 0}
+  _isCorrectlyPlaced: 0
   _graphic: {fileID: 4458885312854341160}
+  _entityHighlightObject: {fileID: 0}
   _pillar: {fileID: 4400281505660226804}
+  _beltRenderer: {fileID: 2858774359953097874}
+  _beltMaterialIndex: 0
   _prevConveyor: {fileID: 0}
   _nextConveyor: {fileID: 0}
+  _allowedHighlightObjects: []
 --- !u!1 &3763292969905744122
 GameObject:
   m_ObjectHideFlags: 0
@@ -290,7 +295,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98ba9816ef7e16242af67c356dc96ba3, type: 2}
+  - {fileID: 2100000, guid: e6f823f633a2d48339aa46e0b65a31e9, type: 2}
   - {fileID: 2100000, guid: 584298370d36a40b990c70c3b95dd23a, type: 2}
   - {fileID: 2100000, guid: 80973dbf27cd842689c73bed8c9f9048, type: 2}
   m_StaticBatchInfo:

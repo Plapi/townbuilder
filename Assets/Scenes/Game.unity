@@ -978,6 +978,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ff9eb57f38a742de825b628404e2ea2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactorySimulation
+  _resourceNodes: []
+  _extractors: []
+  _conveyors: []
+  _constructions: []
 --- !u!114 &165255275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -990,6 +994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d6d2294f4a74a108e24a21638db0d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactorySaveSystem
+  prettyJson: 0
 --- !u!1 &165729558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2596,6 +2601,7 @@ MonoBehaviour:
   - {fileID: 943728821}
   _outputs: []
   _gridPos: {x: 0, y: 0}
+  _isCorrectlyPlaced: 0
 --- !u!1 &448293846
 GameObject:
   m_ObjectHideFlags: 0
@@ -4302,7 +4308,7 @@ Transform:
   m_GameObject: {fileID: 890364971}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4656,7 +4662,7 @@ Transform:
   m_GameObject: {fileID: 943728820}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 3, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4905,7 +4911,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7931522827763748697, guid: 7c369bf4219a44fec966959268476876, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7931522827763748697, guid: 7c369bf4219a44fec966959268476876, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4929,7 +4935,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7931522827763748697, guid: 7c369bf4219a44fec966959268476876, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000000119209275
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7931522827763748697, guid: 7c369bf4219a44fec966959268476876, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

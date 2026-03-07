@@ -10,14 +10,21 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Space]
         [SerializeField] private GameObject _pillar;
 
+        [Header("Belt")]
+        [SerializeField] private MeshRenderer _beltRenderer;
+        [SerializeField] private int _beltMaterialIndex;
+
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _prevConveyor;
         [SerializeField] private Conveyor _nextConveyor;
         [SerializeField] private List<EntityHighlightObject> _allowedHighlightObjects;
 
+        private float _beltSpeed;
+        private int _beltDirection = 1;
+
         public Conveyor PrevConveyor => _prevConveyor;
         public Conveyor NextConveyor => _nextConveyor;
-        public virtual int BeltDirection => 1;
+        public int BeltDirection => _beltDirection;
 
         public void Connect(Conveyor next)
         {
@@ -57,11 +64,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                     Debug.LogError("Error on release");
             }
             _nextConveyor = null;
-        }
-
-        public virtual void SetBeltDirection(int direction)
-        {
-            
         }
 
         public void SetPillarActive(bool active)
@@ -113,6 +115,18 @@ namespace com.Plapamaru.TownCrafter.Factory
                     return true;
             }
             return false;
+        }
+
+        public void SetBeltSpeed(float speed)
+        {
+            _beltRenderer.materials[_beltMaterialIndex].SetFloat("_Speed", speed * _beltDirection);
+            _beltSpeed = speed;
+        }
+
+        public void SetBeltDirection(int beltDirection)
+        {
+            _beltDirection = beltDirection;
+            SetBeltSpeed(_beltSpeed);
         }
 
         private void OnDrawGizmos()

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using com.Plapamaru.Utilities;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.TownCrafter.Layers;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -18,9 +20,13 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private void Start()
         {
-            SetStaticEntities();
-            SetSaveEntities();
             _listeners.Add(_simulationSystem);
+
+            SetStaticEntities();
+
+            SetSaveEntities();
+
+            _simulationSystem.Run(_entities, CancellationToken.None).Forget();
         }
 
         private void SetStaticEntities()
