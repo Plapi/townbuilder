@@ -125,21 +125,16 @@ namespace com.Plapamaru.TownCrafter.Factory
             var fromPrev = from.PrevConveyor;
             if (fromPrev != null && FactoryUtils.AreDiagonals(fromPrev.GridPos, to.GridPos))
             {
-                var inDir = from.GridPos - fromPrev.GridPos;
-                var outDir = to.GridPos - from.GridPos;
-
-                var newFromConveyor = InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
-                Replace(from, newFromConveyor);
-                newFromConveyor.ReleaseHighlightObject();
-                fromPrev.Connect(newFromConveyor);
-
-                newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
-                newFromConveyor.SetBeltDirection(speedSign);
-
-                to.transform.SetLocalAngleY(ConveyorHelper.GetStraightAngle(to.GridPos - newFromConveyor.GridPos));
-
-                onConveyorReplaced?.Invoke(from, newFromConveyor);
-                from = newFromConveyor;
+                var newFrom = ReplaceWithConveyorCorner(from, to, fromPrev.GridPos);
+                fromPrev.Connect(newFrom);
+                onConveyorReplaced?.Invoke(from, newFrom);
+                from = newFrom;
+            }
+            else if (IsDiagonalWithPossibleExtractorConnexion(from, to, out var fromPrevGridPos))
+            {
+                var newFrom = ReplaceWithConveyorCorner(from, to, fromPrevGridPos);
+                onConveyorReplaced?.Invoke(from, newFrom);
+                from = newFrom;
             }
             else
             {
@@ -152,6 +147,55 @@ namespace com.Plapamaru.TownCrafter.Factory
             to.SnapToGrid(to.GridPos);
 
             from.Connect(to);
+        }
+
+        private bool IsDiagonalWithPossibleExtractorConnexion(Conveyor from, Conveyor to, out Vector2Int fromPrevGridPos)
+        {
+            fromPrevGridPos = default;
+
+            if (from.PrevConveyor != null)
+                return false;
+
+            foreach (var entity in _entities)
+            {
+                if (entity.Value is not Extractor extractor)
+                    continue;
+
+                foreach (var output in entity.Value.Outputs)
+                {
+                    var outputGridPos = FactoryUtils.GetGridPos(output);
+                    if (outputGridPos != from.GridPos)
+                        continue;
+
+                    var adjGridPositions = from.GetAdjacentGridPositions();
+                    foreach (var adjGridPosition in adjGridPositions)
+                        if (_entities.ContainsKey(adjGridPosition) && _entities[adjGridPosition] == extractor &&
+                            FactoryUtils.AreDiagonals(adjGridPosition, to.GridPos))
+                        {
+                            fromPrevGridPos = adjGridPosition;
+                            return true;
+                        }
+                }
+            }
+
+            return false;
+        }
+
+        private Conveyor ReplaceWithConveyorCorner(Conveyor from, Conveyor to, Vector2Int fromPrevGridPos)
+        {
+            var inDir = from.GridPos - fromPrevGridPos;
+            var outDir = to.GridPos - from.GridPos;
+
+            var newFromConveyor = InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
+            Replace(from, newFromConveyor);
+            newFromConveyor.ReleaseHighlightObject();
+
+            newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
+            newFromConveyor.SetBeltDirection(speedSign);
+
+            to.transform.SetLocalAngleY(ConveyorHelper.GetStraightAngle(to.GridPos - newFromConveyor.GridPos));
+
+            return newFromConveyor;
         }
 
         public bool TryFindPath(Conveyor conveyor, Vector2Int gridPos, out List<Vector2Int> path)

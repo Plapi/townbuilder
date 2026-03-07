@@ -131,7 +131,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 colliders[i].gameObject.AddComponent<EntityCollider>().SetEntity(this);
         }
 
-        protected List<Vector2Int> GetAdjacentGridPositions()
+        public List<Vector2Int> GetAdjacentGridPositions()
         {
             HashSet<Vector2Int> result = new HashSet<Vector2Int>();
             Vector2Int[] directions =

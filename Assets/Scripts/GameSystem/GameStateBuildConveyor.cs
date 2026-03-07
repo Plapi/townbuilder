@@ -165,11 +165,18 @@ namespace com.Plapamaru.TownCrafter.Game
                 while (_conveyors.Count > 1 && _conveyors.Count > index + 1)
                     RemoveLastConveyor();
 
-                if (_conveyors[^1] is ConveyorCorner && _conveyors.Count > 1)
+                if (_conveyors[^1] is ConveyorCorner)
                 {
                     var lastConveyorGridPos = _conveyors[^1].GridPos;
                     RemoveLastConveyor();
-                    _conveyors.Add(CreateNewConveyor(_conveyors[^1], lastConveyorGridPos));
+                    if (_conveyors.Count > 0)
+                        _conveyors.Add(CreateNewConveyor(_conveyors[^1], lastConveyorGridPos));
+                    else
+                    {
+                        _entity = InstantiateEntity();
+                        _factorySystem.Place(_entity, lastConveyorGridPos);
+                        _conveyors.Add(_entity);
+                    }
                 }
             }
 
@@ -190,9 +197,6 @@ namespace com.Plapamaru.TownCrafter.Game
                 if (_factorySystem.TryGetEntity(gridPos, out Conveyor removeConveyor) &&
                     _conveyors[^1] != removeConveyor && _conveyors.Contains(removeConveyor))
                 {
-                    if (removeConveyor is ConveyorCorner && _conveyors.IndexOf(removeConveyor) == 0)
-                        return false;
-
                     _nextBuildStep = new BuildStep
                     {
                         build = false,
