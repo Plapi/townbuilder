@@ -134,7 +134,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             if (_nextConveyor != null)
             {
                 Gizmos.color = Color.red;
-                var from = new Vector3(GridPos.x, 0f, GridPos.y) + new Vector3(0.5f, 1f, 0.5f);
+                var from = new Vector3(GridPos.x, 0f, GridPos.y) + new Vector3(0.5f, 1.1f, 0.5f);
                 var to = new Vector3(_nextConveyor.GridPos.x, 0f, _nextConveyor.GridPos.y) + new Vector3(0.5f, 1.1f, 0.5f);
                 Gizmos.DrawLine(from, to);
                 Utilities.Utils.DrawArrowHead(from, to, 0.5f);
