@@ -60,6 +60,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
                 var segmentElapsed = 0f;
 
+                transform.LookAt(end);
+
                 while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
                 {
                     segmentElapsed += Time.deltaTime;
