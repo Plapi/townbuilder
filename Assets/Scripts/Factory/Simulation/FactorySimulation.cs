@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
-using com.Plapamaru.Utilities;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -19,13 +18,10 @@ namespace com.Plapamaru.TownCrafter.Factory
         private readonly List<Distribution> _distributions = new List<Distribution>();
         private readonly List<ResourceItem> _resourceItems = new List<ResourceItem>();
 
-        private Dictionary<Vector2Int, Entity> _map;
         private bool _updateDistributions = true;
 
-        public async UniTask Run(Dictionary<Vector2Int, Entity> map, CancellationToken cancellationToken)
+        public async UniTask Run(CancellationToken cancellationToken)
         {
-            _map = map;
-
             try
             {
                 while (cancellationToken.IsCancellationRequested == false)
@@ -65,9 +61,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             {
                 await item.RunAlongRoute(distribution.path, cancellationToken);
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
             finally
             {
                 _resourceItems.Remove(item);
@@ -85,8 +79,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             else if (entity is Construction construction && !_constructions.Contains(construction))
                 _constructions.Add(construction);
 
-            if (_map != null)
-                _updateDistributions = true;
+            _updateDistributions = true;
         }
 
         public void OnEntityRemoved(Entity entity)
@@ -96,8 +89,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             else if (entity is Conveyor conveyor)
                 _conveyors.Remove(conveyor);
 
-            if (_map != null)
-                _updateDistributions = true;
+            _updateDistributions = true;
         }
 
         private void UpdateDistributions()
@@ -147,7 +139,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             var extractors = new List<Extractor>();
             var adjPositions = resourceNode.GetAdjacentGridPositions();
             foreach (var gridPos in adjPositions)
-                if (_map.ContainsKey(gridPos) && _map[gridPos] is Extractor extractor && !extractors.Contains(extractor))
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out Extractor extractor) && !extractors.Contains(extractor))
                     extractors.Add(extractor);
             return extractors;
         }
@@ -158,7 +150,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             foreach (var output in extractor.Outputs)
             {
                 var gridPos = FactoryUtils.GetGridPos(output);
-                if (_map.ContainsKey(gridPos) && _map[gridPos] is Conveyor conveyor)
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor conveyor))
                 {
                     conveyors = GetConnectedConveyors(conveyor);
                     return true;
@@ -193,7 +185,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 foreach (var input in construction.Inputs)
                 {
                     var gridPos = FactoryUtils.GetGridPos(input);
-                    if (_map.TryGetValue(gridPos, out var entity) && entity == conveyor)
+                    if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor outConveyor) && outConveyor == conveyor)
                     {
                         inputConstruction = construction;
                         return true;

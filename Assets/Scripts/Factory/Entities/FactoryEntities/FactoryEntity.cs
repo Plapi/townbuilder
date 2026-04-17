@@ -33,9 +33,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             TryPlaceHighlightObject();
         }
 
-        public override void OnPlacementUpdate(Dictionary<Vector2Int, Entity> map)
+        public override void OnPlacementUpdate()
         {
-            base.OnPlacementUpdate(map);
+            base.OnPlacementUpdate();
             TryPlaceHighlightObject();
         }
 

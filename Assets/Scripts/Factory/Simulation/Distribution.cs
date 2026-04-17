@@ -95,5 +95,17 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             return list;
         }
+
+        public bool IsStillValid()
+        {
+            if (!extractor.gameObject.activeSelf)
+                return false;
+            
+            foreach (var conveyor in conveyors)
+                if (!conveyor.gameObject.activeSelf)
+                    return false;
+
+            return true;
+        }
     }
 }

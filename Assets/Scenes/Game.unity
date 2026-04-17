@@ -923,6 +923,7 @@ GameObject:
   m_Component:
   - component: {fileID: 165255273}
   - component: {fileID: 165255272}
+  - component: {fileID: 165255276}
   - component: {fileID: 165255275}
   - component: {fileID: 165255274}
   m_Layer: 0
@@ -946,7 +947,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FactorySystem
   _saveSystem: {fileID: 165255275}
   _simulationSystem: {fileID: 165255274}
-  _debugCells: {fileID: 1290306709}
 --- !u!4 &165255273
 Transform:
   m_ObjectHideFlags: 0
@@ -995,6 +995,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactorySaveSystem
   prettyJson: 0
+--- !u!114 &165255276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165255271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7580d2aa9e0b0486e9177471e0913fd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactoryMap
+  _debugCells: {fileID: 1290306709}
 --- !u!1 &165729558
 GameObject:
   m_ObjectHideFlags: 0

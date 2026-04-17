@@ -60,13 +60,18 @@ namespace com.Plapamaru.TownCrafter.Factory
 
                 var segmentElapsed = 0f;
 
-                transform.LookAt(end);
+                var direction = end - transform.position;
+                var startRotation = transform.rotation;
+                var endRotation = Quaternion.LookRotation(direction);
 
                 while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
                 {
                     segmentElapsed += Time.deltaTime;
                     var t = Mathf.Clamp01(segmentElapsed / segmentDuration);
+
                     transform.position = Vector3.Lerp(start, end, t);
+
+                    transform.rotation = Quaternion.Lerp(startRotation, endRotation, t);
 
                     await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
                 }

@@ -130,7 +130,7 @@ namespace com.Plapamaru.TownCrafter.Game
 
         protected TFactoryEntity InstantiateEntity()
         {
-            var entity = _factorySystem.InstantiateEntity<TFactoryEntity>(context.id);
+            var entity = FactoryMap.Instance.InstantiateEntity<TFactoryEntity>(context.id);
             entity.SetLayer(LayerType.Interactable);
             return entity;
         }

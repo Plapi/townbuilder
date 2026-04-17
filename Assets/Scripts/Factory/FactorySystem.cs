@@ -13,10 +13,10 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [SerializeField] private FactorySaveSystem _saveSystem;
         [SerializeField] private FactorySimulationSystem _simulationSystem;
-        [SerializeField] private DebugCells _debugCells;
 
-        private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
         private readonly List<IFactoryListener> _listeners = new List<IFactoryListener>();
+
+        public bool WasInit { get; private set; }
 
         public void Init(CancellationToken cancellationToken)
         {
@@ -26,7 +26,9 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             SetSaveEntities();
 
-            _simulationSystem.Run(_entities, cancellationToken).Forget();
+            _simulationSystem.Run(cancellationToken).Forget();
+
+            WasInit = true;
         }
 
         private void SetStaticEntities()
@@ -48,39 +50,13 @@ namespace com.Plapamaru.TownCrafter.Factory
                 if (saveData.conveyors[i].nextConveyorGridPos != null)
                 {
                     var gridPos = saveData.conveyors[i].nextConveyorGridPos.Value;
-                    if (TryGetEntity(gridPos, out Conveyor nextConveyor))
+                    if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor nextConveyor))
                         conveyors[i].Connect(nextConveyor);
                     else
                         Debug.LogError($"Failed to find conveyor grid pos at {gridPos}");
                     conveyors[i].SetBeltDirection(saveData.conveyors[i].beltDirection);
                 }
             }
-        }
-
-        public bool HasEntity(Vector2Int gridPos)
-        {
-            return _entities.ContainsKey(gridPos);
-        }
-
-        public bool TryGetEntity<T>(Vector2Int gridPos, out T entity) where T : Entity
-        {
-            if (_entities.TryGetValue(gridPos, out var baseEntity) && baseEntity is T typedEntity)
-            {
-                entity = typedEntity;
-                return true;
-            }
-            entity = null;
-            return false;
-        }
-
-        public Entity GetEntity(Vector2Int gridPos)
-        {
-            return TryGetEntity(gridPos, out Entity entity) ? entity : null;
-        }
-
-        public T InstantiateEntity<T>(string id) where T : Entity
-        {
-            return ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
         }
 
         private List<U> InstantiateSaveEntities<T, U>(List<T> entitiesSaves)
@@ -90,7 +66,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             var entities = new List<U>();
             foreach (var entitySave in entitiesSaves)
             {
-                var entity = InstantiateEntity<U>(entitySave.id);
+                var entity = FactoryMap.Instance.InstantiateEntity<U>(entitySave.id);
                 entity.transform.SetAngleY(entitySave.rotationY);
                 entity.SetLayer(LayerType.Environment);
                 Place(entity, entitySave.gridPos);
@@ -136,7 +112,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 onConveyorReplaced?.Invoke(from, newFrom);
                 from = newFrom;
             }
-            else if (IsDiagonalWithPossibleExtractorConnexion(from, to, out var fromPrevGridPos))
+            else if (FactoryMap.Instance.IsDiagonalWithPossibleExtractorConnexion(from, to, out var fromPrevGridPos))
             {
                 var newFrom = ReplaceWithConveyorCorner(from, to, fromPrevGridPos);
                 onConveyorReplaced?.Invoke(from, newFrom);
@@ -155,44 +131,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             from.Connect(to);
         }
 
-        private bool IsDiagonalWithPossibleExtractorConnexion(Conveyor from, Conveyor to, out Vector2Int fromPrevGridPos)
-        {
-            fromPrevGridPos = default;
-
-            if (from.PrevConveyor != null)
-                return false;
-
-            foreach (var entity in _entities)
-            {
-                if (entity.Value is not Extractor extractor)
-                    continue;
-
-                foreach (var output in entity.Value.Outputs)
-                {
-                    var outputGridPos = FactoryUtils.GetGridPos(output);
-                    if (outputGridPos != from.GridPos)
-                        continue;
-
-                    var adjGridPositions = from.GetAdjacentGridPositions();
-                    foreach (var adjGridPosition in adjGridPositions)
-                        if (_entities.ContainsKey(adjGridPosition) && _entities[adjGridPosition] == extractor &&
-                            FactoryUtils.AreDiagonals(adjGridPosition, to.GridPos))
-                        {
-                            fromPrevGridPos = adjGridPosition;
-                            return true;
-                        }
-                }
-            }
-
-            return false;
-        }
-
         private Conveyor ReplaceWithConveyorCorner(Conveyor from, Conveyor to, Vector2Int fromPrevGridPos)
         {
             var inDir = from.GridPos - fromPrevGridPos;
             var outDir = to.GridPos - from.GridPos;
 
-            var newFromConveyor = InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
+            var newFromConveyor = FactoryMap.Instance.InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
             Replace(from, newFromConveyor);
             newFromConveyor.ReleaseHighlightObject();
 
@@ -204,50 +148,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             return newFromConveyor;
         }
 
-        public bool TryFindPath(Conveyor conveyor, Vector2Int gridPos, out List<Vector2Int> path)
-        {
-            path = new List<Vector2Int>();
-
-            var fPath = GridPathfinder.FindPath(conveyor.GridPos, gridPos, _entities);
-            if (fPath == null || fPath.Count == 0)
-                return false;
-
-            fPath.RemoveAt(0);
-
-            foreach (var pos in fPath)
-            {
-                if (_entities.ContainsKey(pos))
-                    break;
-                path.Add(pos);
-            }
-
-            return true;
-        }
-
-        public void SetActiveInputsOutputs(params (bool isInput, bool activate, Type type)[] items)
-        {
-            foreach (var item in items)
-            {
-                var updatedEntities = new List<Entity>();
-                foreach (var entity in _entities)
-                {
-                    if (!updatedEntities.Contains(entity.Value) && entity.Value.GetType() == item.type)
-                    {
-                        updatedEntities.Add(entity.Value);
-                        if (item.isInput)
-                            entity.Value.SetActiveInputs(item.activate);
-                        else
-                            entity.Value.SetActiveOutputs(item.activate);
-                    }
-                }
-            }
-        }
-
         private void SetEntities(Entity entity)
         {
-            foreach (var gridPos in entity.GridPositions)
-                _entities.Remove(gridPos);
-            entity.GridPositions.Clear();
+            FactoryMap.Instance.Remove(entity);
 
             Vector2Int right = entity.Right;
             Vector2Int forward = entity.Forward;
@@ -258,20 +161,17 @@ namespace com.Plapamaru.TownCrafter.Factory
                 for (int y = 0; y < entity.Size.y; y++)
                 {
                     Vector2Int gridPos = origin + right * x + forward * y;
-                    if (_entities.ContainsKey(gridPos) == false)
-                    {
-                        entity.GridPositions.Add(gridPos);
-                        _entities.Add(gridPos, entity);
-                    }
+                    if (!FactoryMap.Instance.HasEntity(gridPos))
+                        FactoryMap.Instance.Add(entity, gridPos);
                 }
             }
 
-            entity.OnPlacementUpdate(_entities);
+            entity.OnPlacementUpdate();
 
             foreach (var listener in _listeners)
                 listener.OnEntityPlaced(entity);
 
-            _debugCells.UpdateDebugCells(_entities);
+            FactoryMap.Instance.UpdateDebugCells();
         }
 
         private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
@@ -284,10 +184,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void Release(FactoryEntity entity)
         {
-            foreach (var gridPos in entity.GridPositions)
-                _entities.Remove(gridPos);
-
-            _debugCells.UpdateDebugCells(_entities);
+            FactoryMap.Instance.Remove(entity);
+            FactoryMap.Instance.UpdateDebugCells();
 
             foreach (var listener in _listeners)
                 listener.OnEntityRemoved(entity);
@@ -297,7 +195,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void SaveEntities()
         {
-            _saveSystem.Save(_entities);
+            _saveSystem.Save(FactoryMap.Instance.Map);
         }
     }
 }

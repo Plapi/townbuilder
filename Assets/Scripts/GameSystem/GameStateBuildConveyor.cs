@@ -64,10 +64,10 @@ namespace com.Plapamaru.TownCrafter.Game
                 _factorySystem.Place(_entity, gridPos);
             }
 
-            _entity.ShowAllowedHighlights(_factorySystem.HasEntity);
+            _entity.ShowAllowedHighlights();
             _conveyors.Add(_entity);
 
-            if (_entity.TryGetAjdConveyor(_factorySystem.GetEntity, c => c.NextConveyor == null, out Conveyor firstConveyor))
+            if (_entity.TryGetAjdConveyor(c => c.NextConveyor == null, out Conveyor firstConveyor))
             {
                 _conveyors.Insert(0, firstConveyor);
                 _factorySystem.MakeConveyorsConnexions(firstConveyor, _entity, OnConveyorReplaced);
@@ -95,7 +95,7 @@ namespace com.Plapamaru.TownCrafter.Game
                     _factorySystem.Release(conveyor);
             }
 
-            if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(_factorySystem.GetEntity, c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
+            if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
                 _conveyors[^1].PrevConveyor != lastConveyor)
                 _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
         }
@@ -147,7 +147,7 @@ namespace com.Plapamaru.TownCrafter.Game
         {
             if (_nextBuildStep.build)
             {
-                if (_factorySystem.TryFindPath(_conveyors[^1], _nextBuildStep.gridPos, out var path) == false)
+                if (FactoryMap.Instance.TryFindPath(_conveyors[^1], _nextBuildStep.gridPos, out var path) == false)
                     return;
 
                 _conveyors[^1].ReleaseAllowedHighlights();
@@ -180,7 +180,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 }
             }
 
-            _conveyors[^1].ShowAllowedHighlights(_factorySystem.HasEntity);
+            _conveyors[^1].ShowAllowedHighlights();
             _conveyors[^1].ShowHighlightObject();
         }
 
@@ -192,20 +192,16 @@ namespace com.Plapamaru.TownCrafter.Game
                 return false;
 
             var gridPos = FactoryUtils.WorldToGrid(hit.point, RoundType.Floor);
-            if (_factorySystem.HasEntity(gridPos))
+
+            if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor removeConveyor))
             {
-                if (_factorySystem.TryGetEntity(gridPos, out Conveyor removeConveyor) &&
-                    _conveyors[^1] != removeConveyor && _conveyors.Contains(removeConveyor))
+                _nextBuildStep = new BuildStep
                 {
-                    _nextBuildStep = new BuildStep
-                    {
-                        build = false,
-                        gridPos = removeConveyor.GridPos,
-                        removeConveyor = removeConveyor
-                    };
-                    return true;
-                }
-                return false;
+                    build = false,
+                    gridPos = removeConveyor.GridPos,
+                    removeConveyor = removeConveyor
+                };
+                return true;
             }
 
             var lastConveyor = _conveyors.Count > 0 ? _conveyors[^1] : null;
@@ -257,7 +253,7 @@ namespace com.Plapamaru.TownCrafter.Game
 
         private void SetActivatePossibleConnexions(bool active)
         {
-            _factorySystem.SetActiveInputsOutputs(
+            FactoryMap.Instance.SetActiveInputsOutputs(
                 (false, active, typeof(Extractor)),
                 (true, active, typeof(Construction)));
         }

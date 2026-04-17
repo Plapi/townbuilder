@@ -20,9 +20,10 @@ namespace com.Plapamaru.TownCrafter.Game
         public override async UniTask Run(CancellationToken cancellationToken)
         {
             InitUI();
-            
-            _factorySystem.Init(cancellationToken);
-            
+
+            if (!_factorySystem.WasInit)
+                _factorySystem.Init(cancellationToken);
+
             await _mainPanel.Show(cancellationToken);
 
             await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>
@@ -47,7 +48,7 @@ namespace com.Plapamaru.TownCrafter.Game
 
         private async UniTask ProcessTap(CancellationToken cancellationToken)
         {
-            if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && _factorySystem.TryGetEntity(gridPos, out FactoryEntity entity))
+            if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && FactoryMap.Instance.TryGetEntity(gridPos, out FactoryEntity entity))
             {
                 if (entity is Extractor extractor)
                 {
@@ -118,7 +119,7 @@ namespace com.Plapamaru.TownCrafter.Game
             };
             GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(context, false);
         }
-        
+
         public new class Context : GameStateBase.Context
         {
 

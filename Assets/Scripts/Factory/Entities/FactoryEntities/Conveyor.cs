@@ -75,12 +75,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             _pillar.SetActive(active);
         }
 
-        public void ShowAllowedHighlights(Func<Vector2Int, bool> hasEntity)
+        public void ShowAllowedHighlights()
         {
             var adjacentPositions = GetAdjacentGridPositions();
             foreach (var gridPos in adjacentPositions)
             {
-                if (hasEntity(gridPos))
+                if (FactoryMap.Instance.HasEntity(gridPos))
                     continue;
                 var allowedHighlight = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME);
                 allowedHighlight.Place(gridPos, FactoryConfig.Instance.previewColor);
@@ -108,16 +108,13 @@ namespace com.Plapamaru.TownCrafter.Factory
             ReleaseAllowedHighlights();
         }
 
-        public bool TryGetAjdConveyor(Func<Vector2Int, Entity> getEntity, Func<Conveyor, bool> func, out Conveyor conveyor)
+        public bool TryGetAjdConveyor(Func<Conveyor, bool> func, out Conveyor conveyor)
         {
             conveyor = null;
             var adjacentPositions = GetAdjacentGridPositions();
             foreach (var gridPos in adjacentPositions)
-            {
-                conveyor = getEntity(gridPos) as Conveyor;
-                if (conveyor != null && func(conveyor))
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out conveyor) && func(conveyor))
                     return true;
-            }
             return false;
         }
 

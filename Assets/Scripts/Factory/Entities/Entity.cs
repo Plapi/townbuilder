@@ -154,12 +154,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             return new List<Vector2Int>(result);
         }
 
-        public virtual void OnPlacementUpdate(Dictionary<Vector2Int, Entity> map)
+        public virtual void OnPlacementUpdate()
         {
-            _isCorrectlyPlaced = CheckIsCorrectlyPlaced(map);
+            _isCorrectlyPlaced = CheckIsCorrectlyPlaced();
         }
 
-        protected virtual bool CheckIsCorrectlyPlaced(Dictionary<Vector2Int, Entity> map)
+        protected virtual bool CheckIsCorrectlyPlaced()
         {
             return Size.x * Size.y == GridPositions.Count;
         }

@@ -8,18 +8,19 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Space]
         [SerializeField] private Animator[] _animators;
         [SerializeField] private Transform _resourceOutput;
-        
+        [SerializeField] private float _extractTime;
+
         public Transform ResourceOutput => _resourceOutput;
 
-        protected override bool CheckIsCorrectlyPlaced(Dictionary<Vector2Int, Entity> map)
+        protected override bool CheckIsCorrectlyPlaced()
         {
-            if (!base.CheckIsCorrectlyPlaced(map))
+            if (!base.CheckIsCorrectlyPlaced())
                 return false;
 
             foreach (var input in _inputs)
             {
                 var gridPos = FactoryUtils.GetGridPos(input);
-                if (map.TryGetValue(gridPos, out var entity) && entity is ResourceNode)
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out ResourceNode _))
                     return true;
             }
 
