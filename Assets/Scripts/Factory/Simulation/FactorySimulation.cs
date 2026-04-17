@@ -55,7 +55,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         private ResourceItem InstantiateResourceItem(Distribution distribution)
         {
             var resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(distribution.resourceNode.OutputResourceType.ToString(), transform);
-            resourceItem.transform.position = distribution.path[0];
+            resourceItem.transform.position = distribution.path.PointGroups[0].points[0];
             return resourceItem;
         }
 
@@ -202,6 +202,21 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             return false;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            foreach (var distribution in _distributions)
+            {
+                var path = distribution.path;
+                for (int i = 0; i < path.PointGroups.Count; i++)
+                {
+                    var points = path.PointGroups[i].points;
+                    for (int j = 0; j < points.Count - 1; j++)
+                        Gizmos.DrawLine(points[j], points[j + 1]);
+                }
+            }
         }
     }
 }

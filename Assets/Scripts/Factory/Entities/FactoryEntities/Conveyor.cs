@@ -133,7 +133,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetBeltSpeed(_beltSpeed);
         }
 
-        private void OnDrawGizmos()
+        /*private void OnDrawGizmos()
         {
             if (_nextConveyor != null)
             {
@@ -143,6 +143,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                 Gizmos.DrawLine(from, to);
                 Utilities.Utils.DrawArrowHead(from, to, 0.5f);
             }
-        }
+        }*/
     }
 }

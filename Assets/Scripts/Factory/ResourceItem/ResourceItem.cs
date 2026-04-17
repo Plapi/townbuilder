@@ -18,14 +18,13 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         }
 
-        public async UniTask RunAlongRoute(List<Vector3> path, CancellationToken cancellationToken)
+        public async UniTask RunAlongRoute(DistributionPath path, CancellationToken cancellationToken)
         {
             try
             {
-                for (int i = 1; i < path.Count; i++)
+                for (int i = 1; i < path.PointGroups.Count; i++)
                 {
-                    transform.LookAt(path[i]);
-                    await MoveToAsync(path[i], cancellationToken);
+                    await MoveToAsync(path.PointGroups[i].points, cancellationToken);
                 }
             }
             finally
@@ -34,28 +33,46 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
         }
 
-        private async UniTask MoveToAsync(Vector3 worldPos, CancellationToken cancellationToken)
+        private async UniTask MoveToAsync(List<Vector3> points, CancellationToken cancellationToken)
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
+            const float totalDuration = FactoryConstants.PRODUCTION_STEP_TIME;
 
-            var startPos = transform.position;
-            var elapsed = 0f;
+            var path = new List<Vector3> { transform.position };
+            path.AddRange(points);
 
-            while (elapsed < FactoryConstants.PRODUCTION_STEP_TIME)
+            var totalLength = 0f;
+            for (int i = 0; i < path.Count - 1; i++)
+                totalLength += Vector3.Distance(path[i], path[i + 1]);
+
+            if (totalLength <= Mathf.Epsilon)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    return;
-
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / FactoryConstants.PRODUCTION_STEP_TIME);
-
-                transform.position = Vector3.Lerp(startPos, worldPos, t);
-
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                transform.position = points[^1];
+                return;
             }
 
-            transform.position = worldPos;
+            for (int i = 0; i < path.Count - 1; i++)
+            {
+                var start = path[i];
+                var end = path[i + 1];
+
+                var segmentLength = Vector3.Distance(start, end);
+                var segmentDuration = (segmentLength / totalLength) * totalDuration;
+
+                var segmentElapsed = 0f;
+
+                while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
+                {
+                    segmentElapsed += Time.deltaTime;
+                    var t = Mathf.Clamp01(segmentElapsed / segmentDuration);
+                    transform.position = Vector3.Lerp(start, end, t);
+
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+
+                transform.position = end;
+            }
+
+            transform.position = points[^1];
         }
     }
 }
