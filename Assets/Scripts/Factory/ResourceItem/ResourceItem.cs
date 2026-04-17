@@ -3,7 +3,6 @@ using System.Threading;
 using com.Plapamaru.Pooling;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using DG.Tweening;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
@@ -25,7 +24,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             {
                 for (int i = 1; i < path.Count; i++)
                 {
-                    await MoveToAsync(path[i], Vector3.zero, cancellationToken);
+                    await MoveToAsync(path[i], cancellationToken);
                 }
             }
             finally
@@ -34,23 +33,28 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
         }
 
-        private async UniTask MoveToAsync(Vector3 worldPos, Vector3 lookDirXZ, CancellationToken cancellationToken)
+        private async UniTask MoveToAsync(Vector3 worldPos, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            lookDirXZ.y = 0f;
-            if (lookDirXZ.sqrMagnitude < 1e-6f)
-                lookDirXZ = new Vector3(transform.forward.x, 0f, transform.forward.z);
-            lookDirXZ.Normalize();
+            var startPos = transform.position;
+            var elapsed = 0f;
 
-            var rotation = Quaternion.LookRotation(lookDirXZ, Vector3.up);
+            while (elapsed < FactoryConstants.PRODUCTION_STEP_TIME)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
 
-            var sequence = DOTween.Sequence()
-                .Join(transform.DOMove(worldPos, FactoryConstants.PRODUCTION_STEP_TIME).SetEase(Ease.Linear))
-                .Join(transform.DORotateQuaternion(rotation, FactoryConstants.PRODUCTION_STEP_TIME).SetEase(Ease.Linear));
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / FactoryConstants.PRODUCTION_STEP_TIME);
 
-            await sequence.AsyncWaitForCompletion();
+                transform.position = Vector3.Lerp(startPos, worldPos, t);
+
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            transform.position = worldPos;
         }
     }
 }
