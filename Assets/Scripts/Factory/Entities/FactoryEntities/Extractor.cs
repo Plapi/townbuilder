@@ -7,6 +7,9 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [Space]
         [SerializeField] private Animator[] _animators;
+        [SerializeField] private Transform _resourceOutput;
+        
+        public Transform ResourceOutput => _resourceOutput;
 
         protected override bool CheckIsCorrectlyPlaced(Dictionary<Vector2Int, Entity> map)
         {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
 using Cysharp.Threading.Tasks;
@@ -18,52 +19,19 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         }
 
-        public async UniTask RunAlongRoute(Conveyor firstConveyor, Transform constructionInput, CancellationToken cancellationToken)
+        public async UniTask RunAlongRoute(List<Vector3> path, CancellationToken cancellationToken)
         {
             try
             {
-                if (constructionInput == null || firstConveyor == null)
-                    return;
-
-                Conveyor current = firstConveyor;
-                while (!cancellationToken.IsCancellationRequested && current != null)
+                for (int i = 1; i < path.Count; i++)
                 {
-                    var exitDir = GetExitDirectionFromConveyor(current, current.NextConveyor, constructionInput);
-                    var targetPos = GetConveyorSlotPosition(current);
-                    await MoveToAsync(targetPos, exitDir, cancellationToken);
-                    current = current.NextConveyor;
+                    await MoveToAsync(path[i], Vector3.zero, cancellationToken);
                 }
-
-                if (cancellationToken.IsCancellationRequested)
-                    return;
-
-                var toConstruction = constructionInput.position - transform.position;
-                toConstruction.y = 0f;
-                await MoveToAsync(constructionInput.position, toConstruction, cancellationToken);
             }
             finally
             {
                 ObjectPoolingSystem.Instance.ReleaseObject(this);
             }
-        }
-
-        private static Vector3 GetExitDirectionFromConveyor(Conveyor conveyor, Conveyor nextOnBelt, Transform constructionInput)
-        {
-            if (nextOnBelt != null)
-            {
-                var d = nextOnBelt.GridPos - conveyor.GridPos;
-                return new Vector3(d.x, 0f, d.y);
-            }
-
-            var beltCenter = new Vector3(conveyor.GridPos.x + 0.5f, constructionInput.position.y, conveyor.GridPos.y + 0.5f);
-            var flat = constructionInput.position - beltCenter;
-            flat.y = 0f;
-            return flat;
-        }
-
-        private static Vector3 GetConveyorSlotPosition(Conveyor conveyor)
-        {
-            return new Vector3(conveyor.GridPos.x + 0.5f, 1f, conveyor.GridPos.y + 0.5f);
         }
 
         private async UniTask MoveToAsync(Vector3 worldPos, Vector3 lookDirXZ, CancellationToken cancellationToken)

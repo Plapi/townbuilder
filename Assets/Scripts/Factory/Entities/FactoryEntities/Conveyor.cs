@@ -14,6 +14,9 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private MeshRenderer _beltRenderer;
         [SerializeField] private int _beltMaterialIndex;
 
+        [Space]
+        [SerializeField] private Transform[] _resourceInputs;
+
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _prevConveyor;
         [SerializeField] private Conveyor _nextConveyor;
@@ -25,6 +28,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public Conveyor PrevConveyor => _prevConveyor;
         public Conveyor NextConveyor => _nextConveyor;
         public int BeltDirection => _beltDirection;
+        public Transform[] ResourceInputs => _resourceInputs;
 
         public void Connect(Conveyor next)
         {
