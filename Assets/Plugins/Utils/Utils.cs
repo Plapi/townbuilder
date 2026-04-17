@@ -252,6 +252,33 @@ namespace com.Plapamaru.Utilities
             return closest;
         }
 
+        public static Transform GetFarthest(Transform origin, Transform[] targets)
+        {
+            if (origin == null || targets == null || targets.Length == 0)
+                return null;
+
+            Transform farthest = null;
+            float maxSqrDistance = float.MinValue;
+
+            Vector3 originPosition = origin.position;
+
+            foreach (var t in targets)
+            {
+                if (t == null)
+                    continue;
+
+                float sqrDistance = (t.position - originPosition).sqrMagnitude;
+
+                if (sqrDistance > maxSqrDistance)
+                {
+                    maxSqrDistance = sqrDistance;
+                    farthest = t;
+                }
+            }
+
+            return farthest;
+        }
+        
         public static void DrawArrowHead(Vector3 start, Vector3 end, float size)
         {
             Vector3 direction = (end - start).normalized;

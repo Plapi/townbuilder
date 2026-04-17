@@ -34,6 +34,9 @@ namespace com.Plapamaru.TownCrafter.Factory
                 closest = Utils.GetClosest(closest, conveyors[i].ResourceInputs);
                 path.Add(closest.position);
             }
+
+            var farthest = Utils.GetFarthest(closest, conveyors[^1].ResourceInputs);
+            path.Add(farthest.position);
         }
     }
 }

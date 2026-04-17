@@ -66,6 +66,9 @@ namespace com.Plapamaru.Pooling
 
         public void ReleaseObject(IPoolableObject poolableObject)
         {
+            if (!Application.isPlaying)
+                return;
+            
             if (_pools.TryGetValue(poolableObject.Id, out var queue) == false)
                 throw new KeyNotFoundException($"Pool with id {poolableObject.Id} not found");
 

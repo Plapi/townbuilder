@@ -18,7 +18,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         private readonly Dictionary<Vector2Int, Entity> _entities = new Dictionary<Vector2Int, Entity>();
         private readonly List<IFactoryListener> _listeners = new List<IFactoryListener>();
 
-        private void Start()
+        public void Init(CancellationToken cancellationToken)
         {
             _listeners.Add(_simulationSystem);
 
@@ -26,7 +26,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             SetSaveEntities();
 
-            _simulationSystem.Run(_entities, CancellationToken.None).Forget();
+            _simulationSystem.Run(_entities, cancellationToken).Forget();
         }
 
         private void SetStaticEntities()

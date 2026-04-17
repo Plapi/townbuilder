@@ -24,6 +24,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             {
                 for (int i = 1; i < path.Count; i++)
                 {
+                    transform.LookAt(path[i]);
                     await MoveToAsync(path[i], cancellationToken);
                 }
             }

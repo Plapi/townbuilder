@@ -21,6 +21,8 @@ namespace com.Plapamaru.TownCrafter.Game
         {
             InitUI();
             
+            _factorySystem.Init(cancellationToken);
+            
             await _mainPanel.Show(cancellationToken);
 
             await BaseRun(new Dictionary<Func<CancellationToken, UniTask>, Func<CancellationToken, UniTask>>

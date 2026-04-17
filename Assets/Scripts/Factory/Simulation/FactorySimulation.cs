@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
@@ -25,43 +26,29 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             _map = map;
 
-            while (cancellationToken.IsCancellationRequested == false)
+            try
             {
-                if (_updateDistributions)
+                while (cancellationToken.IsCancellationRequested == false)
                 {
-                    UpdateDistributions();
-
-                    var staticExtractors = new List<Extractor>(_extractors);
-                    var staticConveyors = new List<Conveyor>(_conveyors);
+                    if (_updateDistributions)
+                    {
+                        UpdateDistributions();
+                        UpdateAnimations();
+                        _updateDistributions = false;
+                    }
 
                     foreach (var distribution in _distributions)
                     {
-                        distribution.extractor.SetEnabledAnimators(true);
-                        staticExtractors.Remove(distribution.extractor);
-
-                        foreach (var conveyor in distribution.conveyors)
-                        {
-                            conveyor.SetBeltSpeed(1f);
-                            staticConveyors.Remove(conveyor);
-                        }
+                        var resourceItem = InstantiateResourceItem(distribution);
+                        _resourceItems.Add(resourceItem);
+                        RunItemRoute(resourceItem, distribution, cancellationToken).Forget();
                     }
 
-                    foreach (var extractor in staticExtractors)
-                        extractor.SetEnabledAnimators(false);
-                    foreach (var conveyor in staticConveyors)
-                        conveyor.SetBeltSpeed(0f);
-
-                    _updateDistributions = false;
+                    await UniTask.Delay(FactoryConstants.PRODUCTION_STEP_TIME, cancellationToken);
                 }
-
-                foreach (var distribution in _distributions)
-                {
-                    var resourceItem = InstantiateResourceItem(distribution);
-                    _resourceItems.Add(resourceItem);
-                    RunItemRoute(resourceItem, distribution, cancellationToken).Forget();
-                }
-
-                await UniTask.Delay(FactoryConstants.PRODUCTION_STEP_TIME, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
             }
         }
 
@@ -77,6 +64,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             try
             {
                 await item.RunAlongRoute(distribution.path, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
             }
             finally
             {
@@ -127,6 +117,29 @@ namespace com.Plapamaru.TownCrafter.Factory
                     _distributions.Add(distribution);
                 }
             }
+        }
+
+        private void UpdateAnimations()
+        {
+            var staticExtractors = new List<Extractor>(_extractors);
+            var staticConveyors = new List<Conveyor>(_conveyors);
+
+            foreach (var distribution in _distributions)
+            {
+                distribution.extractor.SetEnabledAnimators(true);
+                staticExtractors.Remove(distribution.extractor);
+
+                foreach (var conveyor in distribution.conveyors)
+                {
+                    conveyor.SetBeltSpeed(1f);
+                    staticConveyors.Remove(conveyor);
+                }
+            }
+
+            foreach (var extractor in staticExtractors)
+                extractor.SetEnabledAnimators(false);
+            foreach (var conveyor in staticConveyors)
+                conveyor.SetBeltSpeed(0f);
         }
 
         private List<Extractor> GetConnectedExtractors(ResourceNode resourceNode)
