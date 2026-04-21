@@ -10,7 +10,10 @@ namespace com.Plapamaru.Utilities
 {
     public static class Utils
     {
-        private static readonly Random random = new();
+        private static readonly Random random = new Random();
+        private static readonly List<RaycastResult> _uiRaycastResults = new List<RaycastResult>(8);
+        private static PointerEventData _cachedUiPointerData;
+        private static EventSystem _cachedUiEventSystem;
 
         public static void ShuffleArray<T>(T[] array)
         {
@@ -91,15 +94,55 @@ namespace com.Plapamaru.Utilities
 
         public static bool MouseIsOverUI()
         {
-            if (EventSystem.current == null)
+            var eventSystem = EventSystem.current;
+            if (eventSystem == null)
             {
                 return false;
             }
-            if (EventSystem.current.IsPointerOverGameObject())
+
+            if (eventSystem.IsPointerOverGameObject())
             {
                 return true;
             }
-            return Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.touches[0].fingerId);
+
+            for (var i = 0; i < Input.touchCount; i++)
+            {
+                if (eventSystem.IsPointerOverGameObject(Input.GetTouch(i).fingerId))
+                {
+                    return true;
+                }
+            }
+
+            // Fallback: IsPointerOverGameObject is unreliable for some touch / simulated-pointer setups
+            // while Input.GetMouseButton* still fires; raycast at the current pointer positions.
+            if (PointerScreenPositionHitsUi(eventSystem, Input.mousePosition))
+            {
+                return true;
+            }
+
+            for (var i = 0; i < Input.touchCount; i++)
+            {
+                if (PointerScreenPositionHitsUi(eventSystem, Input.GetTouch(i).position))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool PointerScreenPositionHitsUi(EventSystem eventSystem, Vector2 screenPosition)
+        {
+            if (_cachedUiPointerData == null || _cachedUiEventSystem != eventSystem)
+            {
+                _cachedUiEventSystem = eventSystem;
+                _cachedUiPointerData = new PointerEventData(eventSystem);
+            }
+
+            _cachedUiPointerData.position = screenPosition;
+            _uiRaycastResults.Clear();
+            eventSystem.RaycastAll(_cachedUiPointerData, _uiRaycastResults);
+            return _uiRaycastResults.Count > 0;
         }
 
         public static string EscapeURL(string text)
@@ -237,7 +280,7 @@ namespace com.Plapamaru.Utilities
 
             foreach (var t in targets)
             {
-                if (t == null) 
+                if (t == null)
                     continue;
 
                 float sqrDistance = (t.position - originPosition).sqrMagnitude;
@@ -278,7 +321,7 @@ namespace com.Plapamaru.Utilities
 
             return farthest;
         }
-        
+
         public static void DrawArrowHead(Vector3 start, Vector3 end, float size)
         {
             Vector3 direction = (end - start).normalized;

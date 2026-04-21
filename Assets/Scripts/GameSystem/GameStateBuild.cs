@@ -35,7 +35,10 @@ namespace com.Plapamaru.TownCrafter.Game
         protected UniTask ProcessTap(CancellationToken cancellationToken)
         {
             _mobileTouchCamera.SetEnabled(false);
-            
+
+            if (Utils.MouseIsOverUI())
+                return UniTask.CompletedTask;
+
             if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
                 _factorySystem.PlaceOnCenter(_entity, gridPos);
             return UniTask.CompletedTask;

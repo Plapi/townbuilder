@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using BitBenderGames;
+using com.Plapamaru.Utilities;
 using com.Plapamaru.TownCrafter.Factory;
 using com.Plapamaru.TownCrafter.UI;
 using Cysharp.Threading.Tasks;
@@ -48,6 +49,9 @@ namespace com.Plapamaru.TownCrafter.Game
 
         private async UniTask ProcessTap(CancellationToken cancellationToken)
         {
+            if (Utils.MouseIsOverUI())
+                return;
+
             if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && FactoryMap.Instance.TryGetEntity(gridPos, out FactoryEntity entity))
             {
                 if (entity is Extractor extractor)
