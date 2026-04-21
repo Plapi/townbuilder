@@ -23,10 +23,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             try
             {
                 transform.position = path.PointGroups[0].points[0];
-                var end = path.PointGroups[0].points[1];
-                var direction = end - transform.position;
-                transform.rotation = Quaternion.LookRotation(direction);
-                
+                if (TryGetFirstForwardAlongPath(path, transform.position, out var forward))
+                    transform.rotation = Quaternion.LookRotation(forward);
+
                 for (int i = 1; i < path.PointGroups.Count; i++)
                 {
                     await MoveToAsync(path.PointGroups[i].points, cancellationToken);
@@ -65,9 +64,11 @@ namespace com.Plapamaru.TownCrafter.Factory
 
                 var segmentElapsed = 0f;
 
-                var direction = end - transform.position;
+                var segmentDirection = end - start;
                 var startRotation = transform.rotation;
-                var endRotation = Quaternion.LookRotation(direction);
+                var endRotation = segmentDirection.sqrMagnitude > 1e-6f
+                    ? Quaternion.LookRotation(segmentDirection)
+                    : startRotation;
 
                 while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
                 {
@@ -85,6 +86,25 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             transform.position = points[^1];
+        }
+
+        private static bool TryGetFirstForwardAlongPath(DistributionPath path, Vector3 from, out Vector3 forward)
+        {
+            foreach (var group in path.PointGroups)
+            {
+                foreach (var p in group.points)
+                {
+                    var delta = p - from;
+                    if (delta.sqrMagnitude > 1e-6f)
+                    {
+                        forward = delta;
+                        return true;
+                    }
+                }
+            }
+
+            forward = Vector3.forward;
+            return false;
         }
     }
 }
