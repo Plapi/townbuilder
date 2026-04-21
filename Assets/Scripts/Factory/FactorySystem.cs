@@ -14,19 +14,17 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private FactorySaveSystem _saveSystem;
         [SerializeField] private FactorySimulationSystem _simulationSystem;
 
-        private readonly List<IFactoryListener> _listeners = new List<IFactoryListener>();
-
         public bool WasInit { get; private set; }
 
-        public void Init(CancellationToken cancellationToken)
+        public void Init()
         {
-            _listeners.Add(_simulationSystem);
-
             SetStaticEntities();
 
             SetSaveEntities();
 
-            _simulationSystem.Run(cancellationToken).Forget();
+            UpdateSimulationDistributions();
+
+            _simulationSystem.Run().Forget();
 
             WasInit = true;
         }
@@ -35,7 +33,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             var staticEntities = GetComponentsInChildren<Entity>();
             foreach (var entity in staticEntities)
-                SetEntities(entity);
+                SetEntity(entity);
         }
 
         private void SetSaveEntities()
@@ -78,7 +76,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public void PlaceOnCenter(Entity entity, Vector3 worldPos)
         {
             entity.SnapToGridOnCenter(worldPos);
-            SetEntities(entity);
+            SetEntity(entity);
         }
 
         public void PlaceOnCenter(Entity entity, Vector2Int gridPos)
@@ -93,13 +91,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         public void Place(Entity entity, Vector2Int gridPos)
         {
             entity.SnapToGrid(gridPos);
-            SetEntities(entity);
+            SetEntity(entity);
         }
 
         public void Rotate(Entity entity, int rotAngleY)
         {
             entity.Rotate(rotAngleY);
-            SetEntities(entity);
+            SetEntity(entity);
         }
 
         public void MakeConveyorsConnexions(Conveyor from, Conveyor to, Action<Conveyor, Conveyor> onConveyorReplaced)
@@ -148,7 +146,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             return newFromConveyor;
         }
 
-        private void SetEntities(Entity entity)
+        private static void SetEntity(Entity entity)
         {
             FactoryMap.Instance.Remove(entity);
 
@@ -168,34 +166,32 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             entity.OnPlacementUpdate();
 
-            foreach (var listener in _listeners)
-                listener.OnEntityPlaced(entity);
-
             FactoryMap.Instance.UpdateDebugCells();
         }
 
-        private void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
+        private static void Replace(Conveyor replacedConveyor, Conveyor replacementConveyor)
         {
             Release(replacedConveyor);
             replacementConveyor.SetLayer(LayerType.Interactable);
             replacementConveyor.SnapToGrid(replacedConveyor.GridPos);
-            SetEntities(replacementConveyor);
+            SetEntity(replacementConveyor);
         }
 
-        public void Release(FactoryEntity entity)
+        public static void Release(FactoryEntity entity)
         {
             FactoryMap.Instance.Remove(entity);
             FactoryMap.Instance.UpdateDebugCells();
-
-            foreach (var listener in _listeners)
-                listener.OnEntityRemoved(entity);
-
             ObjectPoolingSystem.Instance.ReleaseObject(entity);
         }
 
         public void SaveEntities()
         {
             _saveSystem.Save(FactoryMap.Instance.Map);
+        }
+
+        public void UpdateSimulationDistributions()
+        {
+            _simulationSystem.UpdateDistributions();
         }
     }
 }

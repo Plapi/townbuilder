@@ -22,6 +22,11 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             try
             {
+                transform.position = path.PointGroups[0].points[0];
+                var end = path.PointGroups[0].points[1];
+                var direction = end - transform.position;
+                transform.rotation = Quaternion.LookRotation(direction);
+                
                 for (int i = 1; i < path.PointGroups.Count; i++)
                 {
                     await MoveToAsync(path.PointGroups[i].points, cancellationToken);

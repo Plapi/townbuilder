@@ -52,14 +52,14 @@ namespace com.Plapamaru.TownCrafter.Game
 
             if (_buildPanel.SelectedButton == UIButtonType.Close)
             {
-                _factorySystem.Release(_entity);
+                FactorySystem.Release(_entity);
                 return;
             }
 
             if (_entity is ConveyorCorner)
             {
                 var gridPos = _entity.GridPos;
-                _factorySystem.Release(_entity);
+                FactorySystem.Release(_entity);
                 _entity = InstantiateEntity();
                 _factorySystem.Place(_entity, gridPos);
             }
@@ -92,7 +92,7 @@ namespace com.Plapamaru.TownCrafter.Game
             if (_buildPanel.SelectedButton == UIButtonType.Close)
             {
                 foreach (var conveyor in _conveyors)
-                    _factorySystem.Release(conveyor);
+                    FactorySystem.Release(conveyor);
             }
 
             if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
@@ -232,7 +232,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 return;
             }
 
-            _factorySystem.Release(_conveyors[^1]);
+            FactorySystem.Release(_conveyors[^1]);
             _conveyors.RemoveAt(_conveyors.Count - 1);
         }
 

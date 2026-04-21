@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class FactorySimulationSystem : MonoBehaviour, IFactoryListener
+    public class FactorySimulationSystem : MonoBehaviour
     {
         [Header("Runtime Properties")]
         [SerializeField] private List<ResourceNode> _resourceNodes = new List<ResourceNode>();
@@ -18,41 +18,38 @@ namespace com.Plapamaru.TownCrafter.Factory
         private readonly List<Distribution> _distributions = new List<Distribution>();
         private readonly List<ResourceItem> _resourceItems = new List<ResourceItem>();
 
-        private bool _updateDistributions = true;
+        private CancellationTokenSource _cancellationTokenSource;
 
-        public async UniTask Run(CancellationToken cancellationToken)
+        public async UniTask Run()
         {
             try
             {
-                while (cancellationToken.IsCancellationRequested == false)
-                {
-                    if (_updateDistributions)
-                    {
-                        UpdateDistributions();
-                        UpdateAnimations();
-                        _updateDistributions = false;
-                    }
+                _cancellationTokenSource = new CancellationTokenSource();
 
+                while (_cancellationTokenSource.Token.IsCancellationRequested == false)
+                {
                     foreach (var distribution in _distributions)
                     {
-                        var resourceItem = InstantiateResourceItem(distribution);
-                        _resourceItems.Add(resourceItem);
-                        RunItemRoute(resourceItem, distribution, cancellationToken).Forget();
+                        var resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(distribution.resourceNode.OutputResourceType.ToString(), transform);
+                        RunItemRoute(resourceItem, distribution, _cancellationTokenSource.Token).Forget();
                     }
 
-                    await UniTask.Delay(FactoryConstants.PRODUCTION_STEP_TIME, cancellationToken);
+                    await UniTask.Delay(FactoryConstants.PRODUCTION_STEP_TIME, _cancellationTokenSource.Token);
                 }
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (_cancellationTokenSource.Token.IsCancellationRequested)
             {
+            }
+            finally
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
             }
         }
 
-        private ResourceItem InstantiateResourceItem(Distribution distribution)
+        private void OnDestroy()
         {
-            var resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(distribution.resourceNode.OutputResourceType.ToString(), transform);
-            resourceItem.transform.position = distribution.path.PointGroups[0].points[0];
-            return resourceItem;
+            _cancellationTokenSource?.Cancel();
         }
 
         private async UniTaskVoid RunItemRoute(ResourceItem item, Distribution distribution, CancellationToken cancellationToken)
@@ -68,40 +65,18 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
         }
 
-        public void OnEntityPlaced(Entity entity)
-        {
-            if (entity is ResourceNode resourceNode && !_resourceNodes.Contains(resourceNode))
-                _resourceNodes.Add(resourceNode);
-            else if (entity is Extractor extractor && !_extractors.Contains(extractor))
-                _extractors.Add(extractor);
-            else if (entity is Conveyor conveyor && !_conveyors.Contains(conveyor))
-                _conveyors.Add(conveyor);
-            else if (entity is Construction construction && !_constructions.Contains(construction))
-                _constructions.Add(construction);
-
-            _updateDistributions = true;
-        }
-
-        public void OnEntityRemoved(Entity entity)
-        {
-            if (entity is Extractor extractor)
-                _extractors.Remove(extractor);
-            else if (entity is Conveyor conveyor)
-                _conveyors.Remove(conveyor);
-
-            _updateDistributions = true;
-        }
-
-        private void UpdateDistributions()
+        public void UpdateDistributions()
         {
             _distributions.Clear();
 
+            SplitMapElementsByType();
+
             foreach (var resourceNode in _resourceNodes)
             {
-                var extractors = GetConnectedExtractors(resourceNode);
+                var extractors = resourceNode.GetConnectedExtractors();
                 foreach (var extractor in extractors)
                 {
-                    if (!TryGetConnectedConveyorChainsFromExtractor(extractor, out var conveyors) ||
+                    if (!extractor.TryGetConnectedConveyorChains(out var conveyors) ||
                         !TryGetConstruction(conveyors[^1], out var construction))
                         continue;
 
@@ -109,6 +84,8 @@ namespace com.Plapamaru.TownCrafter.Factory
                     _distributions.Add(distribution);
                 }
             }
+
+            UpdateAnimations();
         }
 
         private void UpdateAnimations()
@@ -134,48 +111,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                 conveyor.SetBeltSpeed(0f);
         }
 
-        private List<Extractor> GetConnectedExtractors(ResourceNode resourceNode)
-        {
-            var extractors = new List<Extractor>();
-            var adjPositions = resourceNode.GetAdjacentGridPositions();
-            foreach (var gridPos in adjPositions)
-                if (FactoryMap.Instance.TryGetEntity(gridPos, out Extractor extractor) && !extractors.Contains(extractor))
-                    extractors.Add(extractor);
-            return extractors;
-        }
-
-        private bool TryGetConnectedConveyorChainsFromExtractor(Extractor extractor, out List<Conveyor> conveyors)
-        {
-            conveyors = null;
-            foreach (var output in extractor.Outputs)
-            {
-                var gridPos = FactoryUtils.GetGridPos(output);
-                if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor conveyor))
-                {
-                    conveyors = GetConnectedConveyors(conveyor);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static List<Conveyor> GetConnectedConveyors(Conveyor conveyor)
-        {
-            var conveyors = new List<Conveyor>()
-            {
-                conveyor
-            };
-
-            var nextConveyor = conveyor.NextConveyor;
-            while (nextConveyor != null && !conveyors.Contains(nextConveyor))
-            {
-                conveyors.Add(nextConveyor);
-                nextConveyor = nextConveyor.NextConveyor;
-            }
-
-            return conveyors;
-        }
-
         private bool TryGetConstruction(Conveyor conveyor, out Construction inputConstruction)
         {
             inputConstruction = null;
@@ -194,6 +129,40 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             return false;
+        }
+
+        private void SplitMapElementsByType()
+        {
+            _resourceNodes.Clear();
+            _extractors.Clear();
+            _conveyors.Clear();
+            _constructions.Clear();
+
+            var map = FactoryMap.Instance.Map;
+
+            foreach (var mapElement in map)
+            {
+                if (mapElement.Value is ResourceNode resourceNode)
+                {
+                    if (!_resourceNodes.Contains(resourceNode))
+                        _resourceNodes.Add(resourceNode);
+                }
+                else if (mapElement.Value is Extractor extractor)
+                {
+                    if (!_extractors.Contains(extractor))
+                        _extractors.Add(extractor);
+                }
+                else if (mapElement.Value is Conveyor conveyor)
+                {
+                    if (!_conveyors.Contains(conveyor))
+                        _conveyors.Add(conveyor);
+                }
+                else if (mapElement.Value is Construction construction)
+                {
+                    if (!_constructions.Contains(construction))
+                        _constructions.Add(construction);
+                }
+            }
         }
 
         private void OnDrawGizmos()

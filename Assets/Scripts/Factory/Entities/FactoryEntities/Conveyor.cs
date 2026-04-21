@@ -118,6 +118,20 @@ namespace com.Plapamaru.TownCrafter.Factory
             return false;
         }
 
+        public List<Conveyor> GetConnectedConveyorsChain()
+        {
+            var conveyors = new List<Conveyor>() { this };
+
+            var nextConveyor = _nextConveyor;
+            while (nextConveyor != null && !conveyors.Contains(nextConveyor))
+            {
+                conveyors.Add(nextConveyor);
+                nextConveyor = nextConveyor.NextConveyor;
+            }
+
+            return conveyors;
+        }
+
         public void SetBeltSpeed(float speed)
         {
             _beltRenderer.materials[_beltMaterialIndex].SetFloat("_Speed", speed * _beltDirection);

@@ -32,5 +32,20 @@ namespace com.Plapamaru.TownCrafter.Factory
             foreach (var animator in _animators)
                 animator.enabled = enabled;
         }
+
+        public bool TryGetConnectedConveyorChains(out List<Conveyor> conveyors)
+        {
+            conveyors = null;
+            foreach (var output in _outputs)
+            {
+                var gridPos = FactoryUtils.GetGridPos(output);
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor conveyor))
+                {
+                    conveyors = conveyor.GetConnectedConveyorsChain();
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

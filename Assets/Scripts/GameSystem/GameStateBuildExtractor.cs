@@ -41,7 +41,7 @@ namespace com.Plapamaru.TownCrafter.Game
             if (_buildPanel.SelectedButton == UIButtonType.Confirm)
                 _entity.OnConfirmPlacement();
             else
-                _factorySystem.Release(_entity);
+                FactorySystem.Release(_entity);
         }
 
         public new class Context : GameStateBuild<Context, Extractor>.Context

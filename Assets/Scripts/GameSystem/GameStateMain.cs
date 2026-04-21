@@ -22,7 +22,7 @@ namespace com.Plapamaru.TownCrafter.Game
             InitUI();
 
             if (!_factorySystem.WasInit)
-                _factorySystem.Init(cancellationToken);
+                _factorySystem.Init();
 
             await _mainPanel.Show(cancellationToken);
 

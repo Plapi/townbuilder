@@ -28,6 +28,7 @@ namespace com.Plapamaru.TownCrafter.Game
         public override async UniTask Exit(CancellationToken cancellationToken)
         {
             _factorySystem.SaveEntities();
+            _factorySystem.UpdateSimulationDistributions();
             await _buildPanel.Close(true, cancellationToken);
         }
 

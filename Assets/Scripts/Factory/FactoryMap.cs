@@ -12,11 +12,6 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public readonly Dictionary<Vector2Int, Entity> Map = new Dictionary<Vector2Int, Entity>();
 
-        public void Init()
-        {
-
-        }
-
         public void Add(Entity entity, Vector2Int gridPos)
         {
             entity.GridPositions.Add(gridPos);
