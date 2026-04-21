@@ -1,5 +1,5 @@
 using System.Globalization;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace com.Plapamaru.Utilities
 {
