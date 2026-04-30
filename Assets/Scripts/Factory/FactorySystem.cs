@@ -4,7 +4,6 @@ using System.Threading;
 using com.Plapamaru.Utilities;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.TownCrafter.Layers;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -39,7 +38,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             foreach (var entity in staticEntities)
             {
                 SetEntity(entity);
-                entity.RunProcessLoop(externalCT).SuppressCancellationThrow().Forget();
+                entity.Init(externalCT);
             }
         }
 

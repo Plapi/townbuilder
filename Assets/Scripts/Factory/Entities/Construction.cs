@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class Construction : FactoryEntity
+    public class Construction : Entity
     {
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _connectedConveyor;

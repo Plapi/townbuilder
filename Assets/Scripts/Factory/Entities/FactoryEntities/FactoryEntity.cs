@@ -11,8 +11,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private EntityHighlightObject _entityHighlightObject;
 
-        protected ResourceItem _resourceItem;
-
         public override void OnConfirmPlacement()
         {
             base.OnConfirmPlacement();
@@ -63,13 +61,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                 ObjectPoolingSystem.Instance.ReleaseObject(_entityHighlightObject);
                 _entityHighlightObject = null;
             }
-        }
-
-        protected void PassResourceItem(FactoryEntity passToEntity)
-        {
-            passToEntity._resourceItem = _resourceItem;
-            _resourceItem.transform.parent = passToEntity.transform;
-            _resourceItem = null;
         }
     }
 

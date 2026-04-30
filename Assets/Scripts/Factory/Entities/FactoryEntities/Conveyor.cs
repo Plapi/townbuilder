@@ -28,7 +28,6 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private float _beltSpeed;
         private int _beltDirection = 1;
-        private UniTask? _beltTask;
 
         public Conveyor PrevConveyor => _prevConveyor;
         public Conveyor NextConveyor => _nextConveyor;
@@ -43,10 +42,13 @@ namespace com.Plapamaru.TownCrafter.Factory
             return saveData;
         }
 
+        protected override void OnSimulationPaused(bool paused)
+        {
+            SetBeltSpeed(paused ? 0f : 1f);
+        }
+
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
-            _beltTask ??= UpdateBelt(cancellationToken);
-
             while (_resourceItem == null)
                 await UniTask.NextFrame(cancellationToken);
 
@@ -60,15 +62,6 @@ namespace com.Plapamaru.TownCrafter.Factory
             PassResourceItem(_connectedConstruction != null ? _connectedConstruction : _nextConveyor);
 
             return true;
-        }
-
-        private async UniTask UpdateBelt(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                SetBeltSpeed((_nextConveyor != null || _connectedConstruction != null) && !SimulationClock.Instance.IsPaused ? 1f : 0f);
-                await UniTask.NextFrame(cancellationToken);
-            }
         }
 
         protected abstract List<Vector3> GetResourceDistributionPoints();
@@ -128,14 +121,17 @@ namespace com.Plapamaru.TownCrafter.Factory
             _pillar.SetActive(active);
         }
 
-        public void ShowAllowedHighlights()
+        public void TryShowAllowedHighlights()
         {
+            if (_allowedHighlightObjects.Count > 0)
+                return;
+
             var adjacentPositions = GetAdjacentGridPositions();
             foreach (var gridPos in adjacentPositions)
             {
                 if (FactoryMap.Instance.HasEntity(gridPos))
                     continue;
-                var allowedHighlight = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME);
+                var allowedHighlight = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME, transform);
                 allowedHighlight.Place(gridPos, FactoryConfig.Instance.previewColor);
                 _allowedHighlightObjects.Add(allowedHighlight);
             }

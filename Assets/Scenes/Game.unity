@@ -925,7 +925,6 @@ GameObject:
   - component: {fileID: 165255272}
   - component: {fileID: 165255276}
   - component: {fileID: 165255275}
-  - component: {fileID: 165255274}
   m_Layer: 0
   m_Name: Factory
   m_TagString: Untagged
@@ -965,22 +964,6 @@ Transform:
   - {fileID: 525479560531949432}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &165255274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 165255271}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ff9eb57f38a742de825b628404e2ea2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactorySimulation
-  _resourceNodes: []
-  _extractors: []
-  _conveyors: []
-  _constructions: []
 --- !u!114 &165255275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2614,6 +2597,7 @@ MonoBehaviour:
   _outputs: []
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
+  _connectedConveyor: {fileID: 0}
 --- !u!1 &448293846
 GameObject:
   m_ObjectHideFlags: 0

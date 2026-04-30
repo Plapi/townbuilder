@@ -66,7 +66,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 _factorySystem.Place(_entity, gridPos);
             }
 
-            _entity.ShowAllowedHighlights();
+            _entity.TryShowAllowedHighlights();
             _conveyors.Add(_entity);
 
             if (_entity.TryGetAjdConveyor(c => c.NextConveyor == null, out Conveyor firstConveyor))
@@ -186,7 +186,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 }
             }
 
-            _conveyors[^1].ShowAllowedHighlights();
+            _conveyors[^1].TryShowAllowedHighlights();
             _conveyors[^1].ShowHighlightObject();
         }
 

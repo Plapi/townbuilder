@@ -15,30 +15,17 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private Transform _resourceItemLocator;
         [SerializeField] private float _extractTime;
 
-        public Transform ResourceOutput => _resourceOutput;
-
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
-            SetEnabledAnimators(false);
-
             while (SimulationClock.Instance.IsPaused || !TrySetResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
             _resourceItem.gameObject.SetActive(false);
 
-            var animatorsAreEnabled = false;
-
             var extractTime = _extractTime;
             while (extractTime > 0f)
             {
                 extractTime -= SimulationClock.Instance.DeltaTime;
-
-                if (animatorsAreEnabled == SimulationClock.Instance.IsPaused)
-                {
-                    animatorsAreEnabled = !SimulationClock.Instance.IsPaused;
-                    SetEnabledAnimators(animatorsAreEnabled);
-                }
-
                 await UniTask.NextFrame(cancellationToken);
             }
 
@@ -54,6 +41,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             PassResourceItem(conveyor);
 
             return true;
+        }
+
+        protected override void OnSimulationPaused(bool paused)
+        {
+            SetEnabledAnimators(!paused);
         }
 
         private bool TrySetResourceItem()

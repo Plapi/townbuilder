@@ -21,6 +21,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private Vector2Int _gridPos;
         [SerializeField] private bool _isCorrectlyPlaced;
 
+        protected ResourceItem _resourceItem;
         private CancellationTokenSource _internalCTS;
 
         public Transform[] Inputs => _inputs;
@@ -65,26 +66,46 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected virtual void Awake()
         {
-            _internalCTS = new CancellationTokenSource();
-            GridPos = FactoryUtils.GetGridPos(transform);
             GridPositions = new List<Vector2Int>();
-            SetEntityColliders();
-            SetActiveInputsOutputs(false);
+            GridPos = FactoryUtils.GetGridPos(transform);
         }
 
-        public async UniTask RunProcessLoop(CancellationToken externalCTS)
+        public void Init(CancellationToken externalCTS)
         {
+            _internalCTS = new CancellationTokenSource();
+
+            SetActiveInputsOutputs(false);
+
+            OnInit();
+
+            SimulationClock.Instance.OnPaused += OnSimulationPaused;
+            OnSimulationPaused(SimulationClock.Instance.IsPaused);
+
+            RunProcessLoop(externalCTS).SuppressCancellationThrow().Forget();
+        }
+
+        protected virtual void OnInit() { }
+
+        protected virtual void OnSimulationPaused(bool paused) { }
+
+        private async UniTask RunProcessLoop(CancellationToken cancellationToken)
+        {
+            var linkedCTS = CancellationTokenSource.CreateLinkedTokenSource(_internalCTS.Token, cancellationToken);
+
             try
             {
-                var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_internalCTS.Token, externalCTS).Token;
-                while (linkedToken.IsCancellationRequested == false)
+                while (linkedCTS.Token.IsCancellationRequested == false)
                 {
-                    var result = await ProcessLoop(linkedToken);
+                    var result = await ProcessLoop(linkedCTS.Token);
                     if (!result)
                         return;
                 }
             }
             catch (OperationCanceledException) { }
+            finally
+            {
+                linkedCTS.Dispose();
+            }
         }
 
         protected virtual UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
@@ -150,13 +171,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                 output.gameObject.SetActive(active);
         }
 
-        private void SetEntityColliders()
-        {
-            var colliders = transform.GetComponentsInChildren<Collider>();
-            for (int i = 0; i < colliders.Length; i++)
-                colliders[i].gameObject.AddComponent<EntityCollider>().SetEntity(this);
-        }
-
         public List<Vector2Int> GetAdjacentGridPositions()
         {
             HashSet<Vector2Int> result = new HashSet<Vector2Int>();
@@ -195,8 +209,17 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetActiveInputsOutputs(false);
         }
 
+        protected void PassResourceItem(Entity passToEntity)
+        {
+            passToEntity._resourceItem = _resourceItem;
+            _resourceItem.transform.parent = passToEntity.transform;
+            _resourceItem = null;
+        }
+
         public virtual void OnDispose()
         {
+            SimulationClock.Instance.OnPaused -= OnSimulationPaused;
+
             GridPositions.Clear();
             SetActiveInputsOutputs(false);
 

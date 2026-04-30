@@ -53,7 +53,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public T InstantiateEntity<T>(string id) where T : Entity
         {
             var entity = ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
-            entity.RunProcessLoop(_externalCT).SuppressCancellationThrow().Forget();
+            entity.Init(_externalCT);
             return entity;
         }
 

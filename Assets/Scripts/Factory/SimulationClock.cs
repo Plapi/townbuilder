@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -7,9 +8,15 @@ namespace com.Plapamaru.TownCrafter.Factory
         public bool IsPaused { get; private set; }
         public float DeltaTime => IsPaused ? 0f : Time.deltaTime;
 
+        public Action<bool> OnPaused;
+
         public void SetPaused(bool paused)
         {
-            IsPaused = paused;
+            if (IsPaused != paused)
+            {
+                IsPaused = paused;
+                OnPaused?.Invoke(paused);
+            }
         }
     }
 }
