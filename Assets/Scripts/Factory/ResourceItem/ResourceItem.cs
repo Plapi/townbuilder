@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
@@ -13,31 +14,12 @@ namespace com.Plapamaru.TownCrafter.Factory
         public string Id => _type.ToString();
         public MonoBehaviour Behaviour => this;
 
-        public void OnRelease()
+        public void OnDispose()
         {
 
         }
 
-        public async UniTask RunAlongRoute(DistributionPath path, CancellationToken cancellationToken)
-        {
-            try
-            {
-                transform.position = path.PointGroups[0].points[0];
-                if (TryGetFirstForwardAlongPath(path, transform.position, out var forward))
-                    transform.rotation = Quaternion.LookRotation(forward);
-
-                for (int i = 1; i < path.PointGroups.Count; i++)
-                {
-                    await MoveToAsync(path.PointGroups[i].points, cancellationToken);
-                }
-            }
-            finally
-            {
-                ObjectPoolingSystem.Instance.ReleaseObject(this);
-            }
-        }
-
-        private async UniTask MoveToAsync(List<Vector3> points, CancellationToken cancellationToken)
+        public async UniTask MoveToAsync(List<Vector3> points, CancellationToken cancellationToken)
         {
             const float totalDuration = FactoryConstants.PRODUCTION_STEP_TIME;
 
@@ -72,7 +54,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
                 while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
                 {
-                    segmentElapsed += Time.deltaTime;
+                    segmentElapsed += SimulationDeltaTime.Instance.DeltaTime;
                     var t = Mathf.Clamp01(segmentElapsed / segmentDuration);
 
                     transform.position = Vector3.Lerp(start, end, t);
@@ -86,25 +68,6 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             transform.position = points[^1];
-        }
-
-        private static bool TryGetFirstForwardAlongPath(DistributionPath path, Vector3 from, out Vector3 forward)
-        {
-            foreach (var group in path.PointGroups)
-            {
-                foreach (var p in group.points)
-                {
-                    var delta = p - from;
-                    if (delta.sqrMagnitude > 1e-6f)
-                    {
-                        forward = delta;
-                        return true;
-                    }
-                }
-            }
-
-            forward = Vector3.forward;
-            return false;
         }
     }
 }

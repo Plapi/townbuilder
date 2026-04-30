@@ -12,6 +12,8 @@ namespace com.Plapamaru.TownCrafter.Game
     {
         public override async UniTask Run(CancellationToken cancellationToken)
         {
+            await base.Run(cancellationToken);
+            
             if (context.extractor == null)
             {
                 if (TryPlaceEntity() == false)

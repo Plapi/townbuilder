@@ -19,6 +19,8 @@ namespace com.Plapamaru.TownCrafter.Game
 
         public override async UniTask Run(CancellationToken cancellationToken)
         {
+            await base.Run(cancellationToken);
+            
             if (context.conveyor == null)
             {
                 if (TryPlaceEntity() == false)
@@ -95,9 +97,13 @@ namespace com.Plapamaru.TownCrafter.Game
                     FactorySystem.Release(conveyor);
             }
 
-            if (_conveyors.Count > 0 && _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
+            if (_conveyors.Count > 0 &&
+                _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
                 _conveyors[^1].PrevConveyor != lastConveyor)
-                _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, null);
+                _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, (_, newConveyor) =>
+                {
+                    newConveyor.SetLayer(LayerType.Environment);
+                });
         }
 
         public override async UniTask Exit(CancellationToken cancellationToken)
@@ -244,11 +250,11 @@ namespace com.Plapamaru.TownCrafter.Game
             return newConveyor;
         }
 
-        private void OnConveyorReplaced(Conveyor replacedConveyor, Conveyor replacementConveyor)
+        private void OnConveyorReplaced(Conveyor oldConveyor, Conveyor newConveyor)
         {
             for (int i = 0; i < _conveyors.Count; i++)
-                if (_conveyors[i] == replacedConveyor)
-                    _conveyors[i] = replacementConveyor;
+                if (_conveyors[i] == oldConveyor)
+                    _conveyors[i] = newConveyor;
         }
 
         private void SetActivatePossibleConnexions(bool active)

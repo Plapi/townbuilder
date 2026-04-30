@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.TownCrafter.Layers;
 using UnityEngine;
@@ -12,6 +11,8 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private EntityHighlightObject _entityHighlightObject;
 
+        protected ResourceItem _resourceItem;
+
         public override void OnConfirmPlacement()
         {
             base.OnConfirmPlacement();
@@ -19,11 +20,21 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetLayer(LayerType.Environment);
         }
 
-        public override void OnRelease()
+        public override void OnDispose()
         {
-            base.OnRelease();
+            base.OnDispose();
             ReleaseHighlightObject();
             SetLayer(LayerType.Environment);
+            if (_resourceItem != null)
+            {
+                ObjectPoolingSystem.Instance.ReleaseObject(_resourceItem);
+                _resourceItem = null;
+            }
+        }
+
+        public bool HasResourceItem()
+        {
+            return _resourceItem != null;
         }
 
         public void ShowHighlightObject()
@@ -52,6 +63,26 @@ namespace com.Plapamaru.TownCrafter.Factory
                 ObjectPoolingSystem.Instance.ReleaseObject(_entityHighlightObject);
                 _entityHighlightObject = null;
             }
+        }
+
+        protected void PassResourceItem(FactoryEntity passToEntity)
+        {
+            passToEntity._resourceItem = _resourceItem;
+            _resourceItem.transform.parent = passToEntity.transform;
+            _resourceItem = null;
+        }
+    }
+
+    public abstract class FactoryEntity<TSaveData> : FactoryEntity where TSaveData : EntitySaveData, new()
+    {
+        public virtual TSaveData ToSaveData()
+        {
+            return new TSaveData()
+            {
+                id = Id,
+                gridPos = GridPos,
+                rotationY = Mathf.RoundToInt(transform.eulerAngles.y),
+            };
         }
     }
 }

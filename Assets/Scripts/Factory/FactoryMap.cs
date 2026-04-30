@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.Singletons;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -11,6 +13,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private DebugCells _debugCells;
 
         public readonly Dictionary<Vector2Int, Entity> Map = new Dictionary<Vector2Int, Entity>();
+
+        private CancellationToken _externalCT;
+
+        public void Init(CancellationToken externalCT)
+        {
+            _externalCT = externalCT;
+        }
 
         public void Add(Entity entity, Vector2Int gridPos)
         {
@@ -41,14 +50,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             return false;
         }
 
-        public Entity GetEntity(Vector2Int gridPos)
-        {
-            return TryGetEntity(gridPos, out Entity entity) ? entity : null;
-        }
-
         public T InstantiateEntity<T>(string id) where T : Entity
         {
-            return ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
+            var entity = ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
+            entity.RunProcessLoop(_externalCT).SuppressCancellationThrow().Forget();
+            return entity;
         }
 
         public bool IsDiagonalWithPossibleExtractorConnexion(Conveyor from, Conveyor to, out Vector2Int fromPrevGridPos)

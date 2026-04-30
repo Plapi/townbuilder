@@ -78,7 +78,7 @@ namespace com.Plapamaru.Pooling
             obj.gameObject.SetActive(false);
             queue.Enqueue(poolableObject);
 
-            poolableObject.OnRelease();
+            poolableObject.OnDispose();
         }
 
         private bool TryGetItem(string id, out MonoBehaviour obj)

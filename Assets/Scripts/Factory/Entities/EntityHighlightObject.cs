@@ -41,7 +41,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 rend.material.color = color;
         }
 
-        public void OnRelease()
+        public void OnDispose()
         {
 
         }

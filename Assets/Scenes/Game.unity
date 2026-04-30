@@ -946,7 +946,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FactorySystem
   _saveSystem: {fileID: 165255275}
-  _simulationSystem: {fileID: 165255274}
 --- !u!4 &165255273
 Transform:
   m_ObjectHideFlags: 0
@@ -5900,6 +5899,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f9d14db5f23d4429b2015314100b32c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameSystem
+  _factorySystem: {fileID: 165255272}
 --- !u!1 &1290306708
 GameObject:
   m_ObjectHideFlags: 0
@@ -8716,7 +8716,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameStateBuild
   _camera: {fileID: 379399442}
   _mobileTouchCamera: {fileID: 379399440}
-  _factorySystem: {fileID: 165255272}
 --- !u!1001 &525479560531949431
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using com.Plapamaru.Singletons;
+using com.Plapamaru.TownCrafter.Factory;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,7 +19,9 @@ namespace com.Plapamaru.TownCrafter.Game
             public CancellationTokenSource cancellationTokenSource;
         }
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        [SerializeField] private FactorySystem _factorySystem;
+
+        private readonly CancellationTokenSource _destroyCTS = new CancellationTokenSource();
         private readonly Dictionary<Type, GameStateBase> _dictStates = new Dictionary<Type, GameStateBase>();
         private readonly Stack<StateHandle> _stateStack = new Stack<StateHandle>();
 
@@ -41,12 +44,14 @@ namespace com.Plapamaru.TownCrafter.Game
 
         private void Start()
         {
+            _factorySystem.Init(_destroyCTS.Token);
+
             EnqueueState<GameStateMain, GameStateMain.Context>(new GameStateMain.Context(), true);
         }
 
         private async UniTask Run()
         {
-            while (_cancellationTokenSource.IsCancellationRequested == false)
+            while (_destroyCTS.IsCancellationRequested == false)
             {
                 await UniTask.NextFrame();
 
@@ -60,23 +65,23 @@ namespace com.Plapamaru.TownCrafter.Game
                     break;
 
                 _currentState = _stateStack.Peek();
-                var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_currentState.cancellationTokenSource.Token, _cancellationTokenSource.Token).Token;
+                var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_currentState.cancellationTokenSource.Token, _destroyCTS.Token).Token;
 
                 try
                 {
                     var race = await UniTask.WhenAny(
                         _currentState.state.Run(linkedToken),
-                        UniTask.WaitUntil(() => _newState != null, cancellationToken: _cancellationTokenSource.Token),
-                        UniTask.WaitUntil(() => Input.GetKeyUp(KeyCode.R), cancellationToken: _cancellationTokenSource.Token)
+                        UniTask.WaitUntil(() => _newState != null, cancellationToken: _destroyCTS.Token),
+                        UniTask.WaitUntil(() => Input.GetKeyUp(KeyCode.R), cancellationToken: _destroyCTS.Token)
                     );
-                    
+
                     if (race == 0 && !linkedToken.IsCancellationRequested)
                         await _currentState.state.Exit(linkedToken);
                 }
-                catch (OperationCanceledException) when (_cancellationTokenSource.IsCancellationRequested) { }
+                catch (OperationCanceledException) when (_destroyCTS.IsCancellationRequested) { }
                 catch (Exception e)
                 {
-                    if (e is not OperationCanceledException || _cancellationTokenSource.IsCancellationRequested == false)
+                    if (e is not OperationCanceledException || _destroyCTS.IsCancellationRequested == false)
                         Debug.LogException(e);
                     break;
                 }
@@ -94,8 +99,8 @@ namespace com.Plapamaru.TownCrafter.Game
 
         private void OnDestroy()
         {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
+            _destroyCTS.Cancel();
+            _destroyCTS.Dispose();
         }
 
         public void EnqueueState<TState, TContext>(TContext context, bool isRootState)

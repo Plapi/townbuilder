@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.Utilities;
 using com.Plapamaru.TownCrafter.Layers;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -17,6 +20,8 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private Vector2Int _gridPos;
         [SerializeField] private bool _isCorrectlyPlaced;
+
+        private CancellationTokenSource _internalCTS;
 
         public Transform[] Inputs => _inputs;
         public Transform[] Outputs => _outputs;
@@ -60,10 +65,31 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected virtual void Awake()
         {
+            _internalCTS = new CancellationTokenSource();
             GridPos = FactoryUtils.GetGridPos(transform);
             GridPositions = new List<Vector2Int>();
             SetEntityColliders();
             SetActiveInputsOutputs(false);
+        }
+
+        public async UniTask RunProcessLoop(CancellationToken externalCTS)
+        {
+            try
+            {
+                var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_internalCTS.Token, externalCTS).Token;
+                while (linkedToken.IsCancellationRequested == false)
+                {
+                    var result = await ProcessLoop(linkedToken);
+                    if (!result)
+                        return;
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        protected virtual UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
+        {
+            return UniTask.FromResult(false);
         }
 
         public void SnapToGridOnCenter(Vector3 worldPos)
@@ -169,10 +195,14 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetActiveInputsOutputs(false);
         }
 
-        public virtual void OnRelease()
+        public virtual void OnDispose()
         {
             GridPositions.Clear();
             SetActiveInputsOutputs(false);
+
+            _internalCTS?.Cancel();
+            _internalCTS?.Dispose();
+            _internalCTS = null;
         }
 
         private void OnDrawGizmos()

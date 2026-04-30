@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using com.Plapamaru.Pooling;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public abstract class Conveyor : FactoryEntity
+    public abstract class Conveyor : FactoryEntity<ConveyorSaveData>
     {
         [Space]
         [SerializeField] private GameObject _pillar;
@@ -20,15 +22,56 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _prevConveyor;
         [SerializeField] private Conveyor _nextConveyor;
+        [SerializeField] private Construction _connectedConstruction;
         [SerializeField] private List<EntityHighlightObject> _allowedHighlightObjects;
+        [SerializeField] private List<Vector3> _distributionPoints;
 
         private float _beltSpeed;
         private int _beltDirection = 1;
+        private UniTask? _beltTask;
 
         public Conveyor PrevConveyor => _prevConveyor;
         public Conveyor NextConveyor => _nextConveyor;
-        public int BeltDirection => _beltDirection;
         public Transform[] ResourceInputs => _resourceInputs;
+
+        public override ConveyorSaveData ToSaveData()
+        {
+            var saveData = base.ToSaveData();
+            if (_nextConveyor != null)
+                saveData.nextConveyorGridPos = _nextConveyor.GridPos;
+            saveData.beltDirection = _beltDirection;
+            return saveData;
+        }
+
+        protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
+        {
+            _beltTask ??= UpdateBelt(cancellationToken);
+
+            while (_resourceItem == null)
+                await UniTask.NextFrame(cancellationToken);
+
+            _distributionPoints = GetResourceDistributionPoints();
+            await _resourceItem.MoveToAsync(_distributionPoints, cancellationToken);
+
+            while (SimulationDeltaTime.Instance.IsPaused ||
+                   _connectedConstruction == null && (_nextConveyor == null || _nextConveyor.HasResourceItem()))
+                await UniTask.NextFrame(cancellationToken);
+
+            PassResourceItem(_connectedConstruction != null ? _connectedConstruction : _nextConveyor);
+
+            return true;
+        }
+
+        private async UniTask UpdateBelt(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                SetBeltSpeed((_nextConveyor != null || _connectedConstruction != null) && !SimulationDeltaTime.Instance.IsPaused ? 1f : 0f);
+                await UniTask.NextFrame(cancellationToken);
+            }
+        }
+
+        protected abstract List<Vector3> GetResourceDistributionPoints();
 
         public void Connect(Conveyor next)
         {
@@ -70,6 +113,16 @@ namespace com.Plapamaru.TownCrafter.Factory
             _nextConveyor = null;
         }
 
+        public void ConnectConstruction(Construction construction)
+        {
+            _connectedConstruction = construction;
+        }
+
+        public void DisconnectConstruction()
+        {
+            _connectedConstruction = null;
+        }
+
         public void SetPillarActive(bool active)
         {
             _pillar.SetActive(active);
@@ -101,11 +154,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             ReleaseAllowedHighlights();
         }
 
-        public override void OnRelease()
+        public override void OnDispose()
         {
-            base.OnRelease();
+            base.OnDispose();
             Disconnect();
             ReleaseAllowedHighlights();
+            _connectedConstruction = null;
         }
 
         public bool TryGetAjdConveyor(Func<Conveyor, bool> func, out Conveyor conveyor)
@@ -132,7 +186,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             return conveyors;
         }
 
-        public void SetBeltSpeed(float speed)
+        private void SetBeltSpeed(float speed)
         {
             _beltRenderer.materials[_beltMaterialIndex].SetFloat("_Speed", speed * _beltDirection);
             _beltSpeed = speed;
@@ -144,16 +198,20 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetBeltSpeed(_beltSpeed);
         }
 
-        /*private void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
-            if (_nextConveyor != null)
+            Gizmos.color = Color.green;
+            for (int i = 0; i < _distributionPoints.Count - 1; i++)
+                Gizmos.DrawLine(_distributionPoints[i], _distributionPoints[i + 1]);
+
+            /*if (_nextConveyor != null)
             {
                 Gizmos.color = Color.red;
                 var from = new Vector3(GridPos.x, 0f, GridPos.y) + new Vector3(0.5f, 1.1f, 0.5f);
                 var to = new Vector3(_nextConveyor.GridPos.x, 0f, _nextConveyor.GridPos.y) + new Vector3(0.5f, 1.1f, 0.5f);
                 Gizmos.DrawLine(from, to);
-                Utilities.Utils.DrawArrowHead(from, to, 0.5f);
-            }
-        }*/
+                Utils.DrawArrowHead(from, to, 0.5f);
+            }*/
+        }
     }
 }

@@ -22,15 +22,9 @@ namespace com.Plapamaru.TownCrafter.Factory
                 if (!entities.Contains(entity))
                 {
                     if (entity is Extractor extractor)
-                        saveData.extractors.Add(EntityToSaveData<EntitySaveData>(extractor));
+                        saveData.extractors.Add(extractor.ToSaveData());
                     else if (entity is Conveyor conveyor)
-                    {
-                        var conveyorSaveData = EntityToSaveData<ConveyorSaveData>(conveyor);
-                        if (conveyor.NextConveyor != null)
-                            conveyorSaveData.nextConveyorGridPos = conveyor.NextConveyor.GridPos;
-                        conveyorSaveData.beltDirection = conveyor.BeltDirection;
-                        saveData.conveyors.Add(conveyorSaveData);
-                    }
+                        saveData.conveyors.Add(conveyor.ToSaveData());
 
                     entities.Add(entity);
                 }
@@ -48,16 +42,6 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             var json = PlayerPrefs.GetString(FactoryConstants.FACTORY_SAVE_KEY);
             return json.AsModel<SaveData>();
-        }
-
-        private static T EntityToSaveData<T>(Entity entity) where T : EntitySaveData, new()
-        {
-            return new T()
-            {
-                id = entity.Id,
-                gridPos = entity.GridPos,
-                rotationY = Mathf.RoundToInt(entity.transform.eulerAngles.y),
-            };
         }
 
         public static void Delete()
@@ -86,14 +70,14 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class EntitySaveData
     {
         public string id;
-        public Vector2Int gridPos;
+        public GridPosition gridPos;
         public int rotationY;
     }
 
     [Serializable]
     public class ConveyorSaveData : EntitySaveData
     {
-        public Vector2Int? nextConveyorGridPos;
+        public GridPosition? nextConveyorGridPos;
         public int beltDirection;
     }
 

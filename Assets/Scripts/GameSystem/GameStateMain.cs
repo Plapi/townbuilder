@@ -14,16 +14,12 @@ namespace com.Plapamaru.TownCrafter.Game
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private MobileTouchCamera _mobileTouchCamera;
-        [SerializeField] private FactorySystem _factorySystem;
 
         private UIMainPanel _mainPanel;
 
         public override async UniTask Run(CancellationToken cancellationToken)
         {
             InitUI();
-
-            if (!_factorySystem.WasInit)
-                _factorySystem.Init();
 
             await _mainPanel.Show(cancellationToken);
 

@@ -12,28 +12,35 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class FactorySystem : MonoBehaviour
     {
         [SerializeField] private FactorySaveSystem _saveSystem;
-        [SerializeField] private FactorySimulationSystem _simulationSystem;
 
-        public bool WasInit { get; private set; }
-
-        public void Init()
+        public void Init(CancellationToken externalCT)
         {
-            SetStaticEntities();
+            FactoryMap.Instance.Init(externalCT);
+
+            SetStaticEntities(externalCT);
 
             SetSaveEntities();
-
-            UpdateSimulationDistributions();
-
-            _simulationSystem.Run().Forget();
-
-            WasInit = true;
         }
 
-        private void SetStaticEntities()
+        public void OnBuildEnter()
+        {
+            SimulationDeltaTime.Instance.SetPaused(true);
+        }
+
+        public void OnBuildExit()
+        {
+            SimulationDeltaTime.Instance.SetPaused(false);
+            _saveSystem.Save(FactoryMap.Instance.Map);
+        }
+
+        private void SetStaticEntities(CancellationToken externalCT)
         {
             var staticEntities = GetComponentsInChildren<Entity>();
             foreach (var entity in staticEntities)
+            {
                 SetEntity(entity);
+                entity.RunProcessLoop(externalCT).SuppressCancellationThrow().Forget();
+            }
         }
 
         private void SetSaveEntities()
@@ -182,16 +189,6 @@ namespace com.Plapamaru.TownCrafter.Factory
             FactoryMap.Instance.Remove(entity);
             FactoryMap.Instance.UpdateDebugCells();
             ObjectPoolingSystem.Instance.ReleaseObject(entity);
-        }
-
-        public void SaveEntities()
-        {
-            _saveSystem.Save(FactoryMap.Instance.Map);
-        }
-
-        public void UpdateSimulationDistributions()
-        {
-            _simulationSystem.UpdateDistributions();
         }
     }
 }

@@ -9,6 +9,6 @@ namespace com.Plapamaru.Pooling
         string Id { get; }
         MonoBehaviour Behaviour { get; }
         int CacheCount => DEFAULT_POOL_SIZE;
-        void OnRelease();
+        void OnDispose();
     }
 }
