@@ -66,8 +66,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected virtual void Awake()
         {
-            GridPositions = new List<Vector2Int>();
             GridPos = FactoryUtils.GetGridPos(transform);
+            GridPositions = new List<Vector2Int>();
         }
 
         public void Init(CancellationToken externalCTS)

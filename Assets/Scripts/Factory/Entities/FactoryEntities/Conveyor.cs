@@ -111,11 +111,6 @@ namespace com.Plapamaru.TownCrafter.Factory
             _connectedConstruction = construction;
         }
 
-        public void DisconnectConstruction()
-        {
-            _connectedConstruction = null;
-        }
-
         public void SetPillarActive(bool active)
         {
             _pillar.SetActive(active);
@@ -131,7 +126,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             {
                 if (FactoryMap.Instance.HasEntity(gridPos))
                     continue;
-                var allowedHighlight = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME, transform);
+                var allowedHighlight = ObjectPoolingSystem.Instance.GetObject<EntityHighlightObject>(FactoryConstants.ENTITY_HIGHLIGHT_NAME);
                 allowedHighlight.Place(gridPos, FactoryConfig.Instance.previewColor);
                 _allowedHighlightObjects.Add(allowedHighlight);
             }
