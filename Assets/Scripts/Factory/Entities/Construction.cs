@@ -12,7 +12,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
-            if (SimulationDeltaTime.Instance.IsPaused)
+            if (SimulationClock.Instance.IsPaused)
             {
                 await UniTask.NextFrame(cancellationToken);
                 return true;

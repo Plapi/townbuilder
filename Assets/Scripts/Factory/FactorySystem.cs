@@ -24,12 +24,12 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void OnBuildEnter()
         {
-            SimulationDeltaTime.Instance.SetPaused(true);
+            SimulationClock.Instance.SetPaused(true);
         }
 
         public void OnBuildExit()
         {
-            SimulationDeltaTime.Instance.SetPaused(false);
+            SimulationClock.Instance.SetPaused(false);
             _saveSystem.Save(FactoryMap.Instance.Map);
         }
 

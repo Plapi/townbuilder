@@ -53,7 +53,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             _distributionPoints = GetResourceDistributionPoints();
             await _resourceItem.MoveToAsync(_distributionPoints, cancellationToken);
 
-            while (SimulationDeltaTime.Instance.IsPaused ||
+            while (SimulationClock.Instance.IsPaused ||
                    _connectedConstruction == null && (_nextConveyor == null || _nextConveyor.HasResourceItem()))
                 await UniTask.NextFrame(cancellationToken);
 
@@ -66,7 +66,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                SetBeltSpeed((_nextConveyor != null || _connectedConstruction != null) && !SimulationDeltaTime.Instance.IsPaused ? 1f : 0f);
+                SetBeltSpeed((_nextConveyor != null || _connectedConstruction != null) && !SimulationClock.Instance.IsPaused ? 1f : 0f);
                 await UniTask.NextFrame(cancellationToken);
             }
         }

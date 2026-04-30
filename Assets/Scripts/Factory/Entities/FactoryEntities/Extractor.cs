@@ -21,7 +21,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             SetEnabledAnimators(false);
 
-            while (SimulationDeltaTime.Instance.IsPaused || !TrySetResourceItem())
+            while (SimulationClock.Instance.IsPaused || !TrySetResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
             _resourceItem.gameObject.SetActive(false);
@@ -31,11 +31,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             var extractTime = _extractTime;
             while (extractTime > 0f)
             {
-                extractTime -= SimulationDeltaTime.Instance.DeltaTime;
+                extractTime -= SimulationClock.Instance.DeltaTime;
 
-                if (animatorsAreEnabled == SimulationDeltaTime.Instance.IsPaused)
+                if (animatorsAreEnabled == SimulationClock.Instance.IsPaused)
                 {
-                    animatorsAreEnabled = !SimulationDeltaTime.Instance.IsPaused;
+                    animatorsAreEnabled = !SimulationClock.Instance.IsPaused;
                     SetEnabledAnimators(animatorsAreEnabled);
                 }
 
@@ -45,7 +45,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             _resourceItem.gameObject.SetActive(true);
 
             Conveyor conveyor = null;
-            while (SimulationDeltaTime.Instance.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())
+            while (SimulationClock.Instance.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
             var closest = Utils.GetClosest(_resourceItem.transform, conveyor.ResourceInputs).position;
