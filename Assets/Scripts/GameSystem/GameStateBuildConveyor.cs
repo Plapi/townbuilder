@@ -20,7 +20,7 @@ namespace com.Plapamaru.TownCrafter.Game
         public override async UniTask Run(CancellationToken cancellationToken)
         {
             await base.Run(cancellationToken);
-            
+
             if (context.conveyor == null)
             {
                 if (TryPlaceEntity() == false)
@@ -97,13 +97,32 @@ namespace com.Plapamaru.TownCrafter.Game
                     FactorySystem.Release(conveyor);
             }
 
-            if (_conveyors.Count > 0 &&
-                _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out Conveyor lastConveyor) &&
-                _conveyors[^1].PrevConveyor != lastConveyor)
+            if (TryGetConstructionFromInput(out var construction))
+            {
+                _conveyors[^1].ConnectConstruction(construction);
+            }
+            else if (TryGetAdjLastConveyor(out var lastConveyor))
+            {
                 _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, (_, newConveyor) =>
                 {
                     newConveyor.SetLayer(LayerType.Environment);
                 });
+            }
+        }
+
+        private bool TryGetConstructionFromInput(out Construction construction)
+        {
+            construction = null;
+            return _conveyors.Count > 1 &&
+                   FactoryMap.Instance.TryGetConstructionFromInput(_conveyors[^1].GridPos, out construction);
+        }
+
+        private bool TryGetAdjLastConveyor(out Conveyor lastConveyor)
+        {
+            lastConveyor = null;
+            return _conveyors.Count > 0 &&
+                   _conveyors[^1].TryGetAjdConveyor(c => c.PrevConveyor == null, out lastConveyor) &&
+                   _conveyors[^1].PrevConveyor != lastConveyor;
         }
 
         public override async UniTask Exit(CancellationToken cancellationToken)

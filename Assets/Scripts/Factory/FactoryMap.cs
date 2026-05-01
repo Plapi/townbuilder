@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.Singletons;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -11,6 +10,9 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class FactoryMap : MonoBehaviourSingleton<FactoryMap>
     {
         [SerializeField] private DebugCells _debugCells;
+
+        [Header("Runtime Properties")]
+        [SerializeField] private List<Construction> _constructions;
 
         public readonly Dictionary<Vector2Int, Entity> Map = new Dictionary<Vector2Int, Entity>();
 
@@ -25,6 +27,9 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             entity.GridPositions.Add(gridPos);
             Map.Add(gridPos, entity);
+
+            if (entity is Construction construction)
+                _constructions.Add(construction);
         }
 
         public void Remove(Entity entity)
@@ -47,6 +52,23 @@ namespace com.Plapamaru.TownCrafter.Factory
                 return true;
             }
             entity = null;
+            return false;
+        }
+
+        public bool TryGetConstructionFromInput(Vector2Int gridPos, out Construction constructionOut)
+        {
+            constructionOut = null;
+            foreach (var construction in _constructions)
+            {
+                foreach (var input in construction.Inputs)
+                {
+                    if (FactoryUtils.GetGridPos(input) == gridPos)
+                    {
+                        constructionOut = construction;
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 

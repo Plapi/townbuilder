@@ -55,11 +55,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             _distributionPoints = GetResourceDistributionPoints();
             await _resourceItem.MoveToAsync(_distributionPoints, cancellationToken);
 
-            while (SimulationClock.Instance.IsPaused ||
-                   _connectedConstruction == null && (_nextConveyor == null || _nextConveyor.HasResourceItem()))
+            var entity = (Entity)null;
+            while (!TryGetConnectedEntity(out entity))
                 await UniTask.NextFrame(cancellationToken);
 
-            PassResourceItem(_connectedConstruction != null ? _connectedConstruction : _nextConveyor);
+            PassResourceItem(entity);
 
             return true;
         }
@@ -187,6 +187,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             _beltDirection = beltDirection;
             SetBeltSpeed(_beltSpeed);
+        }
+
+        private bool TryGetConnectedEntity(out Entity entity)
+        {
+            entity = _nextConveyor != null && !_nextConveyor.HasResourceItem() ? _nextConveyor :
+                _connectedConstruction != null ? _connectedConstruction : null;
+            return entity != null;
         }
 
         private void OnDrawGizmos()
