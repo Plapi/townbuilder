@@ -4,6 +4,6 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         Extractor,
         Conveyor,
-        Crafting
+        Crafter
     }
 }

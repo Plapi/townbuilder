@@ -9,6 +9,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class ResourceItem : MonoBehaviour, IPoolableObject
     {
         [SerializeField] private ResourceItemType _type;
+        [SerializeField] private bool _rotate;
 
         public string Id => _type.ToString();
         public MonoBehaviour Behaviour => this;
@@ -56,10 +57,16 @@ namespace com.Plapamaru.TownCrafter.Factory
                 var segmentElapsed = 0f;
 
                 var segmentDirection = end - start;
-                var startRotation = transform.rotation;
-                var endRotation = segmentDirection.sqrMagnitude > 1e-6f
-                    ? Quaternion.LookRotation(segmentDirection)
-                    : startRotation;
+
+                var startRotation = Quaternion.identity;
+                var endRotation = Quaternion.identity;
+                if (_rotate)
+                {
+                    startRotation = transform.rotation;
+                    endRotation = segmentDirection.sqrMagnitude > 1e-6f
+                        ? Quaternion.LookRotation(segmentDirection)
+                        : startRotation;
+                }
 
                 while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
                 {
@@ -68,7 +75,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
                     transform.position = Vector3.Lerp(start, end, t);
 
-                    transform.rotation = Quaternion.Lerp(startRotation, endRotation, t);
+                    if (_rotate)
+                        transform.rotation = Quaternion.Lerp(startRotation, endRotation, t);
 
                     await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
                 }

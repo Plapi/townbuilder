@@ -8,13 +8,13 @@ namespace com.Plapamaru.TownCrafter.UI
     {
         [SerializeField] private Button _extractorButton;
         [SerializeField] private Button _conveyorButton;
-        [SerializeField] private Button _craftingButton;
+        [SerializeField] private Button _crafterButton;
 
         protected override void OnInit()
         {
             _extractorButton.SetExclusiveListener(() => SelectedButton = UIButtonType.Extractor);
             _conveyorButton.SetExclusiveListener(() => SelectedButton = UIButtonType.Conveyor);
-            _craftingButton.SetExclusiveListener(() => SelectedButton = UIButtonType.Crafting);
+            _crafterButton.SetExclusiveListener(() => SelectedButton = UIButtonType.Crafter);
         }
 
         public new class Data : UIPanelBase.Data

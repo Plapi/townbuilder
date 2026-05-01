@@ -6,7 +6,7 @@ namespace com.Plapamaru.TownCrafter.UI
         Close,
         Extractor,
         Conveyor,
-        Crafting,
+        Crafter,
         RotateLeft,
         RotateRight
     }

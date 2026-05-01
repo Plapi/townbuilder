@@ -44,6 +44,9 @@ public partial class DebugWindow : EditorWindow
         Time.timeScale = EditorGUILayout.Slider("Time Scale", Time.timeScale, 0f, 1f);
         SimulationClock.TimeScale = EditorGUILayout.Slider("Factory Sim Time Scale", SimulationClock.TimeScale, 0f, 10f);
 
+        if (GUILayout.Button("Collapse"))
+            EditorCollapseAll.CollApseAll();
+
         _sectionIndex = 0;
         FoldableSection("Game System", OnGUIGameSystem);
         FoldableSection("Default", OnGUIDefault);

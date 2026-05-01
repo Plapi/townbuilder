@@ -94,7 +94,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 await _mainPanel.Close(true, cancellationToken: cancellationToken);
                 EnqueueGameStateBuildConveyor(null);
             }
-            else if (_mainPanel.SelectedButton == UIButtonType.Crafting)
+            else if (_mainPanel.SelectedButton == UIButtonType.Crafter)
             {
 
             }
