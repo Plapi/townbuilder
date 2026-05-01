@@ -29,7 +29,12 @@ namespace com.Plapamaru.TownCrafter.Factory
         public void OnBuildExit()
         {
             SimulationClock.SetPaused(false);
-            _saveSystem.Save(FactoryMap.Instance.Map);
+            Save();
+        }
+
+        public void Save()
+        {
+            _saveSystem.Save();
         }
 
         private void SetStaticEntities(CancellationToken externalCT)
@@ -45,38 +50,22 @@ namespace com.Plapamaru.TownCrafter.Factory
         private void SetSaveEntities()
         {
             var saveData = _saveSystem.Load();
-
             InstantiateSaveEntities<EntitySaveData, Extractor>(saveData.extractors);
-            var conveyors = InstantiateSaveEntities<ConveyorSaveData, Conveyor>(saveData.conveyors);
-
-            for (var i = 0; i < saveData.conveyors.Count; i++)
-            {
-                if (saveData.conveyors[i].nextConveyorGridPos != null)
-                {
-                    var gridPos = saveData.conveyors[i].nextConveyorGridPos.Value;
-                    if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor nextConveyor))
-                        conveyors[i].Connect(nextConveyor);
-                    else
-                        Debug.LogError($"Failed to find conveyor grid pos at {gridPos}");
-                    conveyors[i].SetBeltDirection(saveData.conveyors[i].beltDirection);
-                }
-            }
+            InstantiateSaveEntities<ConveyorSaveData, Conveyor>(saveData.conveyors);
         }
 
-        private List<U> InstantiateSaveEntities<T, U>(List<T> entitiesSaves)
+        private void InstantiateSaveEntities<T, U>(List<T> entitiesSaves)
             where T : EntitySaveData
-            where U : Entity
+            where U : FactoryEntity
         {
-            var entities = new List<U>();
             foreach (var entitySave in entitiesSaves)
             {
                 var entity = FactoryMap.Instance.InstantiateEntity<U>(entitySave.id);
-                entity.transform.SetAngleY(entitySave.rotationY);
                 entity.SetLayer(LayerType.Environment);
+                entity.transform.SetAngleY(entitySave.rotationY);
                 Place(entity, entitySave.gridPos);
-                entities.Add(entity);
+                entity.SetSaveData(entitySave);
             }
-            return entities;
         }
 
         public void PlaceOnCenter(Entity entity, Vector3 worldPos)

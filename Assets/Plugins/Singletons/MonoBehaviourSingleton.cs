@@ -23,7 +23,7 @@ namespace com.Plapamaru.Singletons
 			}
 		}
 
-		public static bool HasInstance()
+		protected static bool HasInstance()
 		{
 			return instance != null;
 		}

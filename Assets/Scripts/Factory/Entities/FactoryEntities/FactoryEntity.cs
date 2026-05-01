@@ -11,6 +11,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected ResourceItem _resourceItem;
 
+        public virtual void SetSaveData(EntitySaveData saveData) { }
+
         public override void OnConfirmPlacement()
         {
             base.OnConfirmPlacement();
@@ -39,6 +41,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             passToEntity._resourceItem = _resourceItem;
             _resourceItem.transform.parent = passToEntity.transform;
+            _resourceItem.UpdateSavedState();
             _resourceItem = null;
         }
 
@@ -73,14 +76,40 @@ namespace com.Plapamaru.TownCrafter.Factory
 
     public abstract class FactoryEntity<TSaveData> : FactoryEntity where TSaveData : EntitySaveData, new()
     {
+        protected TSaveData _saveData;
+
+        protected override void OnInit()
+        {
+            base.OnInit();
+            if (_saveData?.resource != null)
+            {
+                var resourceSave = _saveData?.resource;
+                _resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(resourceSave.id, transform);
+                _resourceItem.transform.SetPositionAndRotation(resourceSave.position, resourceSave.rotation);
+            }
+        }
+
+        public override void SetSaveData(EntitySaveData saveData)
+        {
+            if (saveData is not TSaveData tSaveData)
+            {
+                Debug.LogError($"Something went wrong with Save Data {GetType()} should receive {typeof(TSaveData).Name}, not {saveData.GetType().Name}");
+                return;
+            }
+            _saveData = tSaveData;
+        }
+
         public virtual TSaveData ToSaveData()
         {
-            return new TSaveData()
+            var saveData = new TSaveData()
             {
                 id = Id,
                 gridPos = GridPos,
                 rotationY = Mathf.RoundToInt(transform.eulerAngles.y),
+                resource = _resourceItem != null ? _resourceItem.SavedState : null
             };
+
+            return saveData;
         }
     }
 }

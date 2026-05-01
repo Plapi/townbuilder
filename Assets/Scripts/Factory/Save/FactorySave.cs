@@ -13,11 +13,11 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [SerializeField] private bool prettyJson;
 
-        public void Save(Dictionary<Vector2Int, Entity> entitiesDict)
+        public void Save()
         {
             var entities = new List<Entity>();
             var saveData = new SaveData();
-            foreach (var (_, entity) in entitiesDict)
+            foreach (var (_, entity) in FactoryMap.Instance.Map)
             {
                 if (!entities.Contains(entity))
                 {
@@ -72,6 +72,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public string id;
         public GridPosition gridPos;
         public int rotationY;
+        public ResourceItemSaveData resource;
     }
 
     [Serializable]
@@ -79,6 +80,14 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         public GridPosition? nextConveyorGridPos;
         public int beltDirection;
+    }
+
+    [Serializable]
+    public class ResourceItemSaveData
+    {
+        public string id;
+        public Vector3SaveData position;
+        public QuaternionSaveData rotation;
     }
 
 #if UNITY_EDITOR

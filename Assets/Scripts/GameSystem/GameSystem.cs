@@ -8,6 +8,10 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace com.Plapamaru.TownCrafter.Game
 {
     public class GameSystem : MonoBehaviourSingleton<GameSystem>
@@ -38,6 +42,10 @@ namespace com.Plapamaru.TownCrafter.Game
 
             foreach (var state in states)
                 _dictStates.Add(state.GetType(), state);
+
+#if UNITY_EDITOR
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+#endif
 
             Run().Forget();
         }
@@ -97,8 +105,39 @@ namespace com.Plapamaru.TownCrafter.Game
             }
         }
 
+        private void OnApplicationQuit()
+        {
+            TrySaveFactory();
+        }
+
+        private void OnDisable()
+        {
+            if (Application.isPlaying)
+                TrySaveFactory();
+        }
+
+        private void TrySaveFactory()
+        {
+            if (_factorySystem == null || !FactoryMap.HasInstance())
+                return;
+            _factorySystem.Save();
+        }
+
+#if UNITY_EDITOR
+        private void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state != PlayModeStateChange.ExitingPlayMode)
+                return;
+            TrySaveFactory();
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+        }
+#endif
+
         private void OnDestroy()
         {
+#if UNITY_EDITOR
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+#endif
             _destroyCTS.Cancel();
             _destroyCTS.Dispose();
         }

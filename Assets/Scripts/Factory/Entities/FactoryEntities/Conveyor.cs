@@ -49,6 +49,18 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected override void OnInit()
         {
+            base.OnInit();
+
+            if (_saveData != null && _saveData.nextConveyorGridPos != null)
+            {
+                var gridPos = _saveData.nextConveyorGridPos.Value;
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor nextConveyor))
+                    Connect(nextConveyor);
+                else
+                    Debug.LogError($"Failed to find conveyor grid pos at {gridPos}");
+                SetBeltDirection(_saveData.beltDirection);
+            }
+            
             if (_nextConveyor == null && FactoryMap.Instance.TryGetConstructionFromInput(GridPos, out var construction, out _))
                 _connectedConstruction = construction;
         }

@@ -17,19 +17,22 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
-            while (SimulationClock.IsPaused || !TrySetResourceItem())
-                await UniTask.NextFrame(cancellationToken);
-
-            _resourceItem.gameObject.SetActive(false);
-
-            var extractTime = _extractTime;
-            while (extractTime > 0f)
+            if (_resourceItem == null)
             {
-                extractTime -= SimulationClock.DeltaTime;
-                await UniTask.NextFrame(cancellationToken);
-            }
+                while (SimulationClock.IsPaused || !TrySetResourceItem())
+                    await UniTask.NextFrame(cancellationToken);
 
-            _resourceItem.gameObject.SetActive(true);
+                _resourceItem.gameObject.SetActive(false);
+
+                var extractTime = _extractTime;
+                while (extractTime > 0f)
+                {
+                    extractTime -= SimulationClock.DeltaTime;
+                    await UniTask.NextFrame(cancellationToken);
+                }
+
+                _resourceItem.gameObject.SetActive(true);
+            }
 
             Conveyor conveyor = null;
             while (SimulationClock.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())

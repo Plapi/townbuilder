@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
@@ -14,9 +13,14 @@ namespace com.Plapamaru.TownCrafter.Factory
         public string Id => _type.ToString();
         public MonoBehaviour Behaviour => this;
 
-        public void OnDispose()
-        {
+        public ResourceItemSaveData SavedState { get; private set; }
 
+        public void UpdateSavedState()
+        {
+            SavedState ??= new ResourceItemSaveData();
+            SavedState.id = Id;
+            SavedState.position = transform.position;
+            SavedState.rotation = transform.rotation;
         }
 
         public async UniTask MoveToAsync(List<Vector3> points, CancellationToken cancellationToken)
@@ -68,6 +72,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             transform.position = points[^1];
+        }
+
+        public void OnDispose()
+        {
+            SavedState = null;
         }
     }
 }
