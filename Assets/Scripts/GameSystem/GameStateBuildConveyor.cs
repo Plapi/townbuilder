@@ -315,7 +315,9 @@ namespace com.Plapamaru.TownCrafter.Game
         {
             FactoryMap.Instance.SetActiveInputsOutputs(
                 (false, active, typeof(Extractor)),
-                (true, active, typeof(Construction)));
+                (true, active, typeof(Construction)),
+                (true, active, typeof(Crafter)),
+                (false, active, typeof(Crafter)));
         }
 
         public new class Context : GameStateBuild<Context, Conveyor>.Context

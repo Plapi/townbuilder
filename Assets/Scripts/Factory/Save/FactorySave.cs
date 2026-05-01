@@ -25,6 +25,8 @@ namespace com.Plapamaru.TownCrafter.Factory
                         saveData.extractors.Add(extractor.ToSaveData());
                     else if (entity is Conveyor conveyor)
                         saveData.conveyors.Add(conveyor.ToSaveData());
+                    else if (entity is Crafter crafter)
+                        saveData.crafters.Add(crafter.ToSaveData());
 
                     entities.Add(entity);
                 }
@@ -64,6 +66,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         public List<ExtractorSaveData> extractors = new List<ExtractorSaveData>();
         public List<ConveyorSaveData> conveyors = new List<ConveyorSaveData>();
+        public List<EntitySaveData> crafters = new List<EntitySaveData>();
     }
 
     [Serializable]

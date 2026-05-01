@@ -52,6 +52,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             var saveData = _saveSystem.Load();
             InstantiateSaveEntities<ExtractorSaveData, Extractor>(saveData.extractors);
             InstantiateSaveEntities<ConveyorSaveData, Conveyor>(saveData.conveyors);
+            InstantiateSaveEntities<EntitySaveData, Crafter>(saveData.crafters);
         }
 
         private void InstantiateSaveEntities<T, U>(List<T> entitiesSaves)

@@ -60,6 +60,11 @@ namespace com.Plapamaru.TownCrafter.Game
                     await _mainPanel.Close(true, cancellationToken: cancellationToken);
                     EnqueueGameStateBuildConveyor(conveyor);
                 }
+                else if (entity is Crafter crafter)
+                {
+                    await _mainPanel.Close(true, cancellationToken: cancellationToken);
+                    EnqueueGameStateBuildCrafter(crafter);
+                }
             }
         }
 
@@ -96,7 +101,8 @@ namespace com.Plapamaru.TownCrafter.Game
             }
             else if (_mainPanel.SelectedButton == UIButtonType.Crafter)
             {
-
+                await _mainPanel.Close(true, cancellationToken: cancellationToken);
+                EnqueueGameStateBuildCrafter(null);
             }
         }
 
@@ -118,6 +124,16 @@ namespace com.Plapamaru.TownCrafter.Game
                 conveyor = conveyor
             };
             GameSystem.Instance.EnqueueState<GameStateBuildConveyor, GameStateBuildConveyor.Context>(context, false);
+        }
+
+        private static void EnqueueGameStateBuildCrafter(Crafter crafter)
+        {
+            var context = new GameStateBuildCrafter.Context()
+            {
+                id = FactoryConstants.CRAFTER_NAME,
+                crafter = crafter
+            };
+            GameSystem.Instance.EnqueueState<GameStateBuildCrafter, GameStateBuildCrafter.Context>(context, false);
         }
 
         public new class Context : GameStateBase.Context

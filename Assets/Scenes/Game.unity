@@ -5908,6 +5908,7 @@ Transform:
   - {fileID: 2137754903}
   - {fileID: 1307727162}
   - {fileID: 1583020434}
+  - {fileID: 1623652019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1268288364
@@ -6976,6 +6977,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1591373190}
   m_CullTransparentMesh: 0
+--- !u!1 &1623652018
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1623652019}
+  - component: {fileID: 1623652020}
+  m_Layer: 0
+  m_Name: GameStateBuildCrafter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1623652019
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623652018}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1268288363}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1623652020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623652018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dbbc02c6b2cf4de3adbde4ae9494908, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TownCrafter.Game::GameStateBuildCrafter
+  _camera: {fileID: 379399442}
+  _mobileTouchCamera: {fileID: 379399440}
+  _factorySystem: {fileID: 165255272}
 --- !u!1 &1623658683
 GameObject:
   m_ObjectHideFlags: 0
@@ -7168,6 +7216,7 @@ MonoBehaviour:
   - {fileID: 7555508984605573205, guid: f84bc90cfc98a43cf87598c9ced1e04f, type: 3}
   - {fileID: 5951835227456111248, guid: 328cd7d8938d24daf9027c872113e518, type: 3}
   - {fileID: 3920832455886335240, guid: 9183383a8a8a6420689c3a884f13ee5c, type: 3}
+  - {fileID: 829283731490627989, guid: 34c95a8b3a74b46e5a0259fa548b50a0, type: 3}
   - {fileID: 3865548274206251668, guid: b864e174a0b0246c59813ca764fcdd49, type: 3}
   - {fileID: 1143449541003666358, guid: a523a36e5819748c7bb98c8eb569840f, type: 3}
   - {fileID: 9197192696116441597, guid: 9ee1a7665748549fb9a39cb602a5d501, type: 3}
