@@ -6,10 +6,10 @@ namespace com.Plapamaru.TownCrafter.Factory
 {
     public abstract class FactoryEntity : Entity
     {
-        [SerializeField] protected GameObject _graphic;
-
         [Header("Runtime Properties")]
         [SerializeField] private EntityHighlightObject _entityHighlightObject;
+
+        protected ResourceItem _resourceItem;
 
         public override void OnConfirmPlacement()
         {
@@ -33,6 +33,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         public bool HasResourceItem()
         {
             return _resourceItem != null;
+        }
+
+        protected void PassResourceItem(FactoryEntity passToEntity)
+        {
+            passToEntity._resourceItem = _resourceItem;
+            _resourceItem.transform.parent = passToEntity.transform;
+            _resourceItem = null;
         }
 
         public void ShowHighlightObject()

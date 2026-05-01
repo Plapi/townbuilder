@@ -20,8 +20,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private Vector2Int _gridPos;
         [SerializeField] private bool _isCorrectlyPlaced;
-
-        protected ResourceItem _resourceItem;
+        
         private CancellationTokenSource _internalCTS;
 
         public Transform[] Inputs => _inputs;
@@ -78,8 +77,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             OnInit();
 
-            SimulationClock.Instance.OnPaused += OnSimulationPaused;
-            OnSimulationPaused(SimulationClock.Instance.IsPaused);
+            SimulationClock.OnPaused += OnSimulationPaused;
+            OnSimulationPaused(SimulationClock.IsPaused);
 
             RunProcessLoop(externalCTS).SuppressCancellationThrow().Forget();
         }
@@ -209,16 +208,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetActiveInputsOutputs(false);
         }
 
-        protected void PassResourceItem(Entity passToEntity)
-        {
-            passToEntity._resourceItem = _resourceItem;
-            _resourceItem.transform.parent = passToEntity.transform;
-            _resourceItem = null;
-        }
-
         public virtual void OnDispose()
         {
-            SimulationClock.Instance.OnPaused -= OnSimulationPaused;
+            SimulationClock.OnPaused -= OnSimulationPaused;
 
             GridPositions.Clear();
             SetActiveInputsOutputs(false);

@@ -1,4 +1,5 @@
 using System;
+using com.Plapamaru.TownCrafter.Factory;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,14 +10,14 @@ public partial class DebugWindow : EditorWindow
     {
         ((DebugWindow)GetWindow(typeof(DebugWindow))).Show();
     }
-    
+
     private const string KEY_PREFIX = "TOWNBUILDER_EDITOR_";
     private const string SCROLL_POS_Y_KEY = KEY_PREFIX + "SCROLL_POS_Y";
     private const string FOLDABLE_SECTION_TOGGLE_KEY = KEY_PREFIX + "FOLDABLE_SECTION_TOGGLE_KEY";
 
     private static int _sectionIndex;
-    
-    private static Vector2 ScrollPos 
+
+    private static Vector2 ScrollPos
     {
         get => new Vector2(0f, EditorPrefs.GetFloat(SCROLL_POS_Y_KEY, 0f));
         set => EditorPrefs.SetFloat(SCROLL_POS_Y_KEY, value.y);
@@ -37,38 +38,41 @@ public partial class DebugWindow : EditorWindow
     {
         EditorGUILayout.BeginVertical();
         ScrollPos = EditorGUILayout.BeginScrollView(ScrollPos);
-        
+
         OnGUIBookmarks();
-        
+
         Time.timeScale = EditorGUILayout.Slider("Time Scale", Time.timeScale, 0f, 1f);
-        
+        SimulationClock.TimeScale = EditorGUILayout.Slider("Factory Sim Time Scale", SimulationClock.TimeScale, 0f, 10f);
+
         _sectionIndex = 0;
         FoldableSection("Game System", OnGUIGameSystem);
         FoldableSection("Default", OnGUIDefault);
-        
+
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
     }
 
     private static void OnGUIDefault()
     {
-        if (GUILayout.Button("Delete Player Prefs")) {
+        if (GUILayout.Button("Delete Player Prefs"))
+        {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
         }
-        
+
         if (GUILayout.Button("Take Screenshot"))
             EditorCoroutine.Start(TakeScreenshotIEnumerator());
-        
-        if (GUILayout.Button("Test")) 
+
+        if (GUILayout.Button("Test"))
         {
-            
+
         }
     }
-    
-    private static void FoldableSection(string text, Action onComplete) {
+
+    private static void FoldableSection(string text, Action onComplete)
+    {
         EditorGUILayout.Space();
-        if (SetFoldableSectionToggle(_sectionIndex, 
+        if (SetFoldableSectionToggle(_sectionIndex,
                 EditorGUILayout.BeginFoldoutHeaderGroup(GetFoldableSectionToggle(_sectionIndex), text)))
             onComplete.Invoke();
         EditorGUILayout.EndFoldoutHeaderGroup();

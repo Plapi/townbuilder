@@ -17,7 +17,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
-            while (SimulationClock.Instance.IsPaused || !TrySetResourceItem())
+            while (SimulationClock.IsPaused || !TrySetResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
             _resourceItem.gameObject.SetActive(false);
@@ -25,14 +25,14 @@ namespace com.Plapamaru.TownCrafter.Factory
             var extractTime = _extractTime;
             while (extractTime > 0f)
             {
-                extractTime -= SimulationClock.Instance.DeltaTime;
+                extractTime -= SimulationClock.DeltaTime;
                 await UniTask.NextFrame(cancellationToken);
             }
 
             _resourceItem.gameObject.SetActive(true);
 
             Conveyor conveyor = null;
-            while (SimulationClock.Instance.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())
+            while (SimulationClock.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
             var closest = Utils.GetClosest(_resourceItem.transform, conveyor.ResourceInputs).position;

@@ -54,7 +54,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
                 while (segmentElapsed < segmentDuration && cancellationToken.IsCancellationRequested == false)
                 {
-                    segmentElapsed += SimulationClock.Instance.DeltaTime;
+                    segmentElapsed += SimulationClock.DeltaTime;
                     var t = Mathf.Clamp01(segmentElapsed / segmentDuration);
 
                     transform.position = Vector3.Lerp(start, end, t);

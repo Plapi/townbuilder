@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using com.Plapamaru.Pooling;
 using com.Plapamaru.Singletons;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
@@ -78,7 +79,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         public T InstantiateEntity<T>(string id) where T : Entity
         {
             var entity = ObjectPoolingSystem.Instance.GetObject<T>(id, transform);
-            entity.Init(_externalCT);
+
+            UniTask.Action(async () =>
+            {
+                await UniTask.NextFrame(_externalCT);
+                entity.Init(_externalCT);
+            }).Invoke();
+
             return entity;
         }
 

@@ -47,6 +47,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetBeltSpeed(paused ? 0f : 1f);
         }
 
+        protected override void OnInit()
+        {
+            if (_nextConveyor == null && FactoryMap.Instance.TryGetConstructionFromInput(GridPos, out var construction, out _))
+                _connectedConstruction = construction;
+        }
+
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
             while (_resourceItem == null)
@@ -55,7 +61,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             _distributionPoints = GetResourceDistributionPoints();
             await _resourceItem.MoveToAsync(_distributionPoints, cancellationToken);
 
-            var entity = (Entity)null;
+            var entity = (FactoryEntity)null;
             while (!TryGetConnectedEntity(out entity))
                 await UniTask.NextFrame(cancellationToken);
 
@@ -189,7 +195,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetBeltSpeed(_beltSpeed);
         }
 
-        private bool TryGetConnectedEntity(out Entity entity)
+        private bool TryGetConnectedEntity(out FactoryEntity entity)
         {
             entity = _nextConveyor != null && !_nextConveyor.HasResourceItem() ? _nextConveyor :
                 _connectedConstruction != null ? _connectedConstruction : null;

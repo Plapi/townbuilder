@@ -3,14 +3,16 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    internal class SimulationClock : Singleton<SimulationClock>
+    public static class SimulationClock
     {
-        public bool IsPaused { get; private set; }
-        public float DeltaTime => IsPaused ? 0f : Time.deltaTime;
+        public static float TimeScale = 1f;
 
-        public Action<bool> OnPaused;
+        public static bool IsPaused { get; private set; }
+        public static float DeltaTime => IsPaused ? 0f : Time.deltaTime * TimeScale;
 
-        public void SetPaused(bool paused)
+        public static Action<bool> OnPaused;
+
+        public static void SetPaused(bool paused)
         {
             if (IsPaused != paused)
             {
