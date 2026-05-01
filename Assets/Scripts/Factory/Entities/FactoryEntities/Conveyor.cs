@@ -4,6 +4,7 @@ using System.Threading;
 using com.Plapamaru.Pooling;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
@@ -22,7 +23,8 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _prevConveyor;
         [SerializeField] private Conveyor _nextConveyor;
-        [SerializeField] private Construction _connectedConstruction;
+        [FormerlySerializedAs("_connectedConstruction")]
+        [SerializeField] private FactoryEntity _connectedFeedTarget;
         [SerializeField] private List<EntityHighlightObject> _allowedHighlightObjects;
         [SerializeField] private List<Vector3> _distributionPoints;
 
@@ -56,8 +58,8 @@ namespace com.Plapamaru.TownCrafter.Factory
                 SetBeltDirection(_saveData.beltDirection);
             }
 
-            if (_nextConveyor == null && FactoryMap.Instance.TryGetConstructionFromInput(GridPos, out var construction, out _))
-                _connectedConstruction = construction;
+            if (_nextConveyor == null && FactoryMap.Instance.TryGetFactoryEntityFromInput(GridPos, out var feedTarget, out _))
+                _connectedFeedTarget = feedTarget;
         }
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
@@ -124,9 +126,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             _nextConveyor = null;
         }
 
-        public void ConnectConstruction(Construction construction)
+        public void ConnectFeedTarget(FactoryEntity feedTarget)
         {
-            _connectedConstruction = construction;
+            _connectedFeedTarget = feedTarget;
         }
 
         public void SetPillarActive(bool active)
@@ -168,7 +170,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             base.OnDispose();
             Disconnect();
             ReleaseAllowedHighlights();
-            _connectedConstruction = null;
+            _connectedFeedTarget = null;
         }
 
         public bool TryGetAjdConveyor(Func<Conveyor, bool> func, out Conveyor conveyor)
@@ -210,7 +212,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         private bool TryGetConnectedEntity(out FactoryEntity entity)
         {
             entity = _nextConveyor != null && !_nextConveyor.HasResourceItem() ? _nextConveyor :
-                _connectedConstruction != null ? _connectedConstruction : null;
+                _connectedFeedTarget != null ? _connectedFeedTarget : null;
             return entity != null;
         }
 

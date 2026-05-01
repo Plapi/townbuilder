@@ -68,7 +68,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             return dx == 1 && dy == 1;
         }
 
-        public static bool TryGetConstructionFeedOutDir(Transform matchedInput, out Vector2Int outDir)
+        public static bool TryGetInputFeedOutDir(Transform matchedInput, out Vector2Int outDir)
         {
             outDir = default;
             if (matchedInput == null)

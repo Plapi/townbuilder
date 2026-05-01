@@ -125,7 +125,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             from.Connect(to);
         }
 
-        public void ReplaceConveyorEndWithCornerForConstruction(Conveyor last, Vector2Int fromPrevGridPos,
+        public void ReplaceConveyorEndWithCornerForFeedTarget(Conveyor last, Vector2Int fromPrevGridPos,
             Vector2Int outDir, Action<Conveyor, Conveyor> onConveyorReplaced)
         {
             var prev = last.PrevConveyor;

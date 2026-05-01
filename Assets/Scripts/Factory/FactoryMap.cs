@@ -12,9 +12,6 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [SerializeField] private DebugCells _debugCells;
 
-        [Header("Runtime Properties")]
-        [SerializeField] private List<Construction> _constructions;
-
         public readonly Dictionary<Vector2Int, Entity> Map = new Dictionary<Vector2Int, Entity>();
 
         private CancellationToken _externalCT;
@@ -28,9 +25,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             entity.GridPositions.Add(gridPos);
             Map.Add(gridPos, entity);
-
-            if (entity is Construction construction)
-                _constructions.Add(construction);
         }
 
         public void Remove(Entity entity)
@@ -56,24 +50,37 @@ namespace com.Plapamaru.TownCrafter.Factory
             return false;
         }
 
-        public bool TryGetConstructionFromInput(Vector2Int gridPos, out Construction constructionOut,
+        public bool TryGetFactoryEntityFromInput(Vector2Int gridPos, out FactoryEntity entityOut,
             out Transform matchedInputOut)
         {
-            constructionOut = null;
+            entityOut = null;
             matchedInputOut = null;
-            foreach (var construction in _constructions)
+            var seen = new HashSet<Entity>();
+            foreach (var kv in Map)
             {
-                foreach (var input in construction.Inputs)
+                var entity = kv.Value;
+                if (!seen.Add(entity) || entity is not FactoryEntity factoryEntity || !IsConveyorFeedTarget(factoryEntity))
+                    continue;
+
+                foreach (var input in factoryEntity.Inputs)
                 {
+                    if (input == null)
+                        continue;
                     if (FactoryUtils.GetGridPos(input) == gridPos)
                     {
-                        constructionOut = construction;
+                        entityOut = factoryEntity;
                         matchedInputOut = input;
                         return true;
                     }
                 }
             }
+
             return false;
+        }
+
+        private static bool IsConveyorFeedTarget(FactoryEntity entity)
+        {
+            return entity is Construction or Crafter;
         }
 
         public T InstantiateEntity<T>(string id) where T : Entity

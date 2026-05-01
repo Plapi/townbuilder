@@ -99,12 +99,12 @@ namespace com.Plapamaru.TownCrafter.Game
 
             if (_buildPanel.SelectedButton != UIButtonType.Close)
             {
-                if (TryGetConstructionFromInput(out var construction, out var matchedInput))
+                if (TryGetFactoryEntityFromInput(out var feedTarget, out var matchedInput))
                 {
                     var lastConveyor = _conveyors[^1];
-                    if (ShouldReplaceLastWithCornerForConstruction(lastConveyor, matchedInput, out var outDir, out var fromPrevGridPos))
-                        _factorySystem.ReplaceConveyorEndWithCornerForConstruction(lastConveyor, fromPrevGridPos, outDir, OnConveyorReplaced);
-                    _conveyors[^1].ConnectConstruction(construction);
+                    if (ShouldReplaceLastWithCornerForFeedTarget(lastConveyor, matchedInput, out var outDir, out var fromPrevGridPos))
+                        _factorySystem.ReplaceConveyorEndWithCornerForFeedTarget(lastConveyor, fromPrevGridPos, outDir, OnConveyorReplaced);
+                    _conveyors[^1].ConnectFeedTarget(feedTarget);
                 }
                 else if (TryGetAdjLastConveyor(out var lastConveyor))
                 {
@@ -116,7 +116,7 @@ namespace com.Plapamaru.TownCrafter.Game
             }
         }
 
-        private static bool ShouldReplaceLastWithCornerForConstruction(Conveyor last, Transform matchedInput,
+        private static bool ShouldReplaceLastWithCornerForFeedTarget(Conveyor last, Transform matchedInput,
             out Vector2Int outDir, out Vector2Int fromPrevGridPos)
         {
             outDir = default;
@@ -135,7 +135,7 @@ namespace com.Plapamaru.TownCrafter.Game
             if (Mathf.Abs(inDir.x) + Mathf.Abs(inDir.y) != 1)
                 return false;
 
-            if (FactoryUtils.TryGetConstructionFeedOutDir(matchedInput, out outDir) == false)
+            if (FactoryUtils.TryGetInputFeedOutDir(matchedInput, out outDir) == false)
                 return false;
 
             if (inDir.x * outDir.x + inDir.y * outDir.y != 0)
@@ -144,12 +144,12 @@ namespace com.Plapamaru.TownCrafter.Game
             return true;
         }
 
-        private bool TryGetConstructionFromInput(out Construction construction, out Transform matchedInput)
+        private bool TryGetFactoryEntityFromInput(out FactoryEntity feedTarget, out Transform matchedInput)
         {
-            construction = null;
+            feedTarget = null;
             matchedInput = null;
             return _conveyors.Count > 1 &&
-                   FactoryMap.Instance.TryGetConstructionFromInput(_conveyors[^1].GridPos, out construction, out matchedInput);
+                   FactoryMap.Instance.TryGetFactoryEntityFromInput(_conveyors[^1].GridPos, out feedTarget, out matchedInput);
         }
 
         private bool TryGetAdjLastConveyor(out Conveyor lastConveyor)
