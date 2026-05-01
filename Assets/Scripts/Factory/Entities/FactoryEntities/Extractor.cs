@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class Extractor : FactoryEntity<EntitySaveData>
+    public class Extractor : FactoryEntity<ExtractorSaveData>
     {
         [Space]
         [SerializeField] private Animator[] _animators;
@@ -15,24 +15,40 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private Transform _resourceItemLocator;
         [SerializeField] private float _extractTime;
 
+        [Header("Runtime Properties")]
+        [SerializeField] private float _currentExtractTime;
+
+        public override ExtractorSaveData ToSaveData()
+        {
+            var saveData = base.ToSaveData();
+            saveData.currentExtractTime = _currentExtractTime;
+            return saveData;
+        }
+
+        protected override void OnInit()
+        {
+            base.OnInit();
+            _currentExtractTime = _saveData?.currentExtractTime ?? _extractTime;
+        }
+
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
             if (_resourceItem == null)
             {
                 while (SimulationClock.IsPaused || !TrySetResourceItem())
                     await UniTask.NextFrame(cancellationToken);
-
-                _resourceItem.gameObject.SetActive(false);
-
-                var extractTime = _extractTime;
-                while (extractTime > 0f)
-                {
-                    extractTime -= SimulationClock.DeltaTime;
-                    await UniTask.NextFrame(cancellationToken);
-                }
-
-                _resourceItem.gameObject.SetActive(true);
             }
+
+            _resourceItem.gameObject.SetActive(false);
+
+            while (_currentExtractTime > 0f)
+            {
+                _currentExtractTime -= SimulationClock.DeltaTime;
+                await UniTask.NextFrame(cancellationToken);
+            }
+            _currentExtractTime = _extractTime;
+
+            _resourceItem.gameObject.SetActive(true);
 
             Conveyor conveyor = null;
             while (SimulationClock.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())
@@ -60,6 +76,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 {
                     _resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(resourceNode.OutputResourceType.ToString(), transform);
                     _resourceItem.transform.SetPositionAndRotation(_resourceItemLocator.position, _resourceItemLocator.rotation);
+                    _resourceItem.UpdateSavedData();
                     return true;
                 }
             }

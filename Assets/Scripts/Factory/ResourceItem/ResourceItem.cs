@@ -13,14 +13,19 @@ namespace com.Plapamaru.TownCrafter.Factory
         public string Id => _type.ToString();
         public MonoBehaviour Behaviour => this;
 
-        public ResourceItemSaveData SavedState { get; private set; }
+        public ResourceItemSaveData SavedData { get; private set; }
 
-        public void UpdateSavedState()
+        public void SetSavedData(ResourceItemSaveData saveData)
         {
-            SavedState ??= new ResourceItemSaveData();
-            SavedState.id = Id;
-            SavedState.position = transform.position;
-            SavedState.rotation = transform.rotation;
+            SavedData = saveData;
+        }
+
+        public void UpdateSavedData()
+        {
+            SavedData ??= new ResourceItemSaveData();
+            SavedData.id = Id;
+            SavedData.position = transform.position;
+            SavedData.rotation = transform.rotation;
         }
 
         public async UniTask MoveToAsync(List<Vector3> points, CancellationToken cancellationToken)
@@ -76,7 +81,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void OnDispose()
         {
-            SavedState = null;
+            SavedData = null;
         }
     }
 }

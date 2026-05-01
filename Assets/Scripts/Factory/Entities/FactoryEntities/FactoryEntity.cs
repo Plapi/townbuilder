@@ -41,7 +41,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             passToEntity._resourceItem = _resourceItem;
             _resourceItem.transform.parent = passToEntity.transform;
-            _resourceItem.UpdateSavedState();
+            _resourceItem.UpdateSavedData();
             _resourceItem = null;
         }
 
@@ -83,9 +83,10 @@ namespace com.Plapamaru.TownCrafter.Factory
             base.OnInit();
             if (_saveData?.resource != null)
             {
-                var resourceSave = _saveData?.resource;
+                var resourceSave = _saveData.resource;
                 _resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(resourceSave.id, transform);
                 _resourceItem.transform.SetPositionAndRotation(resourceSave.position, resourceSave.rotation);
+                _resourceItem.SetSavedData(resourceSave);
             }
         }
 
@@ -106,7 +107,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 id = Id,
                 gridPos = GridPos,
                 rotationY = Mathf.RoundToInt(transform.eulerAngles.y),
-                resource = _resourceItem != null ? _resourceItem.SavedState : null
+                resource = _resourceItem != null ? _resourceItem.SavedData : null
             };
 
             return saveData;

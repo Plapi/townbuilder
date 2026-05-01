@@ -50,7 +50,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         private void SetSaveEntities()
         {
             var saveData = _saveSystem.Load();
-            InstantiateSaveEntities<EntitySaveData, Extractor>(saveData.extractors);
+            InstantiateSaveEntities<ExtractorSaveData, Extractor>(saveData.extractors);
             InstantiateSaveEntities<ConveyorSaveData, Conveyor>(saveData.conveyors);
         }
 

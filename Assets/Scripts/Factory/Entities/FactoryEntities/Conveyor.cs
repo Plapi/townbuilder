@@ -42,11 +42,6 @@ namespace com.Plapamaru.TownCrafter.Factory
             return saveData;
         }
 
-        protected override void OnSimulationPaused(bool paused)
-        {
-            SetBeltSpeed(paused ? 0f : 1f);
-        }
-
         protected override void OnInit()
         {
             base.OnInit();
@@ -60,7 +55,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                     Debug.LogError($"Failed to find conveyor grid pos at {gridPos}");
                 SetBeltDirection(_saveData.beltDirection);
             }
-            
+
             if (_nextConveyor == null && FactoryMap.Instance.TryGetConstructionFromInput(GridPos, out var construction, out _))
                 _connectedConstruction = construction;
         }
@@ -80,6 +75,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             PassResourceItem(entity);
 
             return true;
+        }
+
+        protected override void OnSimulationPaused(bool paused)
+        {
+            SetBeltSpeed(paused ? 0f : 1f);
         }
 
         protected abstract List<Vector3> GetResourceDistributionPoints();

@@ -62,7 +62,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     [Serializable]
     public class SaveData
     {
-        public List<EntitySaveData> extractors = new List<EntitySaveData>();
+        public List<ExtractorSaveData> extractors = new List<ExtractorSaveData>();
         public List<ConveyorSaveData> conveyors = new List<ConveyorSaveData>();
     }
 
@@ -73,6 +73,12 @@ namespace com.Plapamaru.TownCrafter.Factory
         public GridPosition gridPos;
         public int rotationY;
         public ResourceItemSaveData resource;
+    }
+
+    [Serializable]
+    public class ExtractorSaveData : EntitySaveData
+    {
+        public float currentExtractTime;
     }
 
     [Serializable]

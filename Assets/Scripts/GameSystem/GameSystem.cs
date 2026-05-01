@@ -96,6 +96,7 @@ namespace com.Plapamaru.TownCrafter.Game
 
                 if (Input.GetKeyUp(KeyCode.R))
                 {
+                    TrySaveFactory();
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                     return;
                 }
