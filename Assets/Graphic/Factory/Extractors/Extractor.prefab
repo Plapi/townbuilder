@@ -228,7 +228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &238180166470777355
 Transform:
   m_ObjectHideFlags: 0
@@ -776,7 +776,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6832471444678002524
 Transform:
   m_ObjectHideFlags: 0
@@ -922,7 +922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &703505611033764209
 Transform:
   m_ObjectHideFlags: 0
@@ -954,7 +954,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6183382567784103004
 Transform:
   m_ObjectHideFlags: 0
@@ -1154,7 +1154,6 @@ MonoBehaviour:
   - {fileID: 6183382567784103004}
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
-  _graphic: {fileID: 1782044764480533135}
   _entityHighlightObject: {fileID: 0}
   _animators:
   - {fileID: 2362173771789094466}
@@ -1165,6 +1164,7 @@ MonoBehaviour:
   _resourceOutput: {fileID: 7212526488194793308}
   _resourceItemLocator: {fileID: 262466263439485433}
   _extractTime: 2
+  _currentExtractTime: 0
 --- !u!1001 &1839915399639652144
 PrefabInstance:
   m_ObjectHideFlags: 0

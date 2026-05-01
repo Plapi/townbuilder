@@ -436,6 +436,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 14172773}
   m_CullTransparentMesh: 0
+--- !u!1 &14461523
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 14461524}
+  m_Layer: 0
+  m_Name: Parent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &14461524
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14461523}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.68007, y: 2.32758, z: -0.13537}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &17705362
 GameObject:
   m_ObjectHideFlags: 0
@@ -990,6 +1021,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactoryMap
   _debugCells: {fileID: 1290306709}
+  _constructions: []
 --- !u!1 &165729558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2597,6 +2629,7 @@ MonoBehaviour:
   _outputs: []
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
+  _entityHighlightObject: {fileID: 0}
   _connectedConveyor: {fileID: 0}
 --- !u!1 &448293846
 GameObject:
@@ -8714,11 +8747,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1463228458495701019, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2160958881110777824, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2160958881110777824, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8726,7 +8759,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2160958881110777824, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -8
       objectReference: {fileID: 0}
     - target: {fileID: 2160958881110777824, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
       propertyPath: m_LocalRotation.w
@@ -9244,3 +9277,4 @@ SceneRoots:
   - {fileID: 1868220538}
   - {fileID: 2155601266674353359}
   - {fileID: 8763335040966900153}
+  - {fileID: 14461524}

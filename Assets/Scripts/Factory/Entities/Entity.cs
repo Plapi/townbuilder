@@ -73,8 +73,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             _internalCTS = new CancellationTokenSource();
 
-            SetActiveInputsOutputs(false);
-
             OnInit();
 
             SimulationClock.OnPaused += OnSimulationPaused;

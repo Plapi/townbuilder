@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3400513027911299679}
   - component: {fileID: 1143449541003666358}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Stone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 2542517138674619601}
   - component: {fileID: 1413509012803477993}
   - component: {fileID: 2879262886451353572}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SM_Generic_Small_Rocks_04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 2284485490684228182}
   - component: {fileID: 6890088540126415163}
   - component: {fileID: 2218398746571096741}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SM_Generic_Small_Rocks_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
