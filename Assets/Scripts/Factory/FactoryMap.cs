@@ -55,9 +55,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             return false;
         }
 
-        public bool TryGetConstructionFromInput(Vector2Int gridPos, out Construction constructionOut)
+        public bool TryGetConstructionFromInput(Vector2Int gridPos, out Construction constructionOut,
+            out Transform matchedInputOut)
         {
             constructionOut = null;
+            matchedInputOut = null;
             foreach (var construction in _constructions)
             {
                 foreach (var input in construction.Inputs)
@@ -65,6 +67,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                     if (FactoryUtils.GetGridPos(input) == gridPos)
                     {
                         constructionOut = construction;
+                        matchedInputOut = input;
                         return true;
                     }
                 }

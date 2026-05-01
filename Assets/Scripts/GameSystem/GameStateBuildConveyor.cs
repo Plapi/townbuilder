@@ -97,24 +97,59 @@ namespace com.Plapamaru.TownCrafter.Game
                     FactorySystem.Release(conveyor);
             }
 
-            if (TryGetConstructionFromInput(out var construction))
+            if (_buildPanel.SelectedButton != UIButtonType.Close)
             {
-                _conveyors[^1].ConnectConstruction(construction);
-            }
-            else if (TryGetAdjLastConveyor(out var lastConveyor))
-            {
-                _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, (_, newConveyor) =>
+                if (TryGetConstructionFromInput(out var construction, out var matchedInput))
                 {
-                    newConveyor.SetLayer(LayerType.Environment);
-                });
+                    var lastConveyor = _conveyors[^1];
+                    if (ShouldReplaceLastWithCornerForConstruction(lastConveyor, matchedInput, out var outDir, out var fromPrevGridPos))
+                        _factorySystem.ReplaceConveyorEndWithCornerForConstruction(lastConveyor, fromPrevGridPos, outDir, OnConveyorReplaced);
+                    _conveyors[^1].ConnectConstruction(construction);
+                }
+                else if (TryGetAdjLastConveyor(out var lastConveyor))
+                {
+                    _factorySystem.MakeConveyorsConnexions(_conveyors[^1], lastConveyor, (_, newConveyor) =>
+                    {
+                        newConveyor.SetLayer(LayerType.Environment);
+                    });
+                }
             }
         }
 
-        private bool TryGetConstructionFromInput(out Construction construction)
+        private static bool ShouldReplaceLastWithCornerForConstruction(Conveyor last, Transform matchedInput,
+            out Vector2Int outDir, out Vector2Int fromPrevGridPos)
+        {
+            outDir = default;
+            fromPrevGridPos = default;
+            if (last is ConveyorCorner)
+                return false;
+
+            var prev = last.PrevConveyor;
+            if (prev == null)
+                return false;
+
+            fromPrevGridPos = prev.GridPos;
+            var inDir = new Vector2Int(
+                Mathf.Clamp(last.GridPos.x - prev.GridPos.x, -1, 1),
+                Mathf.Clamp(last.GridPos.y - prev.GridPos.y, -1, 1));
+            if (Mathf.Abs(inDir.x) + Mathf.Abs(inDir.y) != 1)
+                return false;
+
+            if (FactoryUtils.TryGetConstructionFeedOutDir(matchedInput, out outDir) == false)
+                return false;
+
+            if (inDir.x * outDir.x + inDir.y * outDir.y != 0)
+                return false;
+
+            return true;
+        }
+
+        private bool TryGetConstructionFromInput(out Construction construction, out Transform matchedInput)
         {
             construction = null;
+            matchedInput = null;
             return _conveyors.Count > 1 &&
-                   FactoryMap.Instance.TryGetConstructionFromInput(_conveyors[^1].GridPos, out construction);
+                   FactoryMap.Instance.TryGetConstructionFromInput(_conveyors[^1].GridPos, out construction, out matchedInput);
         }
 
         private bool TryGetAdjLastConveyor(out Conveyor lastConveyor)

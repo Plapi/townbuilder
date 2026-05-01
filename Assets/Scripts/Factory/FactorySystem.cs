@@ -135,20 +135,44 @@ namespace com.Plapamaru.TownCrafter.Factory
             from.Connect(to);
         }
 
+        public void ReplaceConveyorEndWithCornerForConstruction(Conveyor last, Vector2Int fromPrevGridPos,
+            Vector2Int outDir, Action<Conveyor, Conveyor> onConveyorReplaced)
+        {
+            var prev = last.PrevConveyor;
+            if (prev == null)
+                return;
+
+            var inDir = last.GridPos - fromPrevGridPos;
+            var outDirForCorner = new Vector2Int(-outDir.x, -outDir.y);
+            var corner = CreateCornerReplacement(last);
+            corner.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDirForCorner, out var speedSign));
+            corner.SetBeltDirection(speedSign);
+            corner.SnapToGrid(corner.GridPos);
+
+            prev.Connect(corner);
+            onConveyorReplaced?.Invoke(last, corner);
+            corner.OnConfirmPlacement();
+        }
+
         private Conveyor ReplaceWithConveyorCorner(Conveyor from, Conveyor to, Vector2Int fromPrevGridPos)
         {
             var inDir = from.GridPos - fromPrevGridPos;
             var outDir = to.GridPos - from.GridPos;
 
-            var newFromConveyor = FactoryMap.Instance.InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
-            Replace(from, newFromConveyor);
-            newFromConveyor.ReleaseHighlightObject();
-
+            var newFromConveyor = CreateCornerReplacement(from);
             newFromConveyor.transform.SetLocalAngleY(ConveyorHelper.GetCornerAngle(inDir, outDir, out var speedSign));
             newFromConveyor.SetBeltDirection(speedSign);
 
             to.transform.SetLocalAngleY(ConveyorHelper.GetStraightAngle(to.GridPos - newFromConveyor.GridPos));
 
+            return newFromConveyor;
+        }
+
+        private static ConveyorCorner CreateCornerReplacement(Conveyor from)
+        {
+            var newFromConveyor = FactoryMap.Instance.InstantiateEntity<ConveyorCorner>(FactoryConstants.CONVEYOR_CORNER_NAME);
+            Replace(from, newFromConveyor);
+            newFromConveyor.ReleaseHighlightObject();
             return newFromConveyor;
         }
 

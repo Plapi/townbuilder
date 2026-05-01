@@ -67,6 +67,30 @@ namespace com.Plapamaru.TownCrafter.Factory
             int dy = Mathf.Abs(a.y - b.y);
             return dx == 1 && dy == 1;
         }
+
+        public static bool TryGetConstructionFeedOutDir(Transform matchedInput, out Vector2Int outDir)
+        {
+            outDir = default;
+            if (matchedInput == null)
+                return false;
+            if (TryWorldDirToUnitCardinal(-matchedInput.forward, out outDir))
+                return true;
+            return TryWorldDirToUnitCardinal(matchedInput.forward, out outDir);
+        }
+
+        private static bool TryWorldDirToUnitCardinal(Vector3 worldDir, out Vector2Int cardinal)
+        {
+            cardinal = new Vector2Int(
+                Mathf.Clamp(Mathf.RoundToInt(worldDir.x), -1, 1),
+                Mathf.Clamp(Mathf.RoundToInt(worldDir.z), -1, 1));
+            var ax = Mathf.Abs(cardinal.x);
+            var ay = Mathf.Abs(cardinal.y);
+            if (ax + ay == 0)
+                return false;
+            if (ax != 0 && ay != 0)
+                cardinal = ax >= ay ? new Vector2Int((int)Mathf.Sign(cardinal.x), 0) : new Vector2Int(0, (int)Mathf.Sign(cardinal.y));
+            return Mathf.Abs(cardinal.x) + Mathf.Abs(cardinal.y) == 1;
+        }
     }
 
     public enum RoundType
