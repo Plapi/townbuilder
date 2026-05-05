@@ -39,6 +39,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             if (_nextConveyor != null)
                 saveData.nextConveyorGridPos = _nextConveyor.GridPos;
             saveData.beltDirection = _beltDirection;
+            saveData.pilarIsActive = _pillar.activeSelf;
             return saveData;
         }
 
@@ -46,14 +47,15 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             base.OnInit();
 
-            if (_saveData != null && _saveData.nextConveyorGridPos != null)
+            if (_saveData?.nextConveyorGridPos != null)
             {
                 var gridPos = _saveData.nextConveyorGridPos.Value;
                 if (FactoryMap.Instance.TryGetEntity(gridPos, out Conveyor nextConveyor))
-                    Connect(nextConveyor);
+                    Connect(nextConveyor, false);
                 else
                     Debug.LogError($"Failed to find conveyor grid pos at {gridPos}");
                 SetBeltDirection(_saveData.beltDirection);
+                _pillar.SetActive(_saveData.pilarIsActive);
             }
 
             if (_nextConveyor == null && FactoryMap.Instance.TryGetFactoryEntityFromInput(GridPos, out var feedTarget, out _))
@@ -94,11 +96,13 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected abstract List<Vector3> GetResourceDistributionPoints();
 
-        public void Connect(Conveyor next)
+        public void Connect(Conveyor next, bool setActiveNextPilar = true)
         {
             _nextConveyor = next;
             next._prevConveyor = this;
-            next._pillar.gameObject.SetActive(!_pillar.activeSelf);
+
+            if (setActiveNextPilar)
+                next._pillar.gameObject.SetActive(!_pillar.activeSelf);
         }
 
         public void Disconnect(Conveyor next)

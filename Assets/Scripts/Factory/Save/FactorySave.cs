@@ -89,6 +89,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         public GridPosition? nextConveyorGridPos;
         public int beltDirection;
+        public bool pilarIsActive;
     }
 
     [Serializable]
