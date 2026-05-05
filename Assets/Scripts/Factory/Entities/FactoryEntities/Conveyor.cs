@@ -4,7 +4,6 @@ using System.Threading;
 using com.Plapamaru.Pooling;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
@@ -23,7 +22,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _prevConveyor;
         [SerializeField] private Conveyor _nextConveyor;
-        [FormerlySerializedAs("_connectedConstruction")]
         [SerializeField] private FactoryEntity _connectedFeedTarget;
         [SerializeField] private List<EntityHighlightObject> _allowedHighlightObjects;
         [SerializeField] private List<Vector3> _distributionPoints;
