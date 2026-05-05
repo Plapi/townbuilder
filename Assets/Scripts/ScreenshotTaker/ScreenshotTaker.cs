@@ -27,9 +27,10 @@ public class ScreenshotTaker : MonoBehaviour
         AssetDatabase.Refresh();
     }
     
-    private byte[] TakeScreenshot() {
-        var width = Screen.width;
-        var height = Screen.height;
+    private byte[] TakeScreenshot()
+    {
+        var width = 512;//Screen.width;
+        var height = 512;//Screen.height;
         
         var rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
         _camera.targetTexture = rt;

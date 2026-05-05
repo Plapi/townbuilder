@@ -8,6 +8,7 @@ namespace com.Plapamaru.TownCrafter.UI
         Conveyor,
         Crafter,
         RotateLeft,
-        RotateRight
+        RotateRight,
+        Delete
     }
 }

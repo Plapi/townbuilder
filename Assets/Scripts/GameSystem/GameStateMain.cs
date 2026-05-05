@@ -104,6 +104,11 @@ namespace com.Plapamaru.TownCrafter.Game
                 await _mainPanel.Close(true, cancellationToken: cancellationToken);
                 EnqueueGameStateBuildCrafter(null);
             }
+            else if (_mainPanel.SelectedButton == UIButtonType.Delete)
+            {
+                await _mainPanel.Close(true, cancellationToken: cancellationToken);
+                
+            }
         }
 
         private static void EnqueueGameStateBuildExtractor(Extractor extractor)
