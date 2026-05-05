@@ -51,7 +51,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             _resourceItem.gameObject.SetActive(true);
 
             Conveyor conveyor = null;
-            while (SimulationClock.IsPaused || !TryGetConveyor(out conveyor) || conveyor.HasResourceItem())
+            while (SimulationClock.IsPaused || !TryGetConveyor(out conveyor) || !conveyor.CanAcceptIncomingResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
             var closest = Utils.GetClosest(_resourceItem.transform, conveyor.ResourceInputs).position;

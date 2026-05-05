@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using com.Plapamaru.Singletons;
 using UnityEngine;
 
@@ -9,5 +10,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         public Color correctColor;
         public Color wrongColor;
         public Color previewColor;
+        public List<CrafterRecipeDefinition> crafterRecipes;
     }
 }

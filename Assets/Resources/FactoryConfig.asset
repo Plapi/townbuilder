@@ -15,3 +15,10 @@ MonoBehaviour:
   correctColor: {r: 0.39215687, g: 1, b: 0.39215687, a: 1}
   wrongColor: {r: 1, g: 0.28627452, b: 0.28627452, a: 1}
   previewColor: {r: 0.12941177, g: 0.07058824, b: 1, a: 1}
+  crafterRecipes:
+  - inputs:
+    - resourceType: 0
+      amount: 1
+    - resourceType: 2
+      amount: 1
+    output: 4

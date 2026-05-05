@@ -32,9 +32,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
         }
 
-        public bool HasResourceItem()
+        public virtual bool CanAcceptIncomingResourceItem()
         {
-            return _resourceItem != null;
+            return _resourceItem == null;
         }
 
         protected void PassResourceItem(FactoryEntity passToEntity)

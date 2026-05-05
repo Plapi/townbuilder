@@ -209,9 +209,9 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private bool TryGetConnectedEntity(out FactoryEntity entity)
         {
-            entity = _nextConveyor != null && !_nextConveyor.HasResourceItem() ? _nextConveyor :
+            entity = _nextConveyor != null ? _nextConveyor :
                 _connectedFeedTarget != null ? _connectedFeedTarget : null;
-            return entity != null;
+            return entity?.CanAcceptIncomingResourceItem() ?? false;
         }
 
         private void OnDrawGizmos()

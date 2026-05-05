@@ -13,6 +13,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public string Id => _type.ToString();
         public MonoBehaviour Behaviour => this;
+        public ResourceItemType Type => _type;
 
         public ResourceItemSaveData SavedData { get; private set; }
 
