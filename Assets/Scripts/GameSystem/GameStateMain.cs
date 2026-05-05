@@ -4,6 +4,7 @@ using System.Threading;
 using BitBenderGames;
 using com.Plapamaru.Utilities;
 using com.Plapamaru.TownCrafter.Factory;
+using com.Plapamaru.TownCrafter.Layers;
 using com.Plapamaru.TownCrafter.UI;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -44,29 +45,25 @@ namespace com.Plapamaru.TownCrafter.Game
             UISystem.Instance.GetPanel<UIDeletePanel>().Init(new UIDeletePanel.Data());
         }
 
-        private async UniTask ProcessTap(CancellationToken cancellationToken)
+        private UniTask ProcessTap(CancellationToken cancellationToken)
         {
             if (Utils.MouseIsOverUI())
-                return;
+                return UniTask.CompletedTask;
 
-            if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos) && FactoryMap.Instance.TryGetEntity(gridPos, out FactoryEntity entity))
+            if (LayersUtils.Raycast(_camera, LayerType.Environment, out var hit) &&
+                hit.transform.TryGetComponent(out EntityCollider entityCollider) && entityCollider.Entity != null)
             {
-                if (entity is Extractor extractor)
-                {
-                    await _mainPanel.Close(true, cancellationToken: cancellationToken);
-                    EnqueueGameStateBuildExtractor(extractor);
-                }
-                else if (entity is Conveyor conveyor)
-                {
-                    await _mainPanel.Close(true, cancellationToken: cancellationToken);
-                    EnqueueGameStateBuildConveyor(conveyor);
-                }
-                else if (entity is Crafter crafter)
-                {
-                    await _mainPanel.Close(true, cancellationToken: cancellationToken);
-                    EnqueueGameStateBuildCrafter(crafter);
-                }
+                Debug.LogError($"#1 Tapped on {entityCollider.Entity.name}");
             }
+            else if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
+            {
+                if (FactoryMap.Instance.TryGetEntity(gridPos, out Entity entity))
+                    Debug.LogError($"#2 Tapped on {entity.name}");
+                else
+                    Debug.LogError($"Tapped on empty grid {gridPos}");
+            }
+
+            return UniTask.CompletedTask;
         }
 
         private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)
