@@ -66,6 +66,12 @@ namespace com.Plapamaru.TownCrafter.Factory
                 _entityHighlightObject.Place(this, IsCorrectlyPlaced ? FactoryConfig.Instance.correctColor : FactoryConfig.Instance.wrongColor);
         }
 
+        public void SetHighlightObjectColor(Color color)
+        {
+            if (_entityHighlightObject != null)
+                _entityHighlightObject.SetColor(color);
+        }
+
         public void ReleaseHighlightObject()
         {
             if (_entityHighlightObject != null)
@@ -113,6 +119,12 @@ namespace com.Plapamaru.TownCrafter.Factory
             };
 
             return saveData;
+        }
+
+        public override void OnDispose()
+        {
+            _saveData = null;
+            base.OnDispose();
         }
     }
 }

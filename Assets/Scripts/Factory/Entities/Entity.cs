@@ -20,7 +20,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Header("Runtime Properties")]
         [SerializeField] private Vector2Int _gridPos;
         [SerializeField] private bool _isCorrectlyPlaced;
-        
+
         private CancellationTokenSource _internalCTS;
 
         public Transform[] Inputs => _inputs;
@@ -67,6 +67,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             GridPos = FactoryUtils.GetGridPos(transform);
             GridPositions = new List<Vector2Int>();
+            SetColliders();
         }
 
         public void Init(CancellationToken externalCTS)
@@ -204,6 +205,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         public virtual void OnConfirmPlacement()
         {
             SetActiveInputsOutputs(false);
+        }
+
+        private void SetColliders()
+        {
+            var colliders = GetComponentsInChildren<Collider>(true);
+            foreach (var coll in colliders)
+                coll.gameObject.AddComponent<EntityCollider>().SetEntity(this);
         }
 
         public virtual void OnDispose()

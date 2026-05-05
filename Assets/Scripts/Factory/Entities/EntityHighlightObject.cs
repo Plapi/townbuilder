@@ -35,7 +35,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             SetColor(color);
         }
 
-        private void SetColor(Color color)
+        public void SetColor(Color color)
         {
             foreach (var rend in _renderers)
                 rend.material.color = color;

@@ -41,6 +41,7 @@ namespace com.Plapamaru.TownCrafter.Game
             _mainPanel = UISystem.Instance.GetPanel<UIMainPanel>();
             _mainPanel.Init(new UIMainPanel.Data());
             UISystem.Instance.GetPanel<UIBuildPanel>().Init(new UIBuildPanel.Data());
+            UISystem.Instance.GetPanel<UIDeletePanel>().Init(new UIDeletePanel.Data());
         }
 
         private async UniTask ProcessTap(CancellationToken cancellationToken)
@@ -107,7 +108,7 @@ namespace com.Plapamaru.TownCrafter.Game
             else if (_mainPanel.SelectedButton == UIButtonType.Delete)
             {
                 await _mainPanel.Close(true, cancellationToken: cancellationToken);
-                
+                GameSystem.Instance.EnqueueState<GameStateDelete, GameStateDelete.Context>(new GameStateDelete.Context(), false);
             }
         }
 
