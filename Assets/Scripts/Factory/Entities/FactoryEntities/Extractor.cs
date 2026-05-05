@@ -54,8 +54,18 @@ namespace com.Plapamaru.TownCrafter.Factory
             while (SimulationClock.IsPaused || !TryGetConveyor(out conveyor) || !conveyor.CanAcceptIncomingResourceItem())
                 await UniTask.NextFrame(cancellationToken);
 
+            if (cancellationToken.IsCancellationRequested)
+                return false;
+            if (_resourceItem == null)
+                return true;
+
             var closest = Utils.GetClosest(_resourceItem.transform, conveyor.ResourceInputs).position;
             await _resourceItem.MoveToAsync(new List<Vector3>() { _resourceItem.transform.position, closest }, cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+                return false;
+            if (_resourceItem == null)
+                return true;
 
             PassResourceItem(conveyor);
 

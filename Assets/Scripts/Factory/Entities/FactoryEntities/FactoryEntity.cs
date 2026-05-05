@@ -8,8 +8,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [Header("Runtime Properties")]
         [SerializeField] private EntityHighlightObject _entityHighlightObject;
-
-        protected ResourceItem _resourceItem;
+        [SerializeField] protected ResourceItem _resourceItem;
 
         public virtual void SetSaveData(EntitySaveData saveData) { }
 
@@ -39,11 +38,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected void PassResourceItem(FactoryEntity passToEntity)
         {
-            if (_resourceItem == null)
-            {
-                Debug.LogError("Resource Item is null");
+            if (_resourceItem == null || passToEntity == null)
                 return;
-            }
 
             passToEntity._resourceItem = _resourceItem;
             _resourceItem.transform.parent = passToEntity.transform;

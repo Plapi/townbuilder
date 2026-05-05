@@ -68,9 +68,19 @@ namespace com.Plapamaru.TownCrafter.Factory
             _distributionPoints = GetResourceDistributionPoints();
             await _resourceItem.MoveToAsync(_distributionPoints, cancellationToken);
 
+            if (cancellationToken.IsCancellationRequested)
+                return false;
+            if (_resourceItem == null)
+                return true;
+
             var entity = (FactoryEntity)null;
             while (!TryGetConnectedEntity(out entity))
                 await UniTask.NextFrame(cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+                return false;
+            if (_resourceItem == null)
+                return true;
 
             PassResourceItem(entity);
 

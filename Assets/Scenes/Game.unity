@@ -2635,6 +2635,7 @@ MonoBehaviour:
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
   _entityHighlightObject: {fileID: 0}
+  _resourceItem: {fileID: 0}
   _connectedConveyor: {fileID: 0}
 --- !u!1 &448293846
 GameObject:

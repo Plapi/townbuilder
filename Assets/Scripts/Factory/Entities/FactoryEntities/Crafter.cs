@@ -56,6 +56,19 @@ namespace com.Plapamaru.TownCrafter.Factory
                 var closest = Utils.GetClosest(resourceItem.transform, conveyor.ResourceInputs).position;
                 await resourceItem.MoveToAsync(new List<Vector3>() { resourceItem.transform.position, closest }, cancellationToken);
 
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    ObjectPoolingSystem.Instance.ReleaseObject(resourceItem);
+                    _isCrafting = false;
+                    return false;
+                }
+
+                if (resourceItem == null)
+                {
+                    _isCrafting = false;
+                    return true;
+                }
+
                 _resourceItem = resourceItem;
                 PassResourceItem(conveyor);
 
