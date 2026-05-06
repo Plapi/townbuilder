@@ -1,4 +1,4 @@
-using com.Plapamaru.TownCrafter.Factory;
+﻿using com.Plapamaru.TownCrafter.Factory;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,14 +13,33 @@ namespace com.Plapamaru.TownCrafter.UI
 
         protected override void OnInit()
         {
-            _nameText.text = _data.entity.Data.name;
-            _descriptionText.text = _data.entity.Data.description;
-            _image.sprite = _data.entity.Data.icon;
+            UpdateUI(_data.entity.Data);
+        }
+
+        private void UpdateUI(EntityData entityData)
+        {
+            _nameText.text = entityData.name;
+            _descriptionText.text = entityData.description;
+            _image.sprite = entityData.icon;
+            _image.transform.localScale = Vector2.one * entityData.imageScale;
         }
 
         public new class Data : UIPanelBase.Data
         {
             public Entity entity;
         }
+
+#if UNITY_EDITOR
+
+        [Space]
+        [SerializeField] private EntityData _debugEntityData;
+
+        [ContextMenu("Update UI Debug Data")]
+        private void UpdateUIDebugData()
+        {
+            UpdateUI(_debugEntityData);
+        }
+
+#endif
     }
 }

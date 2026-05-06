@@ -8,5 +8,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         public new string name;
         [TextArea(3, 8)] public string description;
         public Sprite icon;
+        public float imageScale = 1f;
     }
 }

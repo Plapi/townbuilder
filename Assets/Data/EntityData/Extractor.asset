@@ -16,3 +16,4 @@ MonoBehaviour:
   description: Pulls resources from an adjacent resource node and outputs them to
     connected conveyors.
   icon: {fileID: 21300000, guid: 4778709e1247440baae798ddd1e64670, type: 3}
+  imageSize: 320

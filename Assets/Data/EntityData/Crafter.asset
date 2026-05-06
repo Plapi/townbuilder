@@ -16,3 +16,4 @@ MonoBehaviour:
   description: Combines input resources into crafted outputs according to configured
     recipes.
   icon: {fileID: 21300000, guid: 92e5734887a084ed685c9e3cc2285143, type: 3}
+  imageScale: 0.9

@@ -16,3 +16,4 @@ MonoBehaviour:
   description: Moves items between machines. Align inputs and outputs to build a
     transport line.
   icon: {fileID: 21300000, guid: 7499a5c05b2d24ee285d4dab7dec50c6, type: 3}
+  imageScale: 0.8
