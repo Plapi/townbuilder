@@ -45,25 +45,34 @@ namespace com.Plapamaru.TownCrafter.Game
             UISystem.Instance.GetPanel<UIDeletePanel>().Init(new UIDeletePanel.Data());
         }
 
-        private UniTask ProcessTap(CancellationToken cancellationToken)
+        private async UniTask ProcessTap(CancellationToken cancellationToken)
         {
             if (Utils.MouseIsOverUI())
-                return UniTask.CompletedTask;
+                return;
+
+            var entity = (Entity)null;
+            var enqueueGameStateEntityInfo = false;
 
             if (LayersUtils.Raycast(_camera, LayerType.Environment, out var hit) &&
                 hit.transform.TryGetComponent(out EntityCollider entityCollider) && entityCollider.Entity != null)
             {
-                Debug.LogError($"#1 Tapped on {entityCollider.Entity.name}");
+                entity = entityCollider.Entity;
+                enqueueGameStateEntityInfo = true;
             }
             else if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
             {
-                if (FactoryMap.Instance.TryGetEntity(gridPos, out Entity entity))
-                    Debug.LogError($"#2 Tapped on {entity.name}");
-                else
-                    Debug.LogError($"Tapped on empty grid {gridPos}");
+                FactoryMap.Instance.TryGetEntity(gridPos, out entity);
+                enqueueGameStateEntityInfo = true;
             }
 
-            return UniTask.CompletedTask;
+            if (enqueueGameStateEntityInfo)
+            {
+                await _mainPanel.Close(true, cancellationToken: cancellationToken);
+                GameSystem.Instance.EnqueueState<GameStateEntityInfo, GameStateEntityInfo.Context>(new GameStateEntityInfo.Context
+                {
+                    entity = entity
+                }, false);
+            }
         }
 
         private async UniTask WaitForCameraMovement(CancellationToken cancellationToken)

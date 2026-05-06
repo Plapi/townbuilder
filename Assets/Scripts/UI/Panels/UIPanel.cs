@@ -12,7 +12,7 @@ namespace com.Plapamaru.TownCrafter.UI
     {
         [SerializeField] protected Image _background;
         [SerializeField] protected CanvasGroup _content;
-
+        [SerializeField] private Button[] _closeButtons;
         protected new T Data { get; private set; }
 
         public UIButtonType? SelectedButton { get; protected set; }
@@ -20,6 +20,10 @@ namespace com.Plapamaru.TownCrafter.UI
         public void Init(T data)
         {
             Data = data;
+
+            foreach (var button in _closeButtons)
+                button.SetExclusiveListener(() => SelectedButton = UIButtonType.Close);
+
             OnInit();
         }
 
@@ -56,11 +60,9 @@ namespace com.Plapamaru.TownCrafter.UI
                         .DOScale(Vector3.one * 0.5f, UISystem.DEFAULT_TIME)
                         .SetEase(Ease.InQuad)
                         .ToUniTask(cancellationToken: cancellationToken),
-
                     _content
                         .DOFade(0f, UISystem.DEFAULT_TIME)
                         .ToUniTask(cancellationToken: cancellationToken),
-
                     _background.DOFade(0f, UISystem.DEFAULT_TIME).ToUniTask(cancellationToken: cancellationToken));
 
                 _content.transform.localScale = Vector3.one;

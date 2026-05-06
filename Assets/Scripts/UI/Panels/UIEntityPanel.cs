@@ -1,14 +1,13 @@
-using com.Plapamaru.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace com.Plapamaru.TownCrafter.UI
 {
-    public class UIDeletePanel : UIPanel<UIDeletePanel.Data>
+    public class UIEntityPanel : UIPanel<UIEntityPanel.Data>
     {
+
         protected override void OnInit()
         {
-            
+
         }
 
         public new class Data : UIPanelBase.Data
