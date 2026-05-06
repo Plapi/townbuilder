@@ -10,6 +10,19 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private Transform _forwardRightCorner;
         [SerializeField] private Transform _backRightCorner;
 
+        public void SetFromEntity(Entity entity)
+        {
+            transform.position = entity.transform.position;
+            transform.SetAngleY(entity.transform.eulerAngles.y);
+
+            float sx = entity.Size.x;
+            float sy = entity.Size.y;
+            _forwardLeftCorner.SetLocalZ(sy);
+            _forwardRightCorner.SetLocalXZ(sx, sy);
+            _backRightCorner.SetLocalX(sx);
+            _backLeftCorner.SetLocalXYZ(0f, _backLeftCorner.localPosition.y, 0f);
+        }
+
         public void SetFromGridRange(Vector2Int first, Vector2Int last)
         {
             int minX = Mathf.Min(first.x, last.x);

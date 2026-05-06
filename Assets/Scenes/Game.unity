@@ -1150,7 +1150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d6d2294f4a74a108e24a21638db0d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactorySaveSystem
-  prettyJson: 0
+  prettyJson: 1
 --- !u!114 &165255276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14030,6 +14030,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameStateBuild
   _camera: {fileID: 379399442}
   _mobileTouchCamera: {fileID: 379399440}
+  _highlightSelection: {fileID: 1072508599}
 --- !u!1001 &525479560531949431
 PrefabInstance:
   m_ObjectHideFlags: 0

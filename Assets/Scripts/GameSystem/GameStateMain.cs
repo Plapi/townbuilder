@@ -15,6 +15,7 @@ namespace com.Plapamaru.TownCrafter.Game
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private MobileTouchCamera _mobileTouchCamera;
+        [SerializeField] private MultipleHighlightSelection _highlightSelection;
 
         private UIMainPanel _mainPanel;
 
@@ -51,6 +52,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 return;
 
             var entity = (Entity)null;
+            var gridPos = Vector2Int.zero;
             var enqueueGameStateEntityInfo = false;
 
             if (LayersUtils.Raycast(_camera, LayerType.Environment, out var hit) &&
@@ -59,7 +61,7 @@ namespace com.Plapamaru.TownCrafter.Game
                 entity = entityCollider.Entity;
                 enqueueGameStateEntityInfo = true;
             }
-            else if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
+            else if (FactoryUtils.TryGetMouseGridPosition(_camera, out gridPos))
             {
                 FactoryMap.Instance.TryGetEntity(gridPos, out entity);
                 enqueueGameStateEntityInfo = true;
@@ -67,7 +69,16 @@ namespace com.Plapamaru.TownCrafter.Game
 
             if (enqueueGameStateEntityInfo)
             {
+                _highlightSelection.gameObject.SetActive(true);
+                if (entity != null)
+                    _highlightSelection.SetFromEntity(entity);
+                else
+                    _highlightSelection.SetFromGridRange(gridPos, gridPos);
+                await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: cancellationToken);
+                _highlightSelection.gameObject.SetActive(false);
+
                 await _mainPanel.Close(true, cancellationToken: cancellationToken);
+
                 GameSystem.Instance.EnqueueState<GameStateEntityInfo, GameStateEntityInfo.Context>(new GameStateEntityInfo.Context
                 {
                     entity = entity
