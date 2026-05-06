@@ -13,13 +13,13 @@ namespace com.Plapamaru.TownCrafter.UI
         [SerializeField] protected Image _background;
         [SerializeField] protected CanvasGroup _content;
         [SerializeField] private Button[] _closeButtons;
-        protected new T Data { get; private set; }
+        protected T _data { get; private set; }
 
         public UIButtonType? SelectedButton { get; protected set; }
 
         public void Init(T data)
         {
-            Data = data;
+            _data = data;
 
             foreach (var button in _closeButtons)
                 button.SetExclusiveListener(() => SelectedButton = UIButtonType.Close);
@@ -54,7 +54,6 @@ namespace com.Plapamaru.TownCrafter.UI
         {
             if (anim && _background != null && _content != null)
             {
-
                 await UniTask.WhenAll(
                     _content.transform
                         .DOScale(Vector3.one * 0.5f, UISystem.DEFAULT_TIME)

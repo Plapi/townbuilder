@@ -82,8 +82,12 @@ namespace com.Plapamaru.TownCrafter.Factory
         }
     }
 
-    public abstract class FactoryEntity<TSaveData> : FactoryEntity where TSaveData : EntitySaveData, new()
+    public abstract class FactoryEntity<TData, TSaveData> : FactoryEntity
+        where TData : EntityData, new()
+        where TSaveData : EntitySaveData, new()
     {
+        public override EntityData Data => (TData)base.Data;
+
         protected TSaveData _saveData;
 
         protected override void OnInit()

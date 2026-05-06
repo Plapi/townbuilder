@@ -13,6 +13,12 @@ namespace com.Plapamaru.TownCrafter.Game
 {
     public class GameStateDelete : GameState<GameStateDelete.Context>
     {
+        private static readonly HashSet<Type> _ignoredDeleteTypes = new HashSet<Type>()
+        {
+            typeof(ResourceNode),
+            typeof(Construction)
+        };
+
         [SerializeField] private Camera _camera;
         [SerializeField] private MobileTouchCamera _mobileTouchCamera;
         [SerializeField] private MultipleHighlightSelection _highlightSelection;
@@ -46,7 +52,8 @@ namespace com.Plapamaru.TownCrafter.Game
             if (!Utils.MouseIsOverUI() &&
                 LayersUtils.Raycast(_camera, LayerType.Environment, out var hit) &&
                 hit.transform.TryGetComponent(out EntityCollider entityCollider) &&
-                entityCollider.Entity != null && entityCollider.Entity is FactoryEntity factoryEntity && factoryEntity is not Construction)
+                entityCollider.Entity != null && entityCollider.Entity is FactoryEntity factoryEntity &&
+                !_ignoredDeleteTypes.Contains(factoryEntity.GetType()))
             {
                 FactorySystem.Release(factoryEntity);
             }
@@ -98,7 +105,7 @@ namespace com.Plapamaru.TownCrafter.Game
 
                     foreach (var entity in entities)
                         entity.ReleaseHighlightObject();
-                    FactoryMap.Instance.GetFactoryEntitiesInGridRange(fromGridPos, toGridPos, entities, typeof(Construction));
+                    FactoryMap.Instance.GetFactoryEntitiesInGridRange(fromGridPos, toGridPos, entities, _ignoredDeleteTypes);
                     foreach (var entity in entities)
                     {
                         entity.ShowHighlightObject();

@@ -1152,6 +1152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.Crafter
   _id: Crafter
+  _data: {fileID: 11400000, guid: f9d7771099ec40aab0d4ccf6a6bece5c, type: 2}
   _size: {x: 3, y: 3}
   _inputs:
   - {fileID: 103408285292163047}
@@ -1161,6 +1162,7 @@ MonoBehaviour:
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
   _entityHighlightObject: {fileID: 0}
+  _resourceItem: {fileID: 0}
   _animators:
   - {fileID: 964549086073736765}
   - {fileID: 1840744839519748018}

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class Crafter : FactoryEntity<EntitySaveData>
+    public class Crafter : FactoryEntity<EntityData, EntitySaveData>
     {
         [Space]
         [SerializeField] private Animator[] _animators;

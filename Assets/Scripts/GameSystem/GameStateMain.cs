@@ -52,37 +52,29 @@ namespace com.Plapamaru.TownCrafter.Game
                 return;
 
             var entity = (Entity)null;
-            var gridPos = Vector2Int.zero;
-            var enqueueGameStateEntityInfo = false;
 
             if (LayersUtils.Raycast(_camera, LayerType.Environment, out var hit) &&
                 hit.transform.TryGetComponent(out EntityCollider entityCollider) && entityCollider.Entity != null)
             {
                 entity = entityCollider.Entity;
-                enqueueGameStateEntityInfo = true;
             }
-            else if (FactoryUtils.TryGetMouseGridPosition(_camera, out gridPos))
+            else if (FactoryUtils.TryGetMouseGridPosition(_camera, out var gridPos))
             {
                 FactoryMap.Instance.TryGetEntity(gridPos, out entity);
-                enqueueGameStateEntityInfo = true;
             }
 
-            if (enqueueGameStateEntityInfo)
+            if (entity != null)
             {
                 _highlightSelection.gameObject.SetActive(true);
-                if (entity != null)
-                    _highlightSelection.SetFromEntity(entity);
-                else
-                    _highlightSelection.SetFromGridRange(gridPos, gridPos);
-                await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: cancellationToken);
-                _highlightSelection.gameObject.SetActive(false);
+                _highlightSelection.SetFromEntity(entity);
 
                 await _mainPanel.Close(true, cancellationToken: cancellationToken);
-
                 GameSystem.Instance.EnqueueState<GameStateEntityInfo, GameStateEntityInfo.Context>(new GameStateEntityInfo.Context
                 {
                     entity = entity
                 }, false);
+
+                _highlightSelection.gameObject.SetActive(false);
             }
         }
 

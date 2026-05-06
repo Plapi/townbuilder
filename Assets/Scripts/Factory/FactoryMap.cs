@@ -50,7 +50,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             return false;
         }
 
-        public void GetFactoryEntitiesInGridRange(Vector2Int fromGrid, Vector2Int toGrid, HashSet<FactoryEntity> results, params Type[] ignoreTypes)
+        public void GetFactoryEntitiesInGridRange(Vector2Int fromGrid, Vector2Int toGrid, HashSet<FactoryEntity> results, HashSet<Type> ignoredDeleteTypes)
         {
             results.Clear();
 
@@ -59,19 +59,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             int minZ = Mathf.Min(fromGrid.y, toGrid.y);
             int maxZ = Mathf.Max(fromGrid.y, toGrid.y);
 
-            bool ShouldBeIgnored(Type type)
-            {
-                foreach (var ignoreType in ignoreTypes)
-                    if (ignoreType == type)
-                        return true;
-                return false;
-            }
-
             for (int x = minX; x <= maxX; x++)
             {
                 for (int z = minZ; z <= maxZ; z++)
                 {
-                    if (TryGetEntity(new Vector2Int(x, z), out FactoryEntity factoryEntity) && !ShouldBeIgnored(factoryEntity.GetType()))
+                    if (TryGetEntity(new Vector2Int(x, z), out FactoryEntity factoryEntity) && !ignoredDeleteTypes.Contains(factoryEntity.GetType()))
                         results.Add(factoryEntity);
                 }
             }

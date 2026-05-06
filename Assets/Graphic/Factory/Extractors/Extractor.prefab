@@ -1145,6 +1145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Extractor
   _id: Extractor
+  _data: {fileID: 11400000, guid: b691e0af0e8a4157babaca47add0ea70, type: 2}
   _size: {x: 3, y: 4}
   _inputs:
   - {fileID: 6832471444678002524}
@@ -1155,6 +1156,7 @@ MonoBehaviour:
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
   _entityHighlightObject: {fileID: 0}
+  _resourceItem: {fileID: 0}
   _animators:
   - {fileID: 2362173771789094466}
   - {fileID: 2331218031069613923}

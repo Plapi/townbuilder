@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class ResourceNode : Entity
+    public class ResourceNode : FactoryEntity<EntityData, EntitySaveData>
     {
         [SerializeField] private ResourceItemType _outputResourceType;
 

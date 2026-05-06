@@ -411,11 +411,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialEntity
   _id: Forest
+  _data: {fileID: 11400000, guid: 1e65a436f4eb4be580cb2e8f35c154b6, type: 2}
   _size: {x: 4, y: 4}
   _inputs: []
   _outputs: []
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
+  _entityHighlightObject: {fileID: 0}
+  _resourceItem: {fileID: 0}
   _outputResourceType: 3
 --- !u!1 &8743550598820787561
 GameObject:

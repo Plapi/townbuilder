@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class Extractor : FactoryEntity<ExtractorSaveData>
+    public class Extractor : FactoryEntity<EntityData, ExtractorSaveData>
     {
         [Space]
         [SerializeField] private Animator[] _animators;

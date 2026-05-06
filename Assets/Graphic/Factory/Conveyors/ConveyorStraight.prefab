@@ -49,13 +49,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ConveyorStraight
   _id: ConveyorStraight
+  _data: {fileID: 11400000, guid: 4b3aac1ebd5b4564b1e3f28e2f940a81, type: 2}
   _size: {x: 1, y: 1}
   _inputs: []
   _outputs: []
   _gridPos: {x: 0, y: 0}
   _isCorrectlyPlaced: 0
-  _graphic: {fileID: 4458885312854341160}
   _entityHighlightObject: {fileID: 0}
+  _resourceItem: {fileID: 0}
   _pillar: {fileID: 4400281505660226804}
   _beltRenderer: {fileID: 8241401341742037709}
   _beltMaterialIndex: 0
@@ -64,7 +65,9 @@ MonoBehaviour:
   - {fileID: 8404905201595642965}
   _prevConveyor: {fileID: 0}
   _nextConveyor: {fileID: 0}
+  _connectedFeedTarget: {fileID: 0}
   _allowedHighlightObjects: []
+  _distributionPoints: []
 --- !u!1 &3224904199475369695
 GameObject:
   m_ObjectHideFlags: 0

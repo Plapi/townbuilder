@@ -8,13 +8,15 @@ namespace com.Plapamaru.TownCrafter.Game
 {
     public class GameStateEntityInfo : GameState<GameStateEntityInfo.Context>
     {
-
         private UIEntityPanel _entityPanel;
 
         public override async UniTask Run(CancellationToken cancellationToken)
         {
             _entityPanel = UISystem.Instance.GetPanel<UIEntityPanel>();
-            _entityPanel.Init(new UIEntityPanel.Data());
+            _entityPanel.Init(new UIEntityPanel.Data
+            {
+                entity = context.entity
+            });
             await _entityPanel.Show(cancellationToken);
 
             _entityPanel.ResetSelectedButton();

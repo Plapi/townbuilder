@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public abstract class Conveyor : FactoryEntity<ConveyorSaveData>
+    public abstract class Conveyor : FactoryEntity<EntityData, ConveyorSaveData>
     {
         [Space]
         [SerializeField] private GameObject _pillar;
