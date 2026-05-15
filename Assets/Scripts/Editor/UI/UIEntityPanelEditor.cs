@@ -18,13 +18,16 @@ public class UIEntityPanelEditor : Editor
         EditorGUILayout.Space();
 
         if (GUILayout.Button("Select Next Entity Data"))
-            SelectNextEntityData();
+            SelectEntityData(1);
+
+        if (GUILayout.Button("Select Prev Entity Data"))
+            SelectEntityData(-1);
 
         if (GUILayout.Button("Force Update UI"))
             ForceUpdateUI();
     }
 
-    private void SelectNextEntityData()
+    private void SelectEntityData(int direction)
     {
         var debugEntityDataProperty = serializedObject.FindProperty("_debugEntityData");
         var entityData = AssetDatabase
@@ -43,10 +46,11 @@ public class UIEntityPanelEditor : Editor
 
         var current = debugEntityDataProperty.objectReferenceValue as EntityData;
         var currentIndex = Array.IndexOf(entityData, current);
-        var next = entityData[(currentIndex + 1) % entityData.Length];
+        var nextIndex = (currentIndex + direction + entityData.Length) % entityData.Length;
+        var next = entityData[nextIndex];
         var panel = (UIEntityPanel)target;
 
-        Undo.RecordObject(panel, "Select Next Entity Data");
+        Undo.RecordObject(panel, "Select Entity Data");
         panel.DebugSetEntityData(next);
 
         serializedObject.Update();

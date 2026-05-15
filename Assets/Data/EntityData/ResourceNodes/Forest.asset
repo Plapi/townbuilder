@@ -9,11 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fac8dd4f9dd4821b8c1f529ab607eb0, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f8257c98e2b14d838ad3d3314ba8aa7, type: 3}
   m_Name: Forest
-  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.EntityData
+  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceNodeData
   name: Forest
   description: A natural resource node that produces wood when connected to an extractor.
   icon: {fileID: 21300000, guid: e6bcb844c71464164be0429d341259e8, type: 3}
   imageScale: 1
   imageOffsetY: -10
+  resourceItemData: {fileID: 11400000, guid: 330a36a8d5a664bcfa235b32e5c51ee8, type: 2}

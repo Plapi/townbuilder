@@ -235,4 +235,4 @@ MonoBehaviour:
   _isCorrectlyPlaced: 0
   _entityHighlightObject: {fileID: 0}
   _resourceItem: {fileID: 0}
-  _outputResourceType: 2
+  _outputResourceData: {fileID: 11400000, guid: b75c6e02312d24d83973ed9b317cb81d, type: 2}

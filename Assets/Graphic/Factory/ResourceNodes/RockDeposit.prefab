@@ -237,7 +237,7 @@ MonoBehaviour:
   _isCorrectlyPlaced: 0
   _entityHighlightObject: {fileID: 0}
   _resourceItem: {fileID: 0}
-  _outputResourceType: 0
+  _outputResourceData: {fileID: 11400000, guid: 5b0e77cee6f3e44a18b27ea764fd2b4d, type: 2}
 --- !u!1 &4621645204391435579
 GameObject:
   m_ObjectHideFlags: 0

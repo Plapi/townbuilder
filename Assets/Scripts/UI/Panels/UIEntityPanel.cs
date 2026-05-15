@@ -12,6 +12,9 @@ namespace com.Plapamaru.TownCrafter.UI
         [SerializeField] private TextMeshProUGUI _descriptionText;
         [SerializeField] private Image _image;
 
+        [Space]
+        [SerializeField] private UIResourceNodeContent _resourceNodeContent;
+
         protected override void OnInit()
         {
             UpdateUI(_data.entity.Data);
@@ -27,6 +30,14 @@ namespace com.Plapamaru.TownCrafter.UI
             _image.sprite = entityData.icon;
             _image.transform.localScale = Vector2.one * entityData.imageScale;
             _image.transform.SetLocalY(entityData.imageOffsetY);
+
+            _resourceNodeContent.gameObject.SetActive(false);
+
+            if (entityData is ResourceNodeData resourceNodeData)
+            {
+                _resourceNodeContent.gameObject.SetActive(true);
+                _resourceNodeContent.ResourceItem.Init(resourceNodeData.resourceItemData);
+            }
         }
 
         public new class Data : UIPanelBase.Data
