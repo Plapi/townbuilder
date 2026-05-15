@@ -2,28 +2,29 @@
 using System.IO;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Presets;
 
 public class ScreenshotTaker : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
     [SerializeField] private Object _locationFolder;
     [SerializeField] private string _fileName;
+    [SerializeField] private Preset _importSettings;
     
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            var path = $"{AssetDatabase.GetAssetPath(_locationFolder)}/{_fileName}.png";
-            File.WriteAllBytes(path, TakeScreenshot());
-            AssetDatabase.Refresh();
+            SaveScreenshot();
         }
     }
 
-    [ContextMenu("Take Screenshot")]
-    private void TakeScreenshotFromContextMenu()
+    private void SaveScreenshot()
     {
         var path = $"{AssetDatabase.GetAssetPath(_locationFolder)}/{_fileName}.png";
         File.WriteAllBytes(path, TakeScreenshot());
+        AssetDatabase.ImportAsset(path);
+        ApplyImportSettings(path);
         AssetDatabase.Refresh();
     }
     
@@ -61,6 +62,43 @@ public class ScreenshotTaker : MonoBehaviour
         }
         
         return bytes;
+    }
+
+    private void ApplyImportSettings(string path)
+    {
+        if (_importSettings == null)
+        {
+            return;
+        }
+
+        var targetImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (targetImporter == null)
+        {
+            return;
+        }
+
+        if (!_importSettings.ApplyTo(targetImporter))
+        {
+            Debug.LogWarning($"Could not apply import settings preset to {path}.", this);
+            return;
+        }
+
+        targetImporter.SaveAndReimport();
+    }
+
+    [CustomEditor(typeof(ScreenshotTaker))]
+    private class ScreenshotTakerEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+
+            EditorGUILayout.Space();
+            if (GUILayout.Button("Take Screenshot"))
+            {
+                ((ScreenshotTaker)target).SaveScreenshot();
+            }
+        }
     }
 }
 #endif
