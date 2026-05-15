@@ -16,4 +16,4 @@ MonoBehaviour:
   name: Stone
   icon: {fileID: 21300000, guid: 98620a0d1dc174d1195feb115ffa24f8, type: 3}
   imageScale: 1.5
-  imageOffsetY: 0
+  imageOffsetY: -10
