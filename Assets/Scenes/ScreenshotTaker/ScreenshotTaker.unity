@@ -205,6 +205,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RockDeposit
       objectReference: {fileID: 0}
+    - target: {fileID: 1463228458495701019, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2160958881110777824, guid: 3056f44554dc14cbaa9b698cf9e2a944, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.6
@@ -739,7 +743,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScreenshotTaker
   _camera: {fileID: 187329029}
   _locationFolder: {fileID: 102900000, guid: 69822f849f49241db8bfbd8b692ffbd6, type: 3}
-  _fileName: RockDeposit
+  _fileName: SandDeposit
 --- !u!1 &986965739
 GameObject:
   m_ObjectHideFlags: 0
@@ -1018,6 +1022,79 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 104396b3e9b3548f7a9e65d579f5cd6c, type: 3}
+--- !u!1001 &1670156119
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 942866133226423887, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7572999155307125285, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
+      propertyPath: m_Name
+      value: SandDeposit
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f55b10222a2d749478187c88a8a3d083, type: 3}
 --- !u!1001 &1691340257
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1311,3 +1388,4 @@ SceneRoots:
   - {fileID: 163685976}
   - {fileID: 1414068247}
   - {fileID: 49010749}
+  - {fileID: 1670156119}

@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceNode
   _id: SandDeposit
-  _data: {fileID: 11400000, guid: 1e65a436f4eb4be580cb2e8f35c154b6, type: 2}
+  _data: {fileID: 11400000, guid: 2893ef436172a4a428fd53f3991fb43e, type: 2}
   _size: {x: 5, y: 5}
   _inputs: []
   _outputs: []
