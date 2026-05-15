@@ -44,9 +44,12 @@ public class SceneCameraSaverAuto {
 		if (EditorPrefs.HasKey("SceneCamPos_" + sceneName) && EditorPrefs.HasKey("SceneCamRot_" + sceneName)) {
 			Vector3 pos = JsonUtility.FromJson<Vector3>(EditorPrefs.GetString("SceneCamPos_" + sceneName));
 			Quaternion rot = JsonUtility.FromJson<Quaternion>(EditorPrefs.GetString("SceneCamRot_" + sceneName));
-			SceneView.lastActiveSceneView.pivot = pos;
-			SceneView.lastActiveSceneView.rotation = rot;
-			SceneView.lastActiveSceneView.Repaint();
+			SceneView sceneView = SceneView.lastActiveSceneView;
+			sceneView.pivot = pos;
+			if (!sceneView.in2DMode) {
+				sceneView.rotation = rot;
+			}
+			sceneView.Repaint();
 		}
 	}
 }
