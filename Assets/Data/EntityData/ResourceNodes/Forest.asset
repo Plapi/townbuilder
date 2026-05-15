@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3fac8dd4f9dd4821b8c1f529ab607eb0, type: 3}
-  m_Name: Construction
+  m_Name: Forest
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.EntityData
-  name: Construction
-  description: Accepts delivered resources for building projects. Connect a conveyor
-    to supply materials.
-  icon: {fileID: 21300000, guid: 1e3f9437c72374d298300f4e2fb17e32, type: 3}
-  imageScale: 1.2
-  imageOffsetY: 25
+  name: Forest
+  description: A natural resource node that produces wood when connected to an extractor.
+  icon: {fileID: 21300000, guid: e6bcb844c71464164be0429d341259e8, type: 3}
+  imageScale: 1
+  imageOffsetY: -10

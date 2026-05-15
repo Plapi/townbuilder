@@ -15,5 +15,6 @@ MonoBehaviour:
   name: Crafter
   description: Combines input resources into crafted outputs according to configured
     recipes.
-  icon: {fileID: 21300000, guid: 92e5734887a084ed685c9e3cc2285143, type: 3}
-  imageScale: 0.9
+  icon: {fileID: 21300000, guid: 23c09792a430241d5a03c4915cd6185f, type: 3}
+  imageScale: 1
+  imageOffsetY: -10

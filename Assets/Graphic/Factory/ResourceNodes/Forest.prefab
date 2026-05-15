@@ -411,7 +411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialEntity
   _id: Forest
-  _data: {fileID: 11400000, guid: 1e65a436f4eb4be580cb2e8f35c154b6, type: 2}
+  _data: {fileID: 11400000, guid: 8620c3516fb88435e81c5a90cd282f7b, type: 2}
   _size: {x: 4, y: 4}
   _inputs: []
   _outputs: []
