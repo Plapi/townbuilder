@@ -193,6 +193,83 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3584949792974052853, guid: bb0b20b84da9e47d68512d7a1b840804, type: 3}
   m_PrefabInstance: {fileID: 5579217}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &29008984
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1972891479166901634, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3563152269357663983, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_Name
+      value: Iron
+      objectReference: {fileID: 0}
+    - target: {fileID: 3563152269357663983, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4e2803e344fb246d2aab9eaf9f47bb0f, type: 3}
 --- !u!1001 &49010749
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -983,7 +1060,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScreenshotTaker
   _camera: {fileID: 187329029}
   _locationFolder: {fileID: 102900000, guid: ff423763ea600431c89c1a69f11416ea, type: 3}
-  _fileName: Coal
+  _fileName: Iron
   _importSettings: {fileID: 2655988077585873504, guid: 307a7f00cfdef4aff838a2645a08ddf7, type: 2}
 --- !u!1 &986965739
 GameObject:
@@ -1783,6 +1860,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Coal
       objectReference: {fileID: 0}
+    - target: {fileID: 8183580797519159999, guid: a8c45298acb03499db8835cfabef977b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2100,3 +2181,4 @@ SceneRoots:
   - {fileID: 2029863524}
   - {fileID: 1470898620}
   - {fileID: 1702032079}
+  - {fileID: 29008984}

@@ -8,6 +8,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         Asphalt,
         Plank,
         IronOre,
-        Coal
+        Coal,
+        Iron
     }
 }

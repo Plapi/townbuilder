@@ -26,3 +26,9 @@ MonoBehaviour:
     - resourceItem: {fileID: 11400000, guid: 330a36a8d5a664bcfa235b32e5c51ee8, type: 2}
       amount: 1
     output: {fileID: 11400000, guid: bde9e24feba4f4f97b860d6173c6f1dd, type: 2}
+  - inputs:
+    - resourceItem: {fileID: 11400000, guid: 11faa2435087d4046a91e46d4be1bcb7, type: 2}
+      amount: 1
+    - resourceItem: {fileID: 11400000, guid: d19f3e174c97649f8bb7adaf0e475b94, type: 2}
+      amount: 1
+    output: {fileID: 11400000, guid: a246f7c1ab0c44041844b83a58ac0fdc, type: 2}

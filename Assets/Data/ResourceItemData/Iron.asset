@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e145d8f26bb4400eac5b7e47c93da67, type: 3}
-  m_Name: Asphalt
+  m_Name: Iron
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItemData
-  type: 3
-  name: Asphalt
-  icon: {fileID: 21300000, guid: 4dc1ea8c6a90d48aa9267e57ef348079, type: 3}
+  type: 7
+  name: Iron
+  icon: {fileID: 21300000, guid: a46d2881f3e54457482620a4d5571c67, type: 3}
   imageScale: 1.5
   imageOffsetY: 0
