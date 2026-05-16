@@ -850,6 +850,79 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a523a36e5819748c7bb98c8eb569840f, type: 3}
+--- !u!1001 &914310016
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8010531726513235521, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_Name
+      value: Plank
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150236335183603537, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3f274b4c07aae4fecbd56552494f0dd4, type: 3}
 --- !u!1 &915082148
 GameObject:
   m_ObjectHideFlags: 0
@@ -897,7 +970,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScreenshotTaker
   _camera: {fileID: 187329029}
   _locationFolder: {fileID: 102900000, guid: ff423763ea600431c89c1a69f11416ea, type: 3}
-  _fileName: Stone
+  _fileName: Plank
   _importSettings: {fileID: 2655988077585873504, guid: 307a7f00cfdef4aff838a2645a08ddf7, type: 2}
 --- !u!1 &986965739
 GameObject:
@@ -1706,3 +1779,4 @@ SceneRoots:
   - {fileID: 770740886}
   - {fileID: 1434193456}
   - {fileID: 720730185}
+  - {fileID: 914310016}

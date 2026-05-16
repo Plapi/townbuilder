@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e145d8f26bb4400eac5b7e47c93da67, type: 3}
-  m_Name: Sand
+  m_Name: Plank
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItemData
-  type: 1
-  name: Sand
-  icon: {fileID: 21300000, guid: 6b249157827dd45fda996ab02ef7ad1a, type: 3}
+  type: 4
+  name: Plank
+  icon: {fileID: 21300000, guid: cd33b637237ed4371b500a508a4bd56f, type: 3}
   imageScale: 1.5
   imageOffsetY: 0

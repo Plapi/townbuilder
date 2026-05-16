@@ -135,5 +135,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9833e8a4037c419fb723c1348b3f4fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItem
-  _type: 4
+  _data: {fileID: 11400000, guid: e5fcb8f8dba74480eb90396f41a7e6fa, type: 2}
   _rotate: 0

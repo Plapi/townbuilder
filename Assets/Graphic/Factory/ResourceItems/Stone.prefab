@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9833e8a4037c419fb723c1348b3f4fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItem
-  _type: 0
+  _data: {fileID: 11400000, guid: 5b0e77cee6f3e44a18b27ea764fd2b4d, type: 2}
   _rotate: 0
 --- !u!1 &4136979863361942396
 GameObject:

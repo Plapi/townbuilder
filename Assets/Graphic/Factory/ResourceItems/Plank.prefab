@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8010531726513235521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9150236335183603537}
+  - component: {fileID: 4026769194261249772}
+  m_Layer: 9
+  m_Name: Plank
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9150236335183603537
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8010531726513235521}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6559070516734455358}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4026769194261249772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8010531726513235521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9833e8a4037c419fb723c1348b3f4fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItem
+  _data: {fileID: 11400000, guid: bde9e24feba4f4f97b860d6173c6f1dd, type: 2}
+  _rotate: 1
+--- !u!1001 &1945650696275180111
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 9150236335183603537}
+    m_Modifications:
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5426267665804594891, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_Name
+      value: SM_Gen_Prop_Plank_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5426267665804594891, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1856089629, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+--- !u!4 &6559070516734455358 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4613420076556145777, guid: 3f54f68ff6899d34a85247498b4b2633, type: 3}
+  m_PrefabInstance: {fileID: 1945650696275180111}
+  m_PrefabAsset: {fileID: 0}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e145d8f26bb4400eac5b7e47c93da67, type: 3}
   m_Name: Asphalt
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItemData
-  type: 4
+  type: 3
   name: Asphalt
   icon: {fileID: 21300000, guid: a31531d9ec96547d594bb229ce9ef401, type: 3}
   imageScale: 1.5

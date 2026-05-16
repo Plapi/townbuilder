@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e145d8f26bb4400eac5b7e47c93da67, type: 3}
   m_Name: Wood
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ResourceItemData
-  type: 3
+  type: 2
   name: Wood
   icon: {fileID: 21300000, guid: 1b013311eec8042c4b3de2eb4679325c, type: 3}
   imageScale: 1.5

@@ -8,12 +8,12 @@ namespace com.Plapamaru.TownCrafter.Factory
 {
     public class ResourceItem : MonoBehaviour, IPoolableObject
     {
-        [SerializeField] private ResourceItemType _type;
+        [SerializeField] private ResourceItemData _data;
         [SerializeField] private bool _rotate;
 
-        public string Id => _type.ToString();
+        public string Id => _data.type.ToString();
         public MonoBehaviour Behaviour => this;
-        public ResourceItemType Type => _type;
+        public ResourceItemType Type => _data.type;
 
         public ResourceItemSaveData SavedData { get; private set; }
 
