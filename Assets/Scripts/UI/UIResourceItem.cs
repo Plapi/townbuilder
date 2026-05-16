@@ -9,15 +9,24 @@ namespace com.Plapamaru.TownCrafter.UI
     public class UIResourceItem : MonoBehaviour
     {
         [SerializeField] private Image _image;
-        [SerializeField] private TextMeshProUGUI _text;
+        [SerializeField] private TextMeshProUGUI _nameText;
+        [SerializeField] private TextMeshProUGUI _amountText;
 
         public void Init(ResourceItemData resourceItemData)
         {
             _image.sprite = resourceItemData.icon;
             _image.transform.localScale = Vector2.one * resourceItemData.imageScale;
-            _image.transform.SetLocalY(resourceItemData.imageOffsetY);
+            _image.GetComponent<RectTransform>().SetAnchorPosY(resourceItemData.imageOffsetY);
 
-            _text.text = resourceItemData.name;
+            _nameText.text = resourceItemData.name;
+        }
+
+        public void Init(ResourceItemData resourceItemData, int amount)
+        {
+            Init(resourceItemData);
+
+            if (_amountText != null)
+                _amountText.text = amount.ToString();
         }
     }
 }

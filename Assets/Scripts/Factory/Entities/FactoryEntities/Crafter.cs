@@ -47,7 +47,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                     await UniTask.NextFrame(cancellationToken);
 
                 foreach (var input in recipe.inputs)
-                    _resourcesDict[input.resourceType] -= input.amount;
+                    _resourcesDict[input.resourceItem.type] -= input.amount;
 
                 var resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(recipe.output.ToString(), transform);
                 resourceItem.transform.SetPositionAndRotation(_resourceItemLocator.position, _resourceItemLocator.rotation);
@@ -94,7 +94,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 var canCraft = true;
                 foreach (var input in recipe.inputs)
                 {
-                    if (!_resourcesDict.TryGetValue(input.resourceType, out var available) || available < input.amount)
+                    if (!_resourcesDict.TryGetValue(input.resourceItem.type, out var available) || available < input.amount)
                     {
                         canCraft = false;
                         break;

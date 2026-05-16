@@ -17,8 +17,8 @@ MonoBehaviour:
   previewColor: {r: 0.12941177, g: 0.07058824, b: 1, a: 1}
   crafterRecipes:
   - inputs:
-    - resourceType: 0
+    - resourceItem: {fileID: 11400000, guid: 5b0e77cee6f3e44a18b27ea764fd2b4d, type: 2}
       amount: 1
-    - resourceType: 2
+    - resourceItem: {fileID: 11400000, guid: b75c6e02312d24d83973ed9b317cb81d, type: 2}
       amount: 1
-    output: 4
+    output: {fileID: 11400000, guid: e5fcb8f8dba74480eb90396f41a7e6fa, type: 2}

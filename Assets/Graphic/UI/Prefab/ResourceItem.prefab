@@ -355,7 +355,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.UI::com.Plapamaru.TownCrafter.UI.UIResourceItem
   _image: {fileID: 7207748196976328372}
-  _text: {fileID: 2854888856070321558}
+  _nameText: {fileID: 2854888856070321558}
+  _amountText: {fileID: 351167695418757803}
 --- !u!1 &5901695143034094880
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +370,7 @@ GameObject:
   - component: {fileID: 6484941880668763927}
   - component: {fileID: 6343201754434366926}
   m_Layer: 5
-  m_Name: Counter
+  m_Name: Amount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

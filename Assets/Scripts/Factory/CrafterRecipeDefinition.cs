@@ -7,13 +7,13 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class CrafterRecipeDefinition
     {
         public List<CrafterRecipeInput> inputs;
-        public ResourceItemType output;
+        public ResourceItemData output;
     }
 
     [Serializable]
     public class CrafterRecipeInput
     {
-        public ResourceItemType resourceType;
+        public ResourceItemData resourceItem;
         public int amount = 1;
     }
 }
