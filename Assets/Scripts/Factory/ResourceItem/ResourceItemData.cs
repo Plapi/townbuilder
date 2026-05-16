@@ -10,5 +10,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public Sprite icon;
         public float imageScale = 1f;
         public float imageOffsetY;
+
+        public string Id => type.ToString();
     }
 }

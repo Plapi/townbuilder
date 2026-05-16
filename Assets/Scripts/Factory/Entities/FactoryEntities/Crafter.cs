@@ -49,7 +49,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 foreach (var input in recipe.inputs)
                     _resourcesDict[input.resourceItem.type] -= input.amount;
 
-                var resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(recipe.output.ToString(), transform);
+                var resourceItem = ObjectPoolingSystem.Instance.GetObject<ResourceItem>(recipe.output.Id, transform);
                 resourceItem.transform.SetPositionAndRotation(_resourceItemLocator.position, _resourceItemLocator.rotation);
                 resourceItem.UpdateSavedData();
 

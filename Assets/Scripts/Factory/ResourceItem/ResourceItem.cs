@@ -11,7 +11,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private ResourceItemData _data;
         [SerializeField] private bool _rotate;
 
-        public string Id => _data.type.ToString();
+        public string Id => _data.Id;
         public MonoBehaviour Behaviour => this;
         public ResourceItemType Type => _data.type;
 

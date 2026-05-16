@@ -1,12 +1,7 @@
-using UnityEngine;
-
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class ResourceNode : FactoryEntity<EntityData, EntitySaveData>
+    public class ResourceNode : FactoryEntity<ResourceNodeData, EntitySaveData>
     {
-        [Space]
-        [SerializeField] private ResourceItemData _outputResourceData;
-
-        public ResourceItemType OutputResourceType => _outputResourceData.type;
+        public ResourceItemType OutputResourceType => ((ResourceNodeData)Data).resourceItemData.type;
     }
 }

@@ -6,6 +6,8 @@ namespace com.Plapamaru.TownCrafter.Factory
         Sand,
         Wood,
         Asphalt,
-        Plank
+        Plank,
+        IronOre,
+        Coal
     }
 }
