@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.Construction
   _id: Road
-  _data: {fileID: 11400000, guid: 66685be5dd8e4e6bb94454cce4d83b3c, type: 2}
+  _data: {fileID: 11400000, guid: bf90661247d5f4e08b5b8d7c97a14fe1, type: 2}
   _size: {x: 8, y: 18}
   _inputs:
   - {fileID: 6270114170687753537}

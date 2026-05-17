@@ -11,6 +11,7 @@ namespace com.Plapamaru.TownCrafter.UI
         [SerializeField] private Image _image;
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private TextMeshProUGUI _amountText;
+        [SerializeField] private GameObject _checkMark;
 
         public void Init(ResourceItemData resourceItemData)
         {
@@ -27,6 +28,17 @@ namespace com.Plapamaru.TownCrafter.UI
 
             if (_amountText != null)
                 _amountText.text = amount.ToString();
+        }
+
+        public void Init(ResourceItemData resourceItemData, int amount, int target)
+        {
+            Init(resourceItemData);
+
+            if (_amountText != null)
+                _amountText.text = $"{amount}/{target}";
+
+            if (_checkMark != null)
+                _checkMark.SetActive(amount >= target);
         }
     }
 }

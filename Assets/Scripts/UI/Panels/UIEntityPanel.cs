@@ -15,6 +15,7 @@ namespace com.Plapamaru.TownCrafter.UI
         [Space]
         [SerializeField] private UIResourceNodeContent _resourceNodeContent;
         [SerializeField] private UICrafterContent _crafterContent;
+        [SerializeField] private UIConstructionContent _constructionContent;
 
         protected override void OnInit()
         {
@@ -34,16 +35,22 @@ namespace com.Plapamaru.TownCrafter.UI
 
             _resourceNodeContent.gameObject.SetActive(false);
             _crafterContent.gameObject.SetActive(false);
+            _constructionContent.gameObject.SetActive(false);
 
             if (entityData is ResourceNodeData resourceNodeData)
             {
                 _resourceNodeContent.gameObject.SetActive(true);
                 _resourceNodeContent.ResourceItem.Init(resourceNodeData.resourceItemData);
             }
-            else if (_data?.entity is Crafter || entityData.name == FactoryConstants.CRAFTER_NAME)
+            else if (_data?.entity is Crafter)
             {
                 _crafterContent.gameObject.SetActive(true);
                 _crafterContent.Init();
+            }
+            else if (_data?.entity is Construction construction)
+            {
+                _constructionContent.gameObject.SetActive(true);
+                _constructionContent.Init(construction);
             }
         }
 
