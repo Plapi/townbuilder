@@ -16,7 +16,7 @@ MonoBehaviour:
   description: Build roads to connect your city and improve transportation. Requires
     resources to start consutrction.
   icon: {fileID: 21300000, guid: cf876cc1a40764117b59ca3e9c2ab85c, type: 3}
-  imageScale: 1
+  imageScale: 1.5
   imageOffsetY: 0
   requiredResources:
   - resourceItem: {fileID: 11400000, guid: e5fcb8f8dba74480eb90396f41a7e6fa, type: 2}

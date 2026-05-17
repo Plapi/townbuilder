@@ -47,10 +47,11 @@ namespace com.Plapamaru.TownCrafter.UI
                 _crafterContent.gameObject.SetActive(true);
                 _crafterContent.Init();
             }
-            else if (_data?.entity is Construction construction)
+            else if (entityData is ConstructionData)
             {
                 _constructionContent.gameObject.SetActive(true);
-                _constructionContent.Init(construction);
+                if (_data?.entity is Construction construction)
+                    _constructionContent.Init(construction);
             }
         }
 
