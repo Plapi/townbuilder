@@ -31,7 +31,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
         }
 
-        public virtual bool CanAcceptIncomingResourceItem()
+        public virtual bool CanAcceptIncomingResourceItem(ResourceItem incomingResourceItem = null)
         {
             return _resourceItem == null;
         }

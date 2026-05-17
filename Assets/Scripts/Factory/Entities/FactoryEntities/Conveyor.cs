@@ -225,7 +225,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             entity = _nextConveyor != null ? _nextConveyor :
                 _connectedFeedTarget != null ? _connectedFeedTarget : null;
-            return entity?.CanAcceptIncomingResourceItem() ?? false;
+            return entity?.CanAcceptIncomingResourceItem(_resourceItem) ?? false;
         }
 
         private void OnDrawGizmos()

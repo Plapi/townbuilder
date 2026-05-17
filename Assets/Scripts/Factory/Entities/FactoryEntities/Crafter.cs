@@ -79,9 +79,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             return true;
         }
 
-        public override bool CanAcceptIncomingResourceItem()
+        public override bool CanAcceptIncomingResourceItem(ResourceItem incomingResourceItem = null)
         {
-            return base.CanAcceptIncomingResourceItem() && _isCrafting == false;
+            return base.CanAcceptIncomingResourceItem(incomingResourceItem) && _isCrafting == false;
         }
 
         private bool TryGetRecipe(out CrafterRecipeDefinition recipeOut)
