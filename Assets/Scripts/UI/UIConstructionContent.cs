@@ -22,7 +22,7 @@ namespace com.Plapamaru.TownCrafter.UI
             Unsubscribe();
 
             _construction = construction;
-            var constructionData = (ConstructionData)construction.Data;
+            var constructionData = construction.Data;
             var requiredResources = constructionData.requiredResources;
             var prefab = _requireResourceItems[0];
             var parent = prefab.transform.parent;

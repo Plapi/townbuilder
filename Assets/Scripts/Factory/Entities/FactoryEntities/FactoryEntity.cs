@@ -86,7 +86,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         where TData : EntityData, new()
         where TSaveData : EntitySaveData, new()
     {
-        public override EntityData Data => (TData)base.Data;
+        public new TData Data => (TData)_data;
 
         protected TSaveData _saveData;
 

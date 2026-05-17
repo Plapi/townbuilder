@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.Factory
 {
-    public class Construction : FactoryEntity<EntityData, EntitySaveData>
+    public class Construction : FactoryEntity<ConstructionData, ConstructionSaveData>
     {
         public Action<ResourceItemType, int> ResourceReceived;
 
@@ -16,8 +16,29 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _connectedConveyor;
+        [SerializeField] private ConstructionState _state;
 
-        private readonly Dictionary<ResourceItemType, int> _resourcesDict = new Dictionary<ResourceItemType, int>();
+        private Dictionary<ResourceItemType, int> _resourcesDict = new Dictionary<ResourceItemType, int>();
+
+        public override ConstructionSaveData ToSaveData()
+        {
+            var saveData = base.ToSaveData();
+            saveData.resource = null; // no need to save the resource
+            saveData.state = _state;
+            saveData.resources = _resourcesDict;
+            return saveData;
+        }
+
+        protected override void OnInit()
+        {
+            base.OnInit();
+
+            if (_saveData != null)
+            {
+                _state = _saveData.state;
+                _resourcesDict = _saveData.resources;
+            }
+        }
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
@@ -44,6 +65,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public override bool CanAcceptIncomingResourceItem(ResourceItem incomingResourceItem = null)
         {
             return base.CanAcceptIncomingResourceItem(incomingResourceItem) &&
+                   _state == ConstructionState.Started &&
                    incomingResourceItem != null &&
                    NeedsResource(incomingResourceItem.Type);
         }
@@ -65,10 +87,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             target = 0;
 
-            if (Data is not ConstructionData constructionData)
-                return false;
-
-            foreach (var requiredResource in constructionData.requiredResources)
+            foreach (var requiredResource in Data.requiredResources)
             {
                 if (requiredResource.resourceItem.type == type)
                 {

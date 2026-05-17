@@ -27,6 +27,8 @@ namespace com.Plapamaru.TownCrafter.Factory
                         saveData.conveyors.Add(conveyor.ToSaveData());
                     else if (entity is Crafter crafter)
                         saveData.crafters.Add(crafter.ToSaveData());
+                    else if (entity is Construction construction)
+                        saveData.constructions.Add(construction.ToSaveData());
 
                     entities.Add(entity);
                 }
@@ -67,6 +69,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public List<ExtractorSaveData> extractors = new List<ExtractorSaveData>();
         public List<ConveyorSaveData> conveyors = new List<ConveyorSaveData>();
         public List<EntitySaveData> crafters = new List<EntitySaveData>();
+        public List<ConstructionSaveData> constructions = new List<ConstructionSaveData>();
     }
 
     [Serializable]
@@ -90,6 +93,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         public GridPosition? nextConveyorGridPos;
         public int beltDirection;
         public bool pilarIsActive;
+    }
+
+    [Serializable]
+    public class ConstructionSaveData : EntitySaveData
+    {
+        public ConstructionState state;
+        public Dictionary<ResourceItemType, int> resources;
     }
 
     [Serializable]

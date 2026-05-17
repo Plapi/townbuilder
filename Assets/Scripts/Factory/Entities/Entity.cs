@@ -13,7 +13,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     {
         [Space]
         [SerializeField] private string _id;
-        [SerializeField] private EntityData _data;
+        [SerializeField] protected EntityData _data;
         [SerializeField] private Vector2Int _size = Vector2Int.one;
         [SerializeField] protected Transform[] _inputs;
         [SerializeField] protected Transform[] _outputs;
@@ -27,7 +27,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public Transform[] Inputs => _inputs;
         public Transform[] Outputs => _outputs;
         public bool IsCorrectlyPlaced => _isCorrectlyPlaced;
-        public virtual EntityData Data => _data;
+        public EntityData Data => _data;
 
         public string Id => _id;
         public MonoBehaviour Behaviour => this;

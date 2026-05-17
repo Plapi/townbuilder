@@ -16,9 +16,9 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             FactoryMap.Instance.Init(externalCT);
 
-            SetStaticEntities(externalCT);
+            SetStaticEntities();
 
-            SetSaveEntities();
+            SetSaveEntities(externalCT);
         }
 
         public void OnBuildEnter()
@@ -37,22 +37,32 @@ namespace com.Plapamaru.TownCrafter.Factory
             _saveSystem.Save();
         }
 
-        private void SetStaticEntities(CancellationToken externalCT)
+        private void SetStaticEntities()
         {
             var staticEntities = GetComponentsInChildren<Entity>();
             foreach (var entity in staticEntities)
-            {
                 SetEntity(entity);
-                entity.Init(externalCT);
-            }
         }
 
-        private void SetSaveEntities()
+        private void SetSaveEntities(CancellationToken externalCT)
         {
             var saveData = _saveSystem.Load();
+
             InstantiateSaveEntities<ExtractorSaveData, Extractor>(saveData.extractors);
             InstantiateSaveEntities<ConveyorSaveData, Conveyor>(saveData.conveyors);
             InstantiateSaveEntities<EntitySaveData, Crafter>(saveData.crafters);
+
+            foreach (var constructionData in saveData.constructions)
+            {
+                if (!FactoryMap.Instance.TryGetEntity(constructionData.gridPos, out Construction construction))
+                {
+                    Debug.LogError($"Could not get construction at {constructionData.gridPos}");
+                    continue;
+                }
+
+                construction.SetSaveData(constructionData);
+                construction.Init(externalCT);
+            }
         }
 
         private void InstantiateSaveEntities<T, U>(List<T> entitiesSaves)
