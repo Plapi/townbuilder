@@ -40,9 +40,22 @@ public class GameStateBuildCrafter : GameStateBuild<GameStateBuildCrafter.Contex
             return;
 
         if (_buildPanel.SelectedButton == UIButtonType.Confirm)
+        {
             _entity.OnConfirmPlacement();
+            ConnectInputConveyorsToCrafter();
+        }
         else
             FactorySystem.Release(_entity);
+    }
+
+    private void ConnectInputConveyorsToCrafter()
+    {
+        foreach (var input in _entity.Inputs)
+        {
+            var inputGridPos = FactoryUtils.GetGridPos(input);
+            if (FactoryMap.Instance.TryGetEntity(inputGridPos, out Conveyor conveyor) && conveyor.NextConveyor == null)
+                conveyor.ConnectFeedTarget(_entity);
+        }
     }
 
     public new class Context : GameStateBuild<Context, Crafter>.Context

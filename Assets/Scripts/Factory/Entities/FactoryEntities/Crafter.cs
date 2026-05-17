@@ -20,7 +20,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
         {
-            if (_resourceItem == null)
+            if (SimulationClock.IsPaused || _resourceItem == null)
             {
                 await UniTask.NextFrame(cancellationToken);
                 return true;
