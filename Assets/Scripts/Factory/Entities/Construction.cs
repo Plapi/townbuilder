@@ -41,6 +41,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 _resourcesDict = _saveData.resources;
             }
 
+            TryCompleteConstruction();
             UpdateStages();
         }
 
@@ -58,6 +59,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                 {
                     _resourcesDict.TryAdd(resourceType, 0);
                     _resourcesDict[resourceType]++;
+                    TryCompleteConstruction();
                     ResourceReceived?.Invoke(resourceType, _resourcesDict[resourceType]);
                 }
             }
@@ -100,9 +102,21 @@ namespace com.Plapamaru.TownCrafter.Factory
             return Mathf.Clamp01((float)deliveredAmount / requiredAmount);
         }
 
+        public bool HasAllRequiredResources()
+        {
+            foreach (var requiredResource in Data.requiredResources)
+            {
+                if (GetResourceCount(requiredResource.resourceItem.type) < requiredResource.amount)
+                    return false;
+            }
+
+            return true;
+        }
+
         public void StartConstruction()
         {
             _state = ConstructionState.Started;
+            TryCompleteConstruction();
             UpdateStages();
         }
 
@@ -130,6 +144,18 @@ namespace com.Plapamaru.TownCrafter.Factory
                 return false;
 
             return GetResourceCount(type) < target;
+        }
+
+        private void TryCompleteConstruction()
+        {
+            if (_state != ConstructionState.Started)
+                return;
+
+            if (!HasAllRequiredResources())
+                return;
+
+            _state = ConstructionState.Finished;
+            UpdateStages();
         }
 
         private bool TryGetRequiredResourceTarget(ResourceItemType type, out int target)

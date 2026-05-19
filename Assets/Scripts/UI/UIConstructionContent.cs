@@ -83,6 +83,11 @@ namespace com.Plapamaru.TownCrafter.UI
                 _constructionProgressSlider.gameObject.SetActive(true);
                 UpdateConstructionProgress();
             }
+            else if (_construction.State == ConstructionState.Finished)
+            {
+                _constructionProgressSlider.gameObject.SetActive(true);
+                UpdateConstructionProgress();
+            }
         }
 
         private void OnDisable()
