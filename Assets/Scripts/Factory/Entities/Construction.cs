@@ -60,6 +60,7 @@ namespace com.Plapamaru.TownCrafter.Factory
                     _resourcesDict.TryAdd(resourceType, 0);
                     _resourcesDict[resourceType]++;
                     TryCompleteConstruction();
+                    UpdateStages();
                     ResourceReceived?.Invoke(resourceType, _resourcesDict[resourceType]);
                 }
             }
@@ -71,7 +72,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public override bool CanAcceptIncomingResourceItem(ResourceItem incomingResourceItem = null)
         {
             return base.CanAcceptIncomingResourceItem(incomingResourceItem) &&
-                   _state == ConstructionState.Started &&
+                   _state == ConstructionState.InProgress &&
                    incomingResourceItem != null &&
                    NeedsResource(incomingResourceItem.Type);
         }
@@ -102,7 +103,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             return Mathf.Clamp01((float)deliveredAmount / requiredAmount);
         }
 
-        public bool HasAllRequiredResources()
+        private bool HasAllRequiredResources()
         {
             foreach (var requiredResource in Data.requiredResources)
             {
@@ -115,20 +116,23 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void StartConstruction()
         {
-            _state = ConstructionState.Started;
+            _state = ConstructionState.InProgress;
             TryCompleteConstruction();
             UpdateStages();
         }
 
         private void UpdateStages()
         {
+            if (_stages.Length == 0)
+                return;
+
             var stageIndex = 0;
 
-            if (_state == ConstructionState.Started)
+            if (_state == ConstructionState.InProgress)
             {
-                stageIndex = 1;
+                stageIndex = CalculateInProgressStageIndex();
             }
-            else
+            else if (_state == ConstructionState.Finished)
             {
                 stageIndex = _stages.Length - 1;
             }
@@ -136,6 +140,18 @@ namespace com.Plapamaru.TownCrafter.Factory
             foreach (var stage in _stages)
                 stage.SetActive(false);
             _stages[stageIndex].SetActive(true);
+        }
+
+        private int CalculateInProgressStageIndex()
+        {
+            if (_stages.Length <= 2)
+                return Mathf.Min(1, _stages.Length - 1);
+
+            var inProgressStageCount = _stages.Length - 2;
+            var progress = CalculateConstructionProgress();
+            var stageIndex = 1 + Mathf.FloorToInt(progress * inProgressStageCount);
+
+            return Mathf.Clamp(stageIndex, 1, _stages.Length - 2);
         }
 
         private bool NeedsResource(ResourceItemType type)
@@ -148,7 +164,7 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private void TryCompleteConstruction()
         {
-            if (_state != ConstructionState.Started)
+            if (_state != ConstructionState.InProgress)
                 return;
 
             if (!HasAllRequiredResources())
@@ -184,7 +200,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     public enum ConstructionState
     {
         NotStarted,
-        Started,
+        InProgress,
         Finished
     }
 }
