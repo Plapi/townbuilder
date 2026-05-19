@@ -20,7 +20,10 @@ namespace com.Plapamaru.TownCrafter.Game
             await _entityPanel.Show(cancellationToken);
 
             _entityPanel.ResetSelectedButton();
-            await UniTask.WaitUntil(() => _entityPanel.SelectedButton == UIButtonType.Close, cancellationToken: cancellationToken);
+            await UniTask.WaitUntil(() => _entityPanel.SelectedButton != null, cancellationToken: cancellationToken);
+
+            if (_entityPanel.SelectedButton == UIButtonType.StartConstruction && context.entity is Construction construction)
+                construction.StartConstruction();
         }
 
         public override async UniTask Exit(CancellationToken cancellationToken)

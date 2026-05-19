@@ -20,6 +20,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private Dictionary<ResourceItemType, int> _resourcesDict = new Dictionary<ResourceItemType, int>();
 
+        public ConstructionState State => _state;
+
         public override ConstructionSaveData ToSaveData()
         {
             var saveData = base.ToSaveData();
@@ -38,6 +40,8 @@ namespace com.Plapamaru.TownCrafter.Factory
                 _state = _saveData.state;
                 _resourcesDict = _saveData.resources;
             }
+
+            UpdateStages();
         }
 
         protected override async UniTask<bool> ProcessLoop(CancellationToken cancellationToken)
@@ -75,6 +79,30 @@ namespace com.Plapamaru.TownCrafter.Factory
             return _resourcesDict.GetValueOrDefault(type, 0);
         }
 
+        public void StartConstruction()
+        {
+            _state = ConstructionState.Started;
+            UpdateStages();
+        }
+
+        private void UpdateStages()
+        {
+            var stageIndex = 0;
+
+            if (_state == ConstructionState.Started)
+            {
+                stageIndex = 1;
+            }
+            else
+            {
+                stageIndex = _stages.Length - 1;
+            }
+
+            foreach (var stage in _stages)
+                stage.SetActive(false);
+            _stages[stageIndex].SetActive(true);
+        }
+
         private bool NeedsResource(ResourceItemType type)
         {
             if (!TryGetRequiredResourceTarget(type, out var target))
@@ -95,7 +123,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                     return true;
                 }
             }
-
 
             return false;
         }

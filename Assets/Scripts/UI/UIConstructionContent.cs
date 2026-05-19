@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
+using TMPro;
 using com.Plapamaru.TownCrafter.Factory;
 using com.Plapamaru.Utilities;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace com.Plapamaru.TownCrafter.UI
 {
@@ -11,13 +14,18 @@ namespace com.Plapamaru.TownCrafter.UI
     {
         [SerializeField] private List<UIResourceItem> _requireResourceItems;
 
+        [Space]
+        [SerializeField] private Button _startConstructionButton;
+        [SerializeField] private Slider _constructionProgressSlider;
+        [SerializeField] private TextMeshProUGUI _constructionProgressText;
+
         private readonly Dictionary<ResourceItemType, UIResourceItem> _resourceItemsByType = new Dictionary<ResourceItemType, UIResourceItem>();
         private readonly Dictionary<ResourceItemType, ResourceItemData> _resourceDataByType = new Dictionary<ResourceItemType, ResourceItemData>();
         private readonly Dictionary<ResourceItemType, int> _resourceTargetsByType = new Dictionary<ResourceItemType, int>();
 
         private Construction _construction;
 
-        public void Init(Construction construction)
+        public void Init(Construction construction, UnityAction onStartConstruction)
         {
             Unsubscribe();
 
@@ -61,6 +69,19 @@ namespace com.Plapamaru.TownCrafter.UI
                 var rect = parent.GetComponent<RectTransform>();
                 rect.SetAnchorPosX(rect.sizeDelta.x / 2f);
             }, CancellationToken.None).Invoke();
+
+            _startConstructionButton.gameObject.SetActive(false);
+            _constructionProgressSlider.gameObject.SetActive(false);
+
+            if (_construction.State == ConstructionState.NotStarted)
+            {
+                _startConstructionButton.gameObject.SetActive(true);
+                _startConstructionButton.SetExclusiveListener(onStartConstruction);
+            }
+            else if (_construction.State == ConstructionState.Started)
+            {
+                _constructionProgressSlider.gameObject.SetActive(true);
+            }
         }
 
         private void OnDisable()

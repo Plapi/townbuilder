@@ -51,7 +51,7 @@ namespace com.Plapamaru.TownCrafter.UI
             {
                 _constructionContent.gameObject.SetActive(true);
                 if (_data?.entity is Construction construction)
-                    _constructionContent.Init(construction);
+                    _constructionContent.Init(construction, () => SelectedButton = UIButtonType.StartConstruction);
             }
         }
 

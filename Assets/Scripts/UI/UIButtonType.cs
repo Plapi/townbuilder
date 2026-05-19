@@ -9,6 +9,7 @@ namespace com.Plapamaru.TownCrafter.UI
         Crafter,
         RotateLeft,
         RotateRight,
-        Delete
+        Delete,
+        StartConstruction
     }
 }
