@@ -81,6 +81,7 @@ namespace com.Plapamaru.TownCrafter.UI
             else if (_construction.State == ConstructionState.Started)
             {
                 _constructionProgressSlider.gameObject.SetActive(true);
+                UpdateConstructionProgress();
             }
         }
 
@@ -91,11 +92,21 @@ namespace com.Plapamaru.TownCrafter.UI
 
         private void OnConstructionResourceReceived(ResourceItemType resourceType, int amount)
         {
-            if (!_resourceItemsByType.TryGetValue(resourceType, out var resourceItem))
-                return;
+            if (_resourceItemsByType.TryGetValue(resourceType, out var resourceItem))
+            {
+                var target = _resourceTargetsByType[resourceType];
+                resourceItem.Init(_resourceDataByType[resourceType], Mathf.Min(target, amount), target);
+            }
 
-            var target = _resourceTargetsByType[resourceType];
-            resourceItem.Init(_resourceDataByType[resourceType], Mathf.Min(target, amount), target);
+            UpdateConstructionProgress();
+        }
+
+        private void UpdateConstructionProgress()
+        {
+            var progress = _construction.CalculateConstructionProgress();
+
+            _constructionProgressSlider.value = progress;
+            _constructionProgressText.text = $"{Mathf.RoundToInt(progress * 100f)}%";
         }
 
         private void Unsubscribe()

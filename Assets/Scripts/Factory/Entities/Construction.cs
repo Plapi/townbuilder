@@ -79,6 +79,27 @@ namespace com.Plapamaru.TownCrafter.Factory
             return _resourcesDict.GetValueOrDefault(type, 0);
         }
 
+        public float CalculateConstructionProgress()
+        {
+            var requiredAmount = 0;
+            var deliveredAmount = 0;
+
+            foreach (var requiredResource in Data.requiredResources)
+            {
+                var target = requiredResource.amount;
+                if (target <= 0)
+                    continue;
+
+                requiredAmount += target;
+                deliveredAmount += Mathf.Min(target, GetResourceCount(requiredResource.resourceItem.type));
+            }
+
+            if (requiredAmount <= 0)
+                return 1f;
+
+            return Mathf.Clamp01((float)deliveredAmount / requiredAmount);
+        }
+
         public void StartConstruction()
         {
             _state = ConstructionState.Started;
