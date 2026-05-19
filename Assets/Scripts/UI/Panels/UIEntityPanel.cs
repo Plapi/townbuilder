@@ -28,7 +28,7 @@ namespace com.Plapamaru.TownCrafter.UI
                 return;
 
             _nameText.text = entityData.name;
-            _descriptionText.text = entityData.description;
+            _descriptionText.text = GetDescriptionText(entityData);
             _image.sprite = entityData.icon;
             _image.transform.localScale = Vector2.one * entityData.imageScale;
             _image.transform.SetLocalY(entityData.imageOffsetY);
@@ -53,6 +53,19 @@ namespace com.Plapamaru.TownCrafter.UI
                 if (_data?.entity is Construction construction)
                     _constructionContent.Init(construction, () => SelectedButton = UIButtonType.StartConstruction);
             }
+        }
+
+        private string GetDescriptionText(EntityData entityData)
+        {
+            if (entityData is ConstructionData constructionData &&
+                _data?.entity is Construction construction &&
+                construction.State == ConstructionState.Finished &&
+                !string.IsNullOrEmpty(constructionData.completedDescription))
+            {
+                return constructionData.completedDescription;
+            }
+
+            return entityData.description;
         }
 
         public new class Data : UIPanelBase.Data

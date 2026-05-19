@@ -18,6 +18,7 @@ namespace com.Plapamaru.TownCrafter.UI
         [SerializeField] private Button _startConstructionButton;
         [SerializeField] private Slider _constructionProgressSlider;
         [SerializeField] private TextMeshProUGUI _constructionProgressText;
+        [SerializeField] private GameObject _constructionComplete;
 
         private readonly Dictionary<ResourceItemType, UIResourceItem> _resourceItemsByType = new Dictionary<ResourceItemType, UIResourceItem>();
         private readonly Dictionary<ResourceItemType, ResourceItemData> _resourceDataByType = new Dictionary<ResourceItemType, ResourceItemData>();
@@ -72,6 +73,7 @@ namespace com.Plapamaru.TownCrafter.UI
 
             _startConstructionButton.gameObject.SetActive(false);
             _constructionProgressSlider.gameObject.SetActive(false);
+            _constructionComplete.SetActive(false);
 
             if (_construction.State == ConstructionState.NotStarted)
             {
@@ -85,8 +87,7 @@ namespace com.Plapamaru.TownCrafter.UI
             }
             else if (_construction.State == ConstructionState.Finished)
             {
-                _constructionProgressSlider.gameObject.SetActive(true);
-                UpdateConstructionProgress();
+                _constructionComplete.SetActive(true);
             }
         }
 

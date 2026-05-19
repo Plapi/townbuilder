@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using com.Plapamaru.TownCrafter.Factory;
 using com.Plapamaru.TownCrafter.UI;
@@ -10,6 +11,8 @@ namespace com.Plapamaru.TownCrafter.Game
     {
         private UIEntityPanel _entityPanel;
 
+        private Func<bool> _shouldExitEntityInfo;
+
         public override async UniTask Run(CancellationToken cancellationToken)
         {
             _entityPanel = UISystem.Instance.GetPanel<UIEntityPanel>();
@@ -19,11 +22,25 @@ namespace com.Plapamaru.TownCrafter.Game
             });
             await _entityPanel.Show(cancellationToken);
 
+            SetShouldExitEntityInfo();
+
             _entityPanel.ResetSelectedButton();
-            await UniTask.WaitUntil(() => _entityPanel.SelectedButton != null, cancellationToken: cancellationToken);
+            await UniTask.WaitUntil(ShouldExitEntityInfo, cancellationToken: cancellationToken);
 
             if (_entityPanel.SelectedButton == UIButtonType.StartConstruction && context.entity is Construction construction)
                 construction.StartConstruction();
+        }
+
+        private void SetShouldExitEntityInfo()
+        {
+            _shouldExitEntityInfo = () => false;
+            if (context.entity is Construction construction && construction.State != ConstructionState.Finished)
+                _shouldExitEntityInfo = () => construction.State == ConstructionState.Finished;
+        }
+
+        private bool ShouldExitEntityInfo()
+        {
+            return _entityPanel.SelectedButton != null || _shouldExitEntityInfo();
         }
 
         public override async UniTask Exit(CancellationToken cancellationToken)
