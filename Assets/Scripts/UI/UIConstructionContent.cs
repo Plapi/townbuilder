@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
 using com.Plapamaru.TownCrafter.Factory;
 using com.Plapamaru.Utilities;
-using Cysharp.Threading.Tasks;
 
 namespace com.Plapamaru.TownCrafter.UI
 {
@@ -64,13 +62,6 @@ namespace com.Plapamaru.TownCrafter.UI
 
             _construction.ResourceReceived += OnConstructionResourceReceived;
 
-            UniTask.Action(async ct =>
-            {
-                await UniTask.WaitForEndOfFrame(ct);
-                var rect = parent.GetComponent<RectTransform>();
-                rect.SetAnchorPosX(rect.sizeDelta.x / 2f);
-            }, CancellationToken.None).Invoke();
-
             _startConstructionButton.gameObject.SetActive(false);
             _constructionProgressSlider.gameObject.SetActive(false);
             _constructionComplete.SetActive(false);
@@ -89,11 +80,38 @@ namespace com.Plapamaru.TownCrafter.UI
             {
                 _constructionComplete.SetActive(true);
             }
+
+            ResetRequiredResourcesScroll();
+        }
+
+        private void OnEnable()
+        {
+            ResetRequiredResourcesScroll();
         }
 
         private void OnDisable()
         {
             Unsubscribe();
+        }
+
+        private void ResetRequiredResourcesScroll()
+        {
+            if (_requireResourceItems.Count == 0)
+                return;
+
+            var contentRect = _requireResourceItems[0].transform.parent as RectTransform;
+            if (contentRect == null)
+                return;
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+
+            var scrollRect = contentRect.GetComponentInParent<ScrollRect>();
+            if (scrollRect == null)
+                return;
+
+            scrollRect.StopMovement();
+            scrollRect.velocity = Vector2.zero;
+            scrollRect.horizontalNormalizedPosition = 0f;
         }
 
         private void OnConstructionResourceReceived(ResourceItemType resourceType, int amount)
