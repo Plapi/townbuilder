@@ -14,6 +14,11 @@ namespace com.Plapamaru.TownCrafter.Factory
         [Space]
         [SerializeField] private GameObject[] _stages;
 
+#if UNITY_EDITOR
+        [Header("Editor")]
+        [SerializeField] private UnityEngine.Object _exportFolder;
+#endif
+
         [Header("Runtime Properties")]
         [SerializeField] private Conveyor _connectedConveyor;
         [SerializeField] private ConstructionState _state;
