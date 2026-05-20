@@ -55,6 +55,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class ConstructionPropsPlacerEditor : Editor
     {
         private const string GENERATED_PROP_NAME_SUFFIX = " (Generated Construction Prop)";
+        private const int MAX_PLACEMENT_ATTEMPTS_PER_PROP = 40;
 
         private SerializedProperty _constructionProperty;
         private SerializedProperty _propsCatalogProperty;
@@ -128,17 +129,31 @@ namespace com.Plapamaru.TownCrafter.Factory
             ClearGeneratedProps(placer.transform);
 
             var scale = FactoryConfig.Instance != null ? FactoryConfig.Instance.constructionPropsScale : 0.4f;
-            for (int i = 0; i < placer.PropsCount; i++)
+            var placedRects = new List<Rect>();
+            var placedCount = 0;
+            var attempts = 0;
+            var maxAttempts = Mathf.Max(placer.PropsCount * MAX_PLACEMENT_ATTEMPTS_PER_PROP, MAX_PLACEMENT_ATTEMPTS_PER_PROP);
+
+            while (placedCount < placer.PropsCount && attempts < maxAttempts)
             {
+                attempts++;
                 var propPrefab = availableProps[Random.Range(0, availableProps.Count)];
+                var rotation = GetRotation(placer);
+                var worldRotation = Quaternion.LookRotation(ToWorld(construction.Forward), Vector3.up) * rotation;
+                if (!TryGetRandomPlacement(construction, propPrefab, rotation, scale, placedRects, out var position, out var rect))
+                    continue;
+
                 var instance = PrefabUtility.InstantiatePrefab(propPrefab, placer.transform) as GameObject;
                 if (instance == null)
                     instance = Instantiate(propPrefab, placer.transform);
 
                 Undo.RegisterCreatedObjectUndo(instance, "Instantiate Construction Prop");
-                instance.transform.SetPositionAndRotation(GetRandomPosition(construction), GetRotation(placer));
+                instance.transform.SetPositionAndRotation(position, worldRotation);
                 instance.transform.localScale = Vector3.one * scale;
                 instance.name = $"{propPrefab.name}{GENERATED_PROP_NAME_SUFFIX}";
+
+                placedRects.Add(rect);
+                placedCount++;
             }
 
             EditorUtility.SetDirty(placer);
@@ -157,13 +172,113 @@ namespace com.Plapamaru.TownCrafter.Factory
             return availableProps;
         }
 
-        private static Vector3 GetRandomPosition(Construction construction)
+        private static bool TryGetRandomPlacement(
+            Construction construction,
+            GameObject propPrefab,
+            Quaternion rotation,
+            float scale,
+            List<Rect> placedRects,
+            out Vector3 position,
+            out Rect rect)
         {
-            var x = Random.Range(0f, construction.Size.x);
-            var z = Random.Range(0f, construction.Size.y);
-            return construction.transform.position +
-                   ToWorld(construction.Right) * x +
-                   ToWorld(construction.Forward) * z;
+            position = default;
+            rect = default;
+
+            if (!TryGetLocalFootprint(propPrefab, rotation, scale, out var min, out var max))
+                return false;
+
+            var minPivotX = -min.x;
+            var maxPivotX = construction.Size.x - max.x;
+            var minPivotZ = -min.y;
+            var maxPivotZ = construction.Size.y - max.y;
+
+            if (minPivotX > maxPivotX || minPivotZ > maxPivotZ)
+                return false;
+
+            for (int i = 0; i < MAX_PLACEMENT_ATTEMPTS_PER_PROP; i++)
+            {
+                var pivot = new Vector2(
+                    Random.Range(minPivotX, maxPivotX),
+                    Random.Range(minPivotZ, maxPivotZ));
+
+                rect = Rect.MinMaxRect(
+                    pivot.x + min.x,
+                    pivot.y + min.y,
+                    pivot.x + max.x,
+                    pivot.y + max.y);
+
+                if (OverlapsAny(rect, placedRects))
+                    continue;
+
+                position = construction.transform.position +
+                           ToWorld(construction.Right) * pivot.x +
+                           ToWorld(construction.Forward) * pivot.y;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryGetLocalFootprint(
+            GameObject prefab,
+            Quaternion rotation,
+            float scale,
+            out Vector2 min,
+            out Vector2 max)
+        {
+            min = default;
+            max = default;
+
+            var renderers = prefab.GetComponentsInChildren<MeshRenderer>(true);
+            if (renderers.Length == 0)
+                return false;
+
+            var rootToLocal = prefab.transform.worldToLocalMatrix;
+            var hasBounds = false;
+
+            foreach (var renderer in renderers)
+            {
+                var matrix = rootToLocal * renderer.transform.localToWorldMatrix;
+                var rendererBounds = renderer.localBounds;
+
+                for (int x = -1; x <= 1; x += 2)
+                {
+                    for (int y = -1; y <= 1; y += 2)
+                    {
+                        for (int z = -1; z <= 1; z += 2)
+                        {
+                            var corner = rendererBounds.center + Vector3.Scale(rendererBounds.extents, new Vector3(x, y, z));
+                            var localCorner = rotation * (matrix.MultiplyPoint3x4(corner) * scale);
+                            var point = new Vector2(localCorner.x, localCorner.z);
+
+                            if (!hasBounds)
+                            {
+                                min = point;
+                                max = point;
+                                hasBounds = true;
+                            }
+                            else
+                            {
+                                min = Vector2.Min(min, point);
+                                max = Vector2.Max(max, point);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return hasBounds;
+        }
+
+        private static bool OverlapsAny(Rect rect, List<Rect> placedRects)
+        {
+            foreach (var placedRect in placedRects)
+            {
+                if (rect.Overlaps(placedRect))
+                    return true;
+            }
+
+            return false;
         }
 
         private static Quaternion GetRotation(ConstructionPropsPlacer placer)
