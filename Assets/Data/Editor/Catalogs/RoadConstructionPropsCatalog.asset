@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a4094acb73421b865abf206e2f31fe, type: 3}
+  m_Name: RoadConstructionPropsCatalog
+  m_EditorClassIdentifier: 
+  _props:
+  - {fileID: 1242232213132576, guid: e3f2e5d78b4d30e44872cbfd7dd167c1, type: 3}
+  - {fileID: 1590934878138038, guid: b99484c311809e94a8c06eca89a3e2a5, type: 3}
+  - {fileID: 1198330752654196, guid: f7d843f28c60d5f42af313f8b9a12259, type: 3}
+  - {fileID: 1279970285836280, guid: af6a71ab3a684e949b56f3638651d4d8, type: 3}
+  - {fileID: 1868808197637234, guid: 0e76229d30581bf4e9ee829feac01c87, type: 3}
+  - {fileID: 1526621429589750, guid: dad9ef73669db6c4383dfa5d22348491, type: 3}
+  - {fileID: 1712135265171446, guid: 3fbd242e9fae02c4b87441f3ed02a771, type: 3}
+  - {fileID: 1956315680376676, guid: 41c4aa0ed926d03478c0597806cb29ac, type: 3}
+  - {fileID: 1478941268335474, guid: d524cfd62af570748b1d94e8f4473a7b, type: 3}
+  - {fileID: 1383534554459008, guid: 68fb1831576b9714795637b051034356, type: 3}
+  - {fileID: 1834829247000510, guid: 2320ca5cd850f0d44be83ce2bfe90edc, type: 3}
+  - {fileID: 1161519877104964, guid: a47c48c1ce7ca914babc614eb56fbb21, type: 3}
+  - {fileID: 1393709093251942, guid: 1cb7bec5a45dcb340be40a4c03bdabab, type: 3}
+  - {fileID: 1930465186787402, guid: b52966224b9099140a9a21af67d0a242, type: 3}
+  - {fileID: 1643450076258674, guid: d96be5d60605e094f94c8f164cfaa60d, type: 3}
+  - {fileID: 1124280130069150, guid: 2cefe3e8a0cc749488d313c29a3ef5fd, type: 3}
+  - {fileID: 1913940321970040, guid: a60e42b88314e1a4196af4a0b456e8b6, type: 3}
+  - {fileID: 1573661803126992, guid: b8610b77bc51dbf44a4b91cd4b62d3cf, type: 3}
+  - {fileID: 1713163289026742, guid: cb517d7f5c5b9ba4883ac943a37c805f, type: 3}

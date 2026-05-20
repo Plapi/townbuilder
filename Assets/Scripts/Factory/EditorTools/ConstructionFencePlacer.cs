@@ -20,7 +20,6 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private bool _randomizeFences = true;
 
         public Construction Construction => _construction;
-        public ConstructionFenceCatalog FenceCatalog => _fenceCatalog;
         public IReadOnlyList<GameObject> Fences => _fences;
         public float PerimeterPadding => Mathf.Max(0f, _perimeterPadding);
         public float DefaultFenceLength => Mathf.Max(0.01f, _defaultFenceLength);
