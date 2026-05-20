@@ -10,6 +10,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         public Color correctColor;
         public Color wrongColor;
         public Color previewColor;
+        public float constructionPropsScale = 0.4f;
         public List<CrafterRecipeDefinition> crafterRecipes;
     }
 }

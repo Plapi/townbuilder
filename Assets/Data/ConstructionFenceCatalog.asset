@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc50ee4bb86347e6b1994e0f5dd2b27e, type: 3}
+  m_Name: ConstructionFenceCatalog
+  m_EditorClassIdentifier: 
+  _fences:
+  - {fileID: 1502729838624698, guid: 69c32ebe9171edf46ab965e7d647f697, type: 3}
+  - {fileID: 1351921354885988, guid: 4ce45eafddcef5749933970b0aa5d275, type: 3}
+  - {fileID: 1657986956626262, guid: 6b382d32b7d509e4b885188831f263b8, type: 3}
+  - {fileID: 1396709346711902, guid: 9f7babae3e5f6da4782a0092b827a0ac, type: 3}
+  - {fileID: 1987173581127296, guid: 302e930afc7bc2a48ab49a4e38362d83, type: 3}
+  - {fileID: 1939884417730520, guid: 95a66d60e70135e489def4952d0feba6, type: 3}
+  - {fileID: 1316377326066908, guid: e65bb013af6eb4947acdb175017c9e52, type: 3}
+  - {fileID: 159082, guid: cc10ce20cd2faea4ca8cb6505e5861d5, type: 3}
+  - {fileID: 141732, guid: 283736ea9955d7141bd3a4b0a155ddb7, type: 3}
+  - {fileID: 1719411279065754, guid: ffe16f9903d0b604aab93d16dfb3281d, type: 3}
+  - {fileID: 1330766047959420, guid: 957c0d3270bfd844aba900730d2fbad9, type: 3}
+  - {fileID: 1875903300222292, guid: 011a41c7d94b1814e89ef29d3240e00f, type: 3}
+  - {fileID: 1326242154806616, guid: 6feb631b9ce5ff940802dd0f457bf373, type: 3}
+  - {fileID: 1195577681424524, guid: f7b5a8a75c5a0d14498d2fcb102d7a91, type: 3}
+  - {fileID: 1440861179559792, guid: f5e7ac56f11b36342a85905dbff7ad28, type: 3}
+  - {fileID: 1284649323956640, guid: d68870cf1b8968f49b16b4eaebdce109, type: 3}
+  - {fileID: 1207349738802398, guid: 68361ffccb951394996a1ac3cda7c545, type: 3}
+  - {fileID: 1281240773930694, guid: 5864addef94c23c458de5835888882f7, type: 3}
+  - {fileID: 1847739559296990, guid: e530ecd98d6a5d541b12fe59c564d311, type: 3}
+  - {fileID: 1894148283774100, guid: 9750a5084abaa524996cd407c1f09829, type: 3}
+  - {fileID: 1259711448871708, guid: 900434126ddade04c926449f3b23f354, type: 3}
+  - {fileID: 1317252240251526, guid: 4fa78f9c9f4e51f43842fb4b079d75f8, type: 3}
+  - {fileID: 1254676247812318, guid: aa02e489f4dc7094295e57c800dc8c49, type: 3}
