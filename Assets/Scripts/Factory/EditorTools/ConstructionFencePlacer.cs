@@ -15,12 +15,16 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private Construction _construction;
         [SerializeField] private ConstructionFenceCatalog _fenceCatalog;
         [SerializeField] private List<GameObject> _fences = new List<GameObject>();
+        [SerializeField] private bool _useCustomSize;
+        [SerializeField] private Vector2Int _customSize = Vector2Int.one;
         [SerializeField] private float _perimeterPadding;
         [SerializeField] private float _defaultFenceLength = 1f;
         [SerializeField] private bool _randomizeFences = true;
 
         public Construction Construction => _construction;
         public IReadOnlyList<GameObject> Fences => _fences;
+        public bool UseCustomSize => _useCustomSize;
+        public Vector2Int Size => _useCustomSize ? ClampSize(_customSize) : (_construction != null ? _construction.Size : Vector2Int.one);
         public float PerimeterPadding => Mathf.Max(0f, _perimeterPadding);
         public float DefaultFenceLength => Mathf.Max(0.01f, _defaultFenceLength);
         public bool RandomizeFences => _randomizeFences;
@@ -38,6 +42,43 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             if (_fenceCatalog == null)
                 TryAssignFenceCatalog();
+
+            _customSize = ClampSize(_customSize);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!_useCustomSize)
+                return;
+
+            var right = transform.right;
+            var forward = transform.forward;
+            right.y = 0f;
+            forward.y = 0f;
+
+            if (right.sqrMagnitude <= 0f || forward.sqrMagnitude <= 0f)
+                return;
+
+            right.Normalize();
+            forward.Normalize();
+
+            var size = ClampSize(_customSize);
+            var center = transform.position +
+                         right * (size.x * 0.5f) +
+                         forward * (size.y * 0.5f) +
+                         Vector3.up * 0.03f;
+
+            var previousColor = Gizmos.color;
+            var previousMatrix = Gizmos.matrix;
+
+            Gizmos.matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(forward, Vector3.up), new Vector3(size.x, 0.02f, size.y));
+            Gizmos.color = new Color(1f, 0.8f, 0.1f, 0.15f);
+            Gizmos.DrawCube(Vector3.zero, Vector3.one);
+            Gizmos.color = new Color(1f, 0.8f, 0.1f, 1f);
+            Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+
+            Gizmos.matrix = previousMatrix;
+            Gizmos.color = previousColor;
         }
 
         private void TryAssignConstructionFromParents()
@@ -56,6 +97,11 @@ namespace com.Plapamaru.TownCrafter.Factory
             _fenceCatalog = AssetDatabase.LoadAssetAtPath<ConstructionFenceCatalog>(path);
 #endif
         }
+
+        private static Vector2Int ClampSize(Vector2Int size)
+        {
+            return new Vector2Int(Mathf.Max(1, size.x), Mathf.Max(1, size.y));
+        }
     }
 
 #if UNITY_EDITOR
@@ -67,12 +113,16 @@ namespace com.Plapamaru.TownCrafter.Factory
         private SerializedProperty _constructionProperty;
         private SerializedProperty _fenceCatalogProperty;
         private SerializedProperty _fencesProperty;
+        private SerializedProperty _useCustomSizeProperty;
+        private SerializedProperty _customSizeProperty;
 
         private void OnEnable()
         {
             _constructionProperty = serializedObject.FindProperty("_construction");
             _fenceCatalogProperty = serializedObject.FindProperty("_fenceCatalog");
             _fencesProperty = serializedObject.FindProperty("_fences");
+            _useCustomSizeProperty = serializedObject.FindProperty("_useCustomSize");
+            _customSizeProperty = serializedObject.FindProperty("_customSize");
 
             TryAssignDefaultCatalog();
         }
@@ -80,7 +130,8 @@ namespace com.Plapamaru.TownCrafter.Factory
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            DrawPropertiesExcluding(serializedObject, "_fences");
+            DrawPropertiesExcluding(serializedObject, "_fences", "_useCustomSize", "_customSize");
+            DrawSizeOverride();
             DrawFenceCatalogSelector();
             serializedObject.ApplyModifiedProperties();
 
@@ -96,9 +147,19 @@ namespace com.Plapamaru.TownCrafter.Factory
                 ClearGeneratedFences();
         }
 
+        private void DrawSizeOverride()
+        {
+            EditorGUILayout.PropertyField(_useCustomSizeProperty, new GUIContent("Use Custom Size"));
+
+            using (new EditorGUI.DisabledScope(!_useCustomSizeProperty.boolValue))
+            {
+                EditorGUILayout.PropertyField(_customSizeProperty, new GUIContent("Custom Size"));
+            }
+        }
+
         private bool CanGenerate()
         {
-            if (_constructionProperty.objectReferenceValue == null)
+            if (!_useCustomSizeProperty.boolValue && _constructionProperty.objectReferenceValue == null)
                 return false;
 
             for (int i = 0; i < _fencesProperty.arraySize; i++)
@@ -204,7 +265,7 @@ namespace com.Plapamaru.TownCrafter.Factory
         {
             var placer = (ConstructionFencePlacer)target;
             var construction = placer.Construction;
-            if (construction == null)
+            if (!placer.UseCustomSize && construction == null)
                 return;
 
             ClearGeneratedFences(placer.transform);
@@ -212,11 +273,15 @@ namespace com.Plapamaru.TownCrafter.Factory
             var scale = FactoryConfig.Instance != null ? FactoryConfig.Instance.constructionPropsScale : 0.4f;
             var measuredLengths = new Dictionary<GameObject, float>();
             var fenceIndex = 0;
+            var size = placer.Size;
+            var origin = placer.UseCustomSize ? placer.transform.position : construction.transform.position;
+            var right = placer.UseCustomSize ? FlattenDirection(placer.transform.right) : ToWorld(construction.Right);
+            var forward = placer.UseCustomSize ? FlattenDirection(placer.transform.forward) : ToWorld(construction.Forward);
 
-            CreateSide(placer, placer.transform, construction, construction.Right, -construction.Forward, construction.Size.x, placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
-            CreateSide(placer, placer.transform, construction, construction.Right, construction.Forward, construction.Size.x, construction.Size.y + placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
-            CreateSide(placer, placer.transform, construction, construction.Forward, -construction.Right, construction.Size.y, placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
-            CreateSide(placer, placer.transform, construction, construction.Forward, construction.Right, construction.Size.y, construction.Size.x + placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
+            CreateSide(placer, placer.transform, origin, right, -forward, size.x, placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
+            CreateSide(placer, placer.transform, origin, right, forward, size.x, size.y + placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
+            CreateSide(placer, placer.transform, origin, forward, -right, size.y, placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
+            CreateSide(placer, placer.transform, origin, forward, right, size.y, size.x + placer.PerimeterPadding, scale, measuredLengths, ref fenceIndex);
 
             EditorUtility.SetDirty(placer);
             EditorSceneManager.MarkSceneDirty(placer.gameObject.scene);
@@ -225,9 +290,9 @@ namespace com.Plapamaru.TownCrafter.Factory
         private static void CreateSide(
             ConstructionFencePlacer placer,
             Transform root,
-            Construction construction,
-            Vector2Int tangent,
-            Vector2Int outward,
+            Vector3 origin,
+            Vector3 tangent,
+            Vector3 outward,
             float sideLength,
             float outwardOffset,
             float scale,
@@ -246,11 +311,11 @@ namespace com.Plapamaru.TownCrafter.Factory
                 if (cursor + fenceLength > sideLength)
                     break;
 
-                var center = construction.transform.position +
-                             ToWorld(tangent) * (cursor + fenceLength * 0.5f) +
-                             ToWorld(outward) * outwardOffset;
+                var center = origin +
+                             tangent * (cursor + fenceLength * 0.5f) +
+                             outward * outwardOffset;
 
-                var rotation = Quaternion.LookRotation(ToWorld(outward), Vector3.up);
+                var rotation = Quaternion.LookRotation(outward, Vector3.up);
                 var instance = PrefabUtility.InstantiatePrefab(fencePrefab, root) as GameObject;
                 if (instance == null)
                     instance = Instantiate(fencePrefab, root);
@@ -360,6 +425,12 @@ namespace com.Plapamaru.TownCrafter.Factory
         private static Vector3 ToWorld(Vector2Int gridDirection)
         {
             return new Vector3(gridDirection.x, 0f, gridDirection.y);
+        }
+
+        private static Vector3 FlattenDirection(Vector3 direction)
+        {
+            direction.y = 0f;
+            return direction.sqrMagnitude > 0f ? direction.normalized : Vector3.forward;
         }
     }
 #endif
