@@ -82,6 +82,11 @@ public static class MeshUtils {
 		MeshFilter[] meshFilters = parent.GetComponentsInChildren<MeshFilter>(includeInactive);
 
 		for (int i = 0; i < meshFilters.Length; i++) {
+			MeshRenderer meshRenderer = meshFilters[i].GetComponent<MeshRenderer>();
+			if (meshFilters[i].sharedMesh == null || meshRenderer == null || meshRenderer.sharedMaterial == null) {
+				continue;
+			}
+
 			(Material, Mesh)[] tuple = SplitMesh(meshFilters[i].gameObject);
 			for (int j = 0; j < tuple.Length; j++) {
 				if (!dictionary.ContainsKey(tuple[j].Item1)) {
@@ -137,14 +142,15 @@ public static class MeshUtils {
 
 	private static (Material, Mesh)[] SplitMesh(GameObject obj) {
 		Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+		MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
 		if (mesh.subMeshCount <= 1) {
-			return new (Material, Mesh)[] { (obj.GetComponent<MeshRenderer>().sharedMaterial, mesh) };
+			return new (Material, Mesh)[] { (meshRenderer.sharedMaterial, mesh) };
 		}
 
 		(Material, Mesh)[] tuple = new (Material, Mesh)[mesh.subMeshCount];
 
 		for (int j = 0; j < mesh.subMeshCount; j++) {
-			tuple[j].Item1 = obj.GetComponent<MeshRenderer>().sharedMaterials[j];
+			tuple[j].Item1 = meshRenderer.sharedMaterials[Mathf.Min(j, meshRenderer.sharedMaterials.Length - 1)];
 			tuple[j].Item2 = SubMeshToMesh(mesh, j);
 		}
 

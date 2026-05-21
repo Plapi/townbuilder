@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: House0
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
   name: House
-  description: Build roads to connect your city and improve transportation. Requires
-    resources to start consutrction.
+  description: Build houses to grow your town and give citizens a place to live.
+    Requires resources to start consutrction.
   icon: {fileID: 21300000, guid: cf876cc1a40764117b59ca3e9c2ab85c, type: 3}
   imageScale: 1.5
   imageOffsetY: 0
-  completedDescription: The road has been successfully built. Your town is better
-    connected now!
+  completedDescription: The house has been successfully built. Your town has room
+    for more citizens now!
   requiredResources:
   - resourceItem: {fileID: 11400000, guid: bde9e24feba4f4f97b860d6173c6f1dd, type: 2}
     amount: 10
