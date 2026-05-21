@@ -15,7 +15,7 @@ MonoBehaviour:
   name: House
   description: Build houses to grow your town and give citizens a place to live.
     Requires resources to start consutrction.
-  icon: {fileID: 21300000, guid: cf876cc1a40764117b59ca3e9c2ab85c, type: 3}
+  icon: {fileID: 21300000, guid: ef9af8d4599ac46c7b95a0df6da47af9, type: 3}
   imageScale: 1.5
   imageOffsetY: 0
   completedDescription: The house has been successfully built. Your town has room
