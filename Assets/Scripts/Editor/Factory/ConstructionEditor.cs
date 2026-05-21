@@ -63,7 +63,6 @@ public class ConstructionEditor : Editor
         for (var i = 0; i < 3; i++)
         {
             var stage = CreateChild(graphic.transform, $"Stage{i}{NOT_OPTIMIZED_SUFFIX}");
-            stage.transform.localPosition = new Vector3(8f, 0f, 0f);
 
             CreateDefaultGround(stage.transform);
             var environment = CreateChild(stage.transform, ENVIRONMENT_NAME);
@@ -365,7 +364,7 @@ public class ConstructionEditor : Editor
 
     private static void ApplyGroundTransform(Transform ground, Vector2Int constructionSize)
     {
-        ground.localPosition = new Vector3(-constructionSize.x * 0.5f, 0f, constructionSize.y * 0.5f);
+        ground.localPosition = new Vector3(constructionSize.x * 0.5f, 0f, constructionSize.y * 0.5f);
         ground.localRotation = Quaternion.Euler(90f, 0f, 0f);
         ground.localScale = new Vector3(constructionSize.x, constructionSize.y, 1f);
     }
