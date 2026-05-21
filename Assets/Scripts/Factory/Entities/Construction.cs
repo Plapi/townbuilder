@@ -126,6 +126,24 @@ namespace com.Plapamaru.TownCrafter.Factory
             UpdateStages();
         }
 
+        public void SetToMaxStage()
+        {
+            if (Data?.requiredResources != null)
+            {
+                foreach (var requiredResource in Data.requiredResources)
+                {
+                    if (requiredResource?.resourceItem == null || requiredResource.amount <= 0)
+                        continue;
+
+                    var resourceType = requiredResource.resourceItem.type;
+                    _resourcesDict[resourceType] = requiredResource.amount;
+                }
+            }
+
+            _state = ConstructionState.Finished;
+            UpdateStages();
+        }
+
         private void UpdateStages()
         {
             if (_stages.Length == 0)

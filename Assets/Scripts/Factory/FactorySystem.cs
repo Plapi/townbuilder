@@ -35,6 +35,14 @@ namespace com.Plapamaru.TownCrafter.Factory
             _saveSystem.Save();
         }
 
+        public void SetAllConstructionsToMaxStage()
+        {
+            var constructions = GetComponentsInChildren<Construction>(true);
+
+            foreach (var construction in constructions)
+                construction.SetToMaxStage();
+        }
+
         private void InitEntities(CancellationToken externalCT)
         {
             var staticEntities = GetComponentsInChildren<Entity>();
