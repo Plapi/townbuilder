@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using com.Plapamaru.TownCrafter.Factory;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace com.Plapamaru.TownCrafter.Factory
-{
 [CustomEditor(typeof(Construction))]
 public class ConstructionEditor : Editor
 {
@@ -17,6 +17,9 @@ public class ConstructionEditor : Editor
     private const string NOT_OPTIMIZED_SUFFIX = "NotOptimized";
     private const string OPTIMIZED_SUFFIX = "Optimized";
     private const string ENVIRONMENT_MESH_NAME = "EnvironmentMesh";
+    private const string DEFAULT_CONSTRUCTION_NAME = "NewConstructionNotOptimized";
+    private const string GROUND_MATERIAL_PATH = "Assets/Materials/Dirt.mat";
+    private const string SIZE_PROPERTY = "_size";
 
     private static readonly Regex StageRegex = new Regex(@"^Stage(\d+)NotOptimized$", RegexOptions.Compiled);
 
@@ -40,6 +43,46 @@ public class ConstructionEditor : Editor
             if (GUILayout.Button("Export Construction"))
                 ExportSelectedConstruction();
         }
+
+        if (GUILayout.Button("Update Grounds From Size"))
+            UpdateGroundsFromSize();
+    }
+
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction")]
+    private static void CreateNotOptimizedConstruction()
+    {
+        var root = new GameObject(DEFAULT_CONSTRUCTION_NAME);
+        SetLayerRecursively(root, ENVIRONMENT_NAME);
+        Undo.RegisterCreatedObjectUndo(root, "Create Not Optimized Construction");
+
+        var construction = root.AddComponent<Construction>();
+        var graphic = CreateChild(root.transform, GRAPHIC_NAME);
+        var inputs = CreateChild(root.transform, INPUTS_NAME);
+
+        var stages = new List<GameObject>();
+        for (var i = 0; i < 3; i++)
+        {
+            var stage = CreateChild(graphic.transform, $"Stage{i}{NOT_OPTIMIZED_SUFFIX}");
+            stage.transform.localPosition = new Vector3(8f, 0f, 0f);
+
+            CreateDefaultGround(stage.transform);
+            var environment = CreateChild(stage.transform, ENVIRONMENT_NAME);
+            SetLayerRecursively(environment, ENVIRONMENT_NAME);
+
+            stages.Add(stage);
+        }
+
+        var input0 = CreateChild(inputs.transform, "Input0");
+        input0.transform.localPosition = new Vector3(0f, 0f, -1f);
+
+        var input1 = CreateChild(inputs.transform, "Input1");
+        input1.transform.localPosition = new Vector3(3f, 0f, -1f);
+
+        AssignTemplateReferences(construction, stages, new[] { input0.transform, input1.transform });
+
+        Selection.activeGameObject = root;
+        EditorGUIUtility.PingObject(root);
+        EditorSceneManager.MarkSceneDirty(root.scene);
     }
 
     private void ExportSelectedConstruction()
@@ -86,6 +129,43 @@ public class ConstructionEditor : Editor
         }
 
         Debug.Log($"Construction export completed: {rootFolder}", construction);
+    }
+
+    private void UpdateGroundsFromSize()
+    {
+        var construction = (Construction)target;
+        var sizeProperty = serializedObject.FindProperty(SIZE_PROPERTY);
+        var constructionSize = sizeProperty != null ? sizeProperty.vector2IntValue : construction.Size;
+
+        var graphic = FindDirectChild(construction.transform, GRAPHIC_NAME);
+        if (graphic == null)
+        {
+            Debug.LogError($"Update grounds failed: missing direct child '{GRAPHIC_NAME}'.", construction);
+            return;
+        }
+
+        var updatedCount = 0;
+        foreach (Transform stage in graphic)
+        {
+            var ground = FindDirectChild(stage, GROUND_NAME);
+            if (ground == null)
+                continue;
+
+            Undo.RecordObject(ground, "Update Construction Ground");
+            ApplyGroundTransform(ground, constructionSize);
+            SetLayerRecursively(ground.gameObject, GROUND_NAME);
+            EditorUtility.SetDirty(ground);
+            updatedCount++;
+        }
+
+        if (updatedCount == 0)
+        {
+            Debug.LogWarning($"Update grounds found no direct '{GROUND_NAME}' children under '{GRAPHIC_NAME}' stages.", construction);
+            return;
+        }
+
+        EditorSceneManager.MarkSceneDirty(construction.gameObject.scene);
+        Debug.Log($"Updated {updatedCount} construction ground object(s) from size {constructionSize.x}x{constructionSize.y}.", construction);
     }
 
     private bool TryGetExportFolderPath(out string folderPath)
@@ -232,6 +312,62 @@ public class ConstructionEditor : Editor
 
         stageInfo = new StageInfo(stageIndex, stage, ground, environment);
         return true;
+    }
+
+    private static GameObject CreateChild(Transform parent, string childName)
+    {
+        var child = new GameObject(childName);
+        child.transform.SetParent(parent, false);
+        SetLayerRecursively(child, ENVIRONMENT_NAME);
+        return child;
+    }
+
+    private static GameObject CreateDefaultGround(Transform parent)
+    {
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        ground.name = GROUND_NAME;
+        ground.transform.SetParent(parent, false);
+        ApplyGroundTransform(ground.transform, new Vector2Int(8, 8));
+
+        var groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(GROUND_MATERIAL_PATH);
+        if (groundMaterial != null && ground.TryGetComponent<MeshRenderer>(out var meshRenderer))
+            meshRenderer.sharedMaterial = groundMaterial;
+
+        SetLayerRecursively(ground, GROUND_NAME);
+        return ground;
+    }
+
+    private static void AssignTemplateReferences(Construction construction, List<GameObject> stages, Transform[] inputs)
+    {
+        var serializedConstruction = new SerializedObject(construction);
+
+        var sizeProperty = serializedConstruction.FindProperty(SIZE_PROPERTY);
+        if (sizeProperty != null)
+            sizeProperty.vector2IntValue = new Vector2Int(8, 8);
+
+        var stagesProperty = serializedConstruction.FindProperty(STAGES_PROPERTY);
+        stagesProperty.arraySize = stages.Count;
+        for (var i = 0; i < stages.Count; i++)
+            stagesProperty.GetArrayElementAtIndex(i).objectReferenceValue = stages[i];
+
+        var inputsProperty = serializedConstruction.FindProperty("_inputs");
+        inputsProperty.arraySize = inputs.Length;
+        for (var i = 0; i < inputs.Length; i++)
+            inputsProperty.GetArrayElementAtIndex(i).objectReferenceValue = inputs[i];
+
+        var outputsProperty = serializedConstruction.FindProperty("_outputs");
+        if (outputsProperty != null)
+            outputsProperty.arraySize = 0;
+
+        serializedConstruction.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(construction);
+    }
+
+    private static void ApplyGroundTransform(Transform ground, Vector2Int constructionSize)
+    {
+        ground.localPosition = new Vector3(-constructionSize.x * 0.5f, 0f, constructionSize.y * 0.5f);
+        ground.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        ground.localScale = new Vector3(constructionSize.x, constructionSize.y, 1f);
     }
 
     private static void SaveNotOptimizedPrefab(GameObject sourceRoot, string rootFolder, string constructionName)
@@ -489,5 +625,4 @@ public class ConstructionEditor : Editor
             Environment = environment;
         }
     }
-}
 }
