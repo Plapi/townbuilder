@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using com.Plapamaru.TownCrafter.Factory;
 using UnityEditor;
@@ -20,6 +21,11 @@ public class ConstructionEditor : Editor
     private const string DEFAULT_CONSTRUCTION_NAME = "NewConstructionNotOptimized";
     private const string GROUND_MATERIAL_PATH = "Assets/Materials/Dirt.mat";
     private const string SIZE_PROPERTY = "_size";
+    private const string CONSTRUCTION_PROPERTY = "_construction";
+    private const string NOT_STARTED_STICK_GUID = "957c0d3270bfd844aba900730d2fbad9";
+    private const string NOT_STARTED_ROPE_GUID = "239828adc5be7214c8fa4d6fe7dd6aff";
+    private const string CONSTRUCTION_FENCE_CATALOG_GUID = "342f08ec4b494beba3de50d3fbde4fc8";
+    private const string DEFAULT_CONSTRUCTION_FENCE_GUID = "4fa78f9c9f4e51f43842fb4b079d75f8";
 
     private static readonly Regex StageRegex = new Regex(@"^Stage(\d+)NotOptimized$", RegexOptions.Compiled);
 
@@ -46,6 +52,12 @@ public class ConstructionEditor : Editor
 
         if (GUILayout.Button("Update Grounds From Size"))
             UpdateGroundsFromSize();
+
+        if (GUILayout.Button("Update Not Started Fences"))
+            UpdateFencePlacers<ConstructionNotStartedFencePlacer>("GenerateFence", "not started fence");
+
+        if (GUILayout.Button("Update Construction Fences"))
+            UpdateFencePlacers<ConstructionFencePlacer>("GenerateFences", "construction fence");
     }
 
     [MenuItem("TownCrafter/Construction/Create Not Optimized Construction")]
@@ -67,6 +79,11 @@ public class ConstructionEditor : Editor
             CreateDefaultGround(stage.transform);
             var environment = CreateChild(stage.transform, ENVIRONMENT_NAME);
             SetLayerRecursively(environment, ENVIRONMENT_NAME);
+
+            if (i == 0)
+                CreateNotStartedFence(environment.transform, construction);
+            else if (i == 1)
+                CreateConstructionFence(environment.transform, construction);
 
             stages.Add(stage);
         }
@@ -165,6 +182,42 @@ public class ConstructionEditor : Editor
 
         EditorSceneManager.MarkSceneDirty(construction.gameObject.scene);
         Debug.Log($"Updated {updatedCount} construction ground object(s) from size {constructionSize.x}x{constructionSize.y}.", construction);
+    }
+
+    private void UpdateFencePlacers<TPlacer>(string generateMethodName, string label)
+        where TPlacer : MonoBehaviour
+    {
+        var construction = (Construction)target;
+        var placers = construction.GetComponentsInChildren<TPlacer>(true);
+        if (placers.Length == 0)
+        {
+            Debug.LogWarning($"Update {label}s found no {typeof(TPlacer).Name} components.", construction);
+            return;
+        }
+
+        var updatedCount = 0;
+        foreach (var placer in placers)
+        {
+            var editor = CreateEditor(placer);
+            try
+            {
+                var generateMethod = editor.GetType().GetMethod(generateMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
+                if (generateMethod == null)
+                {
+                    Debug.LogError($"Update {label}s failed: missing editor method '{generateMethodName}'.", placer);
+                    continue;
+                }
+
+                generateMethod.Invoke(editor, null);
+                updatedCount++;
+            }
+            finally
+            {
+                DestroyImmediate(editor);
+            }
+        }
+
+        Debug.Log($"Updated {updatedCount} {label} placer(s).", construction);
     }
 
     private bool TryGetExportFolderPath(out string folderPath)
@@ -326,6 +379,7 @@ public class ConstructionEditor : Editor
         var ground = GameObject.CreatePrimitive(PrimitiveType.Quad);
         ground.name = GROUND_NAME;
         ground.transform.SetParent(parent, false);
+        DestroyImmediate(ground.GetComponent<Collider>());
         ApplyGroundTransform(ground.transform, new Vector2Int(8, 8));
 
         var groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(GROUND_MATERIAL_PATH);
@@ -334,6 +388,37 @@ public class ConstructionEditor : Editor
 
         SetLayerRecursively(ground, GROUND_NAME);
         return ground;
+    }
+
+    private static void CreateNotStartedFence(Transform parent, Construction construction)
+    {
+        var fence = CreateChild(parent, "Fence");
+        var placer = fence.AddComponent<ConstructionNotStartedFencePlacer>();
+        var serializedPlacer = new SerializedObject(placer);
+
+        serializedPlacer.FindProperty(CONSTRUCTION_PROPERTY).objectReferenceValue = construction;
+        serializedPlacer.FindProperty("_stick").objectReferenceValue = LoadAssetByGuid<GameObject>(NOT_STARTED_STICK_GUID);
+        serializedPlacer.FindProperty("_rope").objectReferenceValue = LoadAssetByGuid<GameObject>(NOT_STARTED_ROPE_GUID);
+        serializedPlacer.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorUtility.SetDirty(placer);
+    }
+
+    private static void CreateConstructionFence(Transform parent, Construction construction)
+    {
+        var fence = CreateChild(parent, "Fence");
+        var placer = fence.AddComponent<ConstructionFencePlacer>();
+        var serializedPlacer = new SerializedObject(placer);
+
+        serializedPlacer.FindProperty(CONSTRUCTION_PROPERTY).objectReferenceValue = construction;
+        serializedPlacer.FindProperty("_fenceCatalog").objectReferenceValue = LoadAssetByGuid<ConstructionFenceCatalog>(CONSTRUCTION_FENCE_CATALOG_GUID);
+
+        var fencesProperty = serializedPlacer.FindProperty("_fences");
+        fencesProperty.arraySize = 1;
+        fencesProperty.GetArrayElementAtIndex(0).objectReferenceValue = LoadAssetByGuid<GameObject>(DEFAULT_CONSTRUCTION_FENCE_GUID);
+
+        serializedPlacer.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(placer);
     }
 
     private static void AssignTemplateReferences(Construction construction, List<GameObject> stages, Transform[] inputs)
@@ -367,6 +452,15 @@ public class ConstructionEditor : Editor
         ground.localPosition = new Vector3(constructionSize.x * 0.5f, 0f, constructionSize.y * 0.5f);
         ground.localRotation = Quaternion.Euler(90f, 0f, 0f);
         ground.localScale = new Vector3(constructionSize.x, constructionSize.y, 1f);
+    }
+
+    private static T LoadAssetByGuid<T>(string guid) where T : Object
+    {
+        var path = AssetDatabase.GUIDToAssetPath(guid);
+        if (string.IsNullOrEmpty(path))
+            return null;
+
+        return AssetDatabase.LoadAssetAtPath<T>(path);
     }
 
     private static void SaveNotOptimizedPrefab(GameObject sourceRoot, string rootFolder, string constructionName)
