@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a4094acb73421b865abf206e2f31fe, type: 3}
+  m_Name: ConcreteFloorCatalog
+  m_EditorClassIdentifier: 
+  _props:
+  - {fileID: 1762945973701536, guid: 27e2f0253f3de9a4baa6aba994ff3eb7, type: 3}
+  - {fileID: 1139298442579984, guid: 69bfa6c642d9c9846baa1c4024f377f3, type: 3}
+  - {fileID: 1507543799964052, guid: 56a7df5d71b7dc84ba419747c924ffc6, type: 3}
+  - {fileID: 1365389252355666, guid: c586fddde79bf5f4aba2e6a5cdf2338e, type: 3}
+  _materials: []

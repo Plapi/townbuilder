@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using com.Plapamaru.TownCrafter.Factory;
@@ -19,6 +20,7 @@ public class ConstructionEditor : Editor
     private const string OPTIMIZED_SUFFIX = "Optimized";
     private const string ENVIRONMENT_MESH_NAME = "EnvironmentMesh";
     private const string DEFAULT_CONSTRUCTION_NAME = "NewConstructionNotOptimized";
+    private const string DEFAULT_EXPORT_FOLDER_PATH = "Assets/Graphic/Factory/Constructions";
     private const string GROUND_MATERIAL_PATH = "Assets/Materials/Dirt.mat";
     private const string SIZE_PROPERTY = "_size";
     private const string CONSTRUCTION_PROPERTY = "_construction";
@@ -34,11 +36,14 @@ public class ConstructionEditor : Editor
     private void OnEnable()
     {
         _exportFolderProperty = serializedObject.FindProperty(EXPORT_FOLDER_PROPERTY);
+        AutoAssignExportFolderIfNeeded();
     }
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+        AutoAssignExportFolderIfNeeded();
+
         DrawDefaultInspector();
         serializedObject.ApplyModifiedProperties();
 
@@ -99,6 +104,53 @@ public class ConstructionEditor : Editor
         Selection.activeGameObject = root;
         EditorGUIUtility.PingObject(root);
         EditorSceneManager.MarkSceneDirty(root.scene);
+    }
+
+    private void AutoAssignExportFolderIfNeeded()
+    {
+        if (_exportFolderProperty == null || _exportFolderProperty.objectReferenceValue != null)
+            return;
+
+        if (target is not Construction construction || !ShouldAutoAssignExportFolder(construction))
+            return;
+
+        var exportFolder = GetAutoExportFolder(construction);
+        if (exportFolder == null)
+            return;
+
+        _exportFolderProperty.objectReferenceValue = exportFolder;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(construction);
+    }
+
+    private static bool ShouldAutoAssignExportFolder(Construction construction)
+    {
+        var assetPath = GetConstructionAssetPath(construction);
+        return string.IsNullOrEmpty(assetPath) || !assetPath.Contains($"{OPTIMIZED_SUFFIX}/");
+    }
+
+    private static Object GetAutoExportFolder(Construction construction)
+    {
+        var assetPath = GetConstructionAssetPath(construction);
+        if (!string.IsNullOrEmpty(assetPath))
+        {
+            var folderPath = Path.GetDirectoryName(assetPath)?.Replace('\\', '/');
+            if (!string.IsNullOrEmpty(folderPath) && AssetDatabase.IsValidFolder(folderPath))
+                return AssetDatabase.LoadAssetAtPath<DefaultAsset>(folderPath);
+        }
+
+        return AssetDatabase.IsValidFolder(DEFAULT_EXPORT_FOLDER_PATH)
+            ? AssetDatabase.LoadAssetAtPath<DefaultAsset>(DEFAULT_EXPORT_FOLDER_PATH)
+            : null;
+    }
+
+    private static string GetConstructionAssetPath(Construction construction)
+    {
+        var assetPath = AssetDatabase.GetAssetPath(construction.gameObject);
+        if (!string.IsNullOrEmpty(assetPath))
+            return assetPath;
+
+        return PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(construction.gameObject);
     }
 
     private void ExportSelectedConstruction()
@@ -604,7 +656,7 @@ public class ConstructionEditor : Editor
                 stageObjects.Add(stageInstance);
             }
 
-            AssignStages(rootCopy, stageObjects);
+            AssignOptimizedReferences(rootCopy, stageObjects, inputsCopy);
 
             PrefabUtility.SaveAsPrefabAsset(rootCopy, optimizedRootPath);
         }
@@ -614,7 +666,7 @@ public class ConstructionEditor : Editor
         }
     }
 
-    private static void AssignStages(GameObject root, List<GameObject> stages)
+    private static void AssignOptimizedReferences(GameObject root, List<GameObject> stages, Transform inputs)
     {
         var construction = root.GetComponent<Construction>();
         if (construction == null)
@@ -626,6 +678,14 @@ public class ConstructionEditor : Editor
 
         for (var i = 0; i < stages.Count; i++)
             stagesProperty.GetArrayElementAtIndex(i).objectReferenceValue = stages[i];
+
+        var inputsProperty = serializedConstruction.FindProperty("_inputs");
+        if (inputsProperty != null)
+        {
+            inputsProperty.arraySize = inputs != null ? inputs.childCount : 0;
+            for (var i = 0; i < inputsProperty.arraySize; i++)
+                inputsProperty.GetArrayElementAtIndex(i).objectReferenceValue = inputs.GetChild(i);
+        }
 
         var exportFolderProperty = serializedConstruction.FindProperty(EXPORT_FOLDER_PROPERTY);
         if (exportFolderProperty != null)

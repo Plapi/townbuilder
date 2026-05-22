@@ -7,7 +7,9 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class ConstructionPropsCatalog : ScriptableObject
     {
         [SerializeField] private List<GameObject> _props = new List<GameObject>();
+        [SerializeField] private List<Material> _materials = new List<Material>();
 
         public IReadOnlyList<GameObject> Props => _props;
+        public IReadOnlyList<Material> Materials => _materials;
     }
 }

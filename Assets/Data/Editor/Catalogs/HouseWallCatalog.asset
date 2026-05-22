@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a4094acb73421b865abf206e2f31fe, type: 3}
+  m_Name: HouseWallCatalog
+  m_EditorClassIdentifier: 
+  _props:
+  - {fileID: 1808541236442032, guid: 1990f65d5770d1b4d86a89e27031213c, type: 3}
+  - {fileID: 1425027599133236, guid: 0ce2a74f333041446ad403313db080a9, type: 3}
+  - {fileID: 1638825774828796, guid: 1ba3da746684738489297e70c5d2c224, type: 3}
+  - {fileID: 1608099649242304, guid: bbe0032a393acdf44b6eecea39c55463, type: 3}
+  - {fileID: 1552521573394822, guid: 721dd8a0771c4c34faab2b237d9ec276, type: 3}
+  - {fileID: 1128075517509838, guid: 21443e85f6db2db45b14024cc1e9e364, type: 3}
+  - {fileID: 1366956832668916, guid: 5a9a03aee9fc2da469081e7616dc19bb, type: 3}
+  - {fileID: 1869539160788820, guid: 1143fd2808fa2c5489fe47111a8ff77f, type: 3}
+  - {fileID: 1914677866468676, guid: 564dc0913f7fc3046aaeef42fddcf49c, type: 3}
+  - {fileID: 1167521536867572, guid: f830acbbdfa5932439d0d45d594cc1c4, type: 3}
+  - {fileID: 1278883626616086, guid: 7aa9601e104200848b763a5185df0e05, type: 3}
+  - {fileID: 1274697010394880, guid: 6a7b883e89c23cd4d948c666507b1a45, type: 3}
+  _materials: []

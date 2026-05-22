@@ -171,13 +171,12 @@ Generated structure:
 
 These live under `Assets/Scripts/Factory/EditorTools` and are editor helpers attached to construction prefab children.
 
-### Props
+### Synty House Stages
 
-- `ConstructionPropsPlacer` randomly places props inside a construction footprint.
-- Catalog type: `ConstructionPropsCatalog`.
-- Default catalog lookup prefers asset named `ConstructionPropsCatalog`.
-- Generated children end with ` (Generated Construction Prop)`.
-- Placement uses mesh renderer footprint bounds, optional 90-degree rotation, non-overlapping rects, and `FactoryConfig.constructionPropsScale`.
+- `ConstructionHousePlacer` lives on `Stage2NotOptimized/Environment`; it places a catalog house, applies optional catalog material, and resizes the `Construction` to the house footprint plus inspector padding.
+- `ConstructionStage1EnvironmentGenerator` lives on `Stage1NotOptimized/Environment`; it generates concrete floors, border walls, and random non-overlapping props from catalogs, using the Stage2 house footprint when needed.
+- Shared catalog type: `ConstructionPropsCatalog`; known assets include house, concrete floor, wall, and house prop catalogs under `Assets/Data/Editor/Catalogs`.
+- Synty construction visuals use `FactoryConfig.constructionPropsScale`.
 
 ### In-Progress Fences
 
