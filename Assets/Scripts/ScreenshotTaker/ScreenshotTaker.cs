@@ -19,12 +19,22 @@ public class ScreenshotTaker : MonoBehaviour
         }
     }
 
-    private void SaveScreenshot()
+    public void SaveScreenshot()
     {
         var path = $"{AssetDatabase.GetAssetPath(_locationFolder)}/{_fileName}.png";
+        SaveScreenshot(path, _importSettings);
+    }
+
+    public void SaveScreenshot(string folderPath, string fileName, Preset importSettings)
+    {
+        SaveScreenshot($"{folderPath}/{fileName}.png", importSettings);
+    }
+
+    private void SaveScreenshot(string path, Preset importSettings)
+    {
         File.WriteAllBytes(path, TakeScreenshot());
         AssetDatabase.ImportAsset(path);
-        ApplyImportSettings(path);
+        ApplyImportSettings(path, importSettings);
         AssetDatabase.Refresh();
     }
     
@@ -64,9 +74,9 @@ public class ScreenshotTaker : MonoBehaviour
         return bytes;
     }
 
-    private void ApplyImportSettings(string path)
+    private void ApplyImportSettings(string path, Preset importSettings)
     {
-        if (_importSettings == null)
+        if (importSettings == null)
         {
             return;
         }
@@ -77,7 +87,7 @@ public class ScreenshotTaker : MonoBehaviour
             return;
         }
 
-        if (!_importSettings.ApplyTo(targetImporter))
+        if (!importSettings.ApplyTo(targetImporter))
         {
             Debug.LogWarning($"Could not apply import settings preset to {path}.", this);
             return;

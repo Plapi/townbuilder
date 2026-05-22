@@ -4,8 +4,10 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using com.Plapamaru.TownCrafter.Factory;
 using UnityEditor;
+using UnityEditor.Presets;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [CustomEditor(typeof(Construction))]
 public class ConstructionEditor : Editor
@@ -28,6 +30,9 @@ public class ConstructionEditor : Editor
     private const string NOT_STARTED_ROPE_GUID = "239828adc5be7214c8fa4d6fe7dd6aff";
     private const string CONSTRUCTION_FENCE_CATALOG_GUID = "342f08ec4b494beba3de50d3fbde4fc8";
     private const string DEFAULT_CONSTRUCTION_FENCE_GUID = "4fa78f9c9f4e51f43842fb4b079d75f8";
+    private const string SCREENSHOT_TAKER_SCENE_PATH = "Assets/Scenes/ScreenshotTaker/ScreenshotTaker.unity";
+    private const string CONSTRUCTION_INITIALS_FOLDER_PATH = "Assets/Graphic/UI/Constructions/Initials";
+    private const string UI_TEXTURE_IMPORTER_PRESET_PATH = "Assets/Graphic/UI/UI.preset";
 
     private static readonly Regex StageRegex = new Regex(@"^Stage(\d+)NotOptimized$", RegexOptions.Compiled);
 
@@ -63,6 +68,17 @@ public class ConstructionEditor : Editor
 
         if (GUILayout.Button("Update Construction Fences"))
             UpdateFencePlacers<ConstructionFencePlacer>("GenerateFences", "construction fence");
+
+        EditorGUILayout.Space();
+
+        using (new EditorGUI.DisabledScope(!IsProjectPrefabAsset((Construction)target)))
+        {
+            if (GUILayout.Button("Generate Initial UI Screenshot"))
+                GenerateInitialUiScreenshot();
+        }
+
+        if (!IsProjectPrefabAsset((Construction)target))
+            EditorGUILayout.HelpBox("Initial UI screenshots can only be generated from a Construction prefab asset in the Project window.", MessageType.Info);
     }
 
     [MenuItem("TownCrafter/Construction/Create Not Optimized Construction")]
@@ -270,6 +286,98 @@ public class ConstructionEditor : Editor
         }
 
         Debug.Log($"Updated {updatedCount} {label} placer(s).", construction);
+    }
+
+    private void GenerateInitialUiScreenshot()
+    {
+        var construction = (Construction)target;
+        var prefabPath = AssetDatabase.GetAssetPath(construction.gameObject);
+        if (string.IsNullOrEmpty(prefabPath))
+        {
+            Debug.LogError("Initial UI screenshot failed: selected Construction must be a prefab asset in the Project window.", construction);
+            return;
+        }
+
+        if (!AssetDatabase.IsValidFolder(CONSTRUCTION_INITIALS_FOLDER_PATH))
+        {
+            Debug.LogError($"Initial UI screenshot failed: missing folder '{CONSTRUCTION_INITIALS_FOLDER_PATH}'.", construction);
+            return;
+        }
+
+        var uiPreset = AssetDatabase.LoadAssetAtPath<Preset>(UI_TEXTURE_IMPORTER_PRESET_PATH);
+        if (uiPreset == null)
+        {
+            Debug.LogError($"Initial UI screenshot failed: missing UI texture importer preset '{UI_TEXTURE_IMPORTER_PRESET_PATH}'.", construction);
+            return;
+        }
+
+        var previousScene = SceneManager.GetActiveScene();
+        var previousScenePath = previousScene.path;
+
+        if (string.IsNullOrEmpty(previousScenePath))
+        {
+            Debug.LogError("Initial UI screenshot failed: the active scene must be saved before switching to ScreenshotTaker.", construction);
+            return;
+        }
+
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            return;
+
+        var screenshotPath = $"{CONSTRUCTION_INITIALS_FOLDER_PATH}/{construction.gameObject.name}.png";
+        var screenshotGenerated = false;
+
+        try
+        {
+            var screenshotScene = EditorSceneManager.OpenScene(SCREENSHOT_TAKER_SCENE_PATH, OpenSceneMode.Single);
+            var screenshotTaker = FindInScene<ScreenshotTaker>(screenshotScene);
+            if (screenshotTaker == null)
+            {
+                Debug.LogError($"Initial UI screenshot failed: '{SCREENSHOT_TAKER_SCENE_PATH}' does not contain a ScreenshotTaker.", construction);
+                return;
+            }
+
+            ClearConstructionInstancesFromScene(screenshotScene);
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, screenshotScene);
+            if (instance == null)
+            {
+                Debug.LogError($"Initial UI screenshot failed: could not instantiate prefab '{prefabPath}'.", construction);
+                return;
+            }
+
+            instance.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            instance.transform.localScale = Vector3.one;
+            CenterRenderersOnOrigin(instance);
+
+            EditorSceneManager.MarkSceneDirty(screenshotScene);
+            EditorSceneManager.SaveScene(screenshotScene);
+
+            ReplaceAsset(screenshotPath);
+            screenshotTaker.SaveScreenshot(CONSTRUCTION_INITIALS_FOLDER_PATH, construction.gameObject.name, uiPreset);
+            screenshotGenerated = true;
+        }
+        finally
+        {
+            if (!string.IsNullOrEmpty(previousScenePath))
+                EditorSceneManager.OpenScene(previousScenePath, OpenSceneMode.Single);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            if (screenshotGenerated)
+            {
+                var generatedTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(screenshotPath);
+                if (generatedTexture != null)
+                {
+                    Selection.activeObject = generatedTexture;
+                    EditorGUIUtility.PingObject(generatedTexture);
+                    EditorUtility.FocusProjectWindow();
+                }
+            }
+        }
+
+        Debug.Log($"Initial UI screenshot generated: {screenshotPath}", construction);
     }
 
     private bool TryGetExportFolderPath(out string folderPath)
@@ -703,6 +811,49 @@ public class ConstructionEditor : Editor
         }
 
         return null;
+    }
+
+    private static bool IsProjectPrefabAsset(Construction construction)
+    {
+        return construction != null &&
+               EditorUtility.IsPersistent(construction.gameObject) &&
+               PrefabUtility.IsPartOfPrefabAsset(construction.gameObject);
+    }
+
+    private static void ClearConstructionInstancesFromScene(Scene scene)
+    {
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            if (root.GetComponentInChildren<Construction>(true) == null)
+                continue;
+
+            Object.DestroyImmediate(root);
+        }
+    }
+
+    private static T FindInScene<T>(Scene scene) where T : Component
+    {
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            var component = root.GetComponentInChildren<T>(true);
+            if (component != null)
+                return component;
+        }
+
+        return null;
+    }
+
+    private static void CenterRenderersOnOrigin(GameObject instance)
+    {
+        var renderers = instance.GetComponentsInChildren<Renderer>(true);
+        if (renderers.Length == 0)
+            return;
+
+        var bounds = renderers[0].bounds;
+        for (var i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+
+        instance.transform.position -= bounds.center;
     }
 
     private static bool HasCombinableMeshes(Transform root)
