@@ -21,6 +21,7 @@ namespace com.Plapamaru.TownCrafter.Game
 
         [SerializeField] private Camera _camera;
         [SerializeField] private MobileTouchCamera _mobileTouchCamera;
+        [SerializeField] private FactorySystem _factorySystem;
         [SerializeField] private MultipleHighlightSelection _highlightSelection;
 
         private UIDeletePanel _deletePanel;
@@ -28,6 +29,7 @@ namespace com.Plapamaru.TownCrafter.Game
         public override async UniTask Run(CancellationToken cancellationToken)
         {
             SimulationClock.SetPaused(true);
+            GetFactorySystem()?.FadeInGrid();
 
             _deletePanel = UISystem.Instance.GetPanel<UIDeletePanel>();
             await _deletePanel.Show(cancellationToken);
@@ -44,7 +46,16 @@ namespace com.Plapamaru.TownCrafter.Game
         public override async UniTask Exit(CancellationToken cancellationToken)
         {
             await _deletePanel.Close(true, cancellationToken);
+            GetFactorySystem()?.FadeOutGrid();
             SimulationClock.SetPaused(false);
+        }
+
+        private FactorySystem GetFactorySystem()
+        {
+            if (_factorySystem == null)
+                _factorySystem = UnityEngine.Object.FindFirstObjectByType<FactorySystem>();
+
+            return _factorySystem;
         }
 
         private UniTask ProcessTap(CancellationToken cancellationToken)

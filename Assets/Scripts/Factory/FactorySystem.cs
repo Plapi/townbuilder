@@ -23,14 +23,24 @@ namespace com.Plapamaru.TownCrafter.Factory
         public void OnBuildEnter()
         {
             SimulationClock.SetPaused(true);
-            _grid.FadeIn();
+            FadeInGrid();
         }
 
         public void OnBuildExit()
         {
             SimulationClock.SetPaused(false);
-            _grid.FadeOut();
+            FadeOutGrid();
             Save();
+        }
+
+        public void FadeInGrid()
+        {
+            _grid?.FadeIn();
+        }
+
+        public void FadeOutGrid()
+        {
+            _grid?.FadeOut();
         }
 
         public void Save()

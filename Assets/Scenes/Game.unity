@@ -12450,6 +12450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TownCrafter.Game::com.Plapamaru.TownCrafter.Game.GameStateDelete
   _camera: {fileID: 379399442}
   _mobileTouchCamera: {fileID: 379399440}
+  _factorySystem: {fileID: 165255272}
   _highlightSelection: {fileID: 1072508599}
 --- !u!1 &1417596985
 GameObject:
