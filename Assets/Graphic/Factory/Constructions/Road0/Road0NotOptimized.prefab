@@ -94,7 +94,7 @@ MonoBehaviour:
   - {fileID: 179888451706816125}
   - {fileID: 6811303498970515658}
   - {fileID: 8746054112839617140}
-  _exportFolder: {fileID: 102900000, guid: 7625c618f5f3348319dc33c8a326d043, type: 3}
+  _exportFolder: {fileID: 102900000, guid: f27ca9db20f804c75889b5ef2003a53a, type: 3}
   _connectedConveyor: {fileID: 0}
   _state: 0
 --- !u!1 &620783173521195862
@@ -353,6 +353,8 @@ MonoBehaviour:
   _fences:
   - {fileID: 1317252240251526, guid: 4fa78f9c9f4e51f43842fb4b079d75f8, type: 3}
   - {fileID: 0}
+  _useCustomSize: 0
+  _customSize: {x: 1, y: 1}
   _perimeterPadding: 0
   _defaultFenceLength: 1
   _randomizeFences: 1
