@@ -11,6 +11,7 @@ namespace com.Plapamaru.TownCrafter.Factory
     public class FactorySystem : MonoBehaviour
     {
         [SerializeField] private FactorySaveSystem _saveSystem;
+        [SerializeField] private Grid _grid;
 
         public void Init(CancellationToken externalCT)
         {
@@ -22,11 +23,13 @@ namespace com.Plapamaru.TownCrafter.Factory
         public void OnBuildEnter()
         {
             SimulationClock.SetPaused(true);
+            _grid.FadeIn();
         }
 
         public void OnBuildExit()
         {
             SimulationClock.SetPaused(false);
+            _grid.FadeOut();
             Save();
         }
 
