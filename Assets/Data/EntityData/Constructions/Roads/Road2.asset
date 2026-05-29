@@ -15,7 +15,7 @@ MonoBehaviour:
   name: Road
   description: Build roads to connect your city and improve transportation. Requires
     resources to start consutrction.
-  icon: {fileID: 21300000, guid: 31592bb89ad8b48119250582a147bf1e, type: 3}
+  icon: {fileID: 21300000, guid: b5f734f220b1040de98176447336c2bc, type: 3}
   imageScale: 1.5
   imageOffsetY: 0
   completedDescription: The road has been successfully built. Your town is better
