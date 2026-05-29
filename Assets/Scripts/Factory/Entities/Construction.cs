@@ -126,23 +126,25 @@ namespace com.Plapamaru.TownCrafter.Factory
             UpdateStages();
         }
 
-        public void SetToMaxStage()
+#if UNITY_EDITOR
+        public void SetEditorStage(int stageIndex)
         {
-            if (Data?.requiredResources != null)
-            {
-                foreach (var requiredResource in Data.requiredResources)
-                {
-                    if (requiredResource?.resourceItem == null || requiredResource.amount <= 0)
-                        continue;
+            if (_stages.Length == 0)
+                return;
 
-                    var resourceType = requiredResource.resourceItem.type;
-                    _resourcesDict[resourceType] = requiredResource.amount;
-                }
-            }
+            stageIndex = Mathf.Clamp(stageIndex, 0, _stages.Length - 1);
 
-            _state = ConstructionState.Finished;
-            UpdateStages();
+            UnityEditor.Undo.RecordObjects(_stages, "Set Construction Debug Stage");
+
+            foreach (var stage in _stages)
+                stage.SetActive(false);
+
+            _stages[stageIndex].SetActive(true);
+
+            foreach (var stage in _stages)
+                UnityEditor.EditorUtility.SetDirty(stage);
         }
+#endif
 
         private void UpdateStages()
         {

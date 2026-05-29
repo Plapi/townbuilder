@@ -11,16 +11,16 @@ public class FactorySystemEditor : Editor
 
         EditorGUILayout.Space();
 
-        if (GUILayout.Button("Set All Constructions To Max Stage"))
-            SetAllConstructionsToMaxStage();
+        if (GUILayout.Button("Set All Constructions To Debug Stage"))
+            SetAllConstructionsToDebugStage();
     }
 
-    private void SetAllConstructionsToMaxStage()
+    private void SetAllConstructionsToDebugStage()
     {
         var factorySystem = (FactorySystem)target;
         var constructions = factorySystem.GetComponentsInChildren<Construction>(true);
 
-        factorySystem.SetAllConstructionsToMaxStage();
+        factorySystem.SetAllConstructionsToDebugStage();
 
         foreach (var construction in constructions)
             EditorUtility.SetDirty(construction);

@@ -13,6 +13,12 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private FactorySaveSystem _saveSystem;
         [SerializeField] private Grid _grid;
 
+#if UNITY_EDITOR
+        [Header("Editor Debug")]
+        [Min(0)]
+        [SerializeField] private int _debugConstructionStage;
+#endif
+
         public void Init(CancellationToken externalCT)
         {
             FactoryMap.Instance.Init(externalCT);
@@ -48,13 +54,15 @@ namespace com.Plapamaru.TownCrafter.Factory
             _saveSystem.Save();
         }
 
-        public void SetAllConstructionsToMaxStage()
+#if UNITY_EDITOR
+        public void SetAllConstructionsToDebugStage()
         {
             var constructions = GetComponentsInChildren<Construction>(true);
 
             foreach (var construction in constructions)
-                construction.SetToMaxStage();
+                construction.SetEditorStage(_debugConstructionStage);
         }
+#endif
 
         private void InitEntities(CancellationToken externalCT)
         {
