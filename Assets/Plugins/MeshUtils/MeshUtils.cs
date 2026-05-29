@@ -6,6 +6,7 @@ using MantisLOD;
 using Object = UnityEngine.Object;
 
 public static class MeshUtils {
+	private const int UInt16VertexLimit = 65535;
 
 	public static GameObject OptimizeAndCombine(Transform parent, float quality) {
 		parent = OptimizeChildMeshes(parent, quality);
@@ -104,6 +105,9 @@ public static class MeshUtils {
 		List<CombineInstance> combineInstances = new List<CombineInstance>();
 		foreach (var item in dictionary) {
 			Mesh mesh = new Mesh();
+			if (GetVertexCount(item.Value) > UInt16VertexLimit) {
+				mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+			}
 			mesh.CombineMeshes(item.Value.ToArray());
 			mesh.Optimize();
 			combineInstances.Add(new CombineInstance {
@@ -114,7 +118,7 @@ public static class MeshUtils {
 		}
 
 		Mesh newMesh = new Mesh() { name = "mesh" };
-		if (vertexCount > 65535) {
+		if (vertexCount > UInt16VertexLimit) {
 			newMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 		}
 		newMesh.CombineMeshes(combineInstances.ToArray(), false);
@@ -126,6 +130,17 @@ public static class MeshUtils {
 		newMeshObj.AddComponent<MeshFilter>().mesh = newMesh;
 
 		return newMeshObj;
+	}
+
+	private static int GetVertexCount(List<CombineInstance> combineInstances) {
+		int vertexCount = 0;
+		for (int i = 0; i < combineInstances.Count; i++) {
+			if (combineInstances[i].mesh != null) {
+				vertexCount += combineInstances[i].mesh.vertexCount;
+			}
+		}
+
+		return vertexCount;
 	}
 
 	public static Mesh CloneMesh(Mesh mesh) {

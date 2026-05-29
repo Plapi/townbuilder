@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 545a67d7b8cd2461fb6f4a3b226dbd7f, type: 3}
+  m_Name: Park0
+  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
+  name: Park
+  description: Build parks to beautify your town and give citizens a relaxing place
+    to gather. Requires resources to start construction.
+  icon: {fileID: 21300000, guid: 035ebd043448044c49c7b16741ba5600, type: 3}
+  imageScale: 1.5
+  imageOffsetY: 0
+  completedDescription: The park has been successfully built. Your town feels greener
+    and more welcoming now!
+  requiredResources:
+  - resourceItem: {fileID: 11400000, guid: bde9e24feba4f4f97b860d6173c6f1dd, type: 2}
+    amount: 10
+  - resourceItem: {fileID: 11400000, guid: a246f7c1ab0c44041844b83a58ac0fdc, type: 2}
+    amount: 10
