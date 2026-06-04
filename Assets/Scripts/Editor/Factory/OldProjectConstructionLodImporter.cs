@@ -8,6 +8,7 @@ using UnityEngine;
 public class OldProjectConstructionLodImporter : EditorWindow
 {
     private const string DefaultDestinationRoot = "Assets/Graphic/OldProject";
+    private const string DefaultImportedMaterialsFolder = "Assets/Graphic/OldProject/Materials";
     private const string MenuPath = "TownCrafter/Import Old Project Construction LODs";
     private const string SharedLodFolderName = "_SharedLodGroups";
     private const string SourceFolderPrefsKey = "TownCrafter.OldProjectConstructionLodImporter.SourceFolder";
@@ -17,6 +18,7 @@ public class OldProjectConstructionLodImporter : EditorWindow
     private static readonly Regex GuidRegex = new Regex(@"^guid: ([0-9a-f]{32})\s*$", RegexOptions.Multiline);
     private static readonly Regex NameRegex = new Regex(@"^\s*m_Name:\s*(.+?)\s*$", RegexOptions.Multiline);
     private static readonly Regex LodGuidRegex = new Regex(@"guid:\s*(?<guid>[0-9a-f]{32})");
+    private static readonly Regex MaterialReferenceRegex = new Regex(@"(?<prefix>\{fileID:\s*2100000,\s*guid:\s*)(?<guid>[0-9a-f]{32})(?<suffix>,\s*type:\s*2\})");
 
     [SerializeField] private string _sourceFolder = "";
     [SerializeField] private string _destinationRoot = DefaultDestinationRoot;
@@ -46,7 +48,7 @@ public class OldProjectConstructionLodImporter : EditorWindow
         EditorGUILayout.HelpBox(
             "Select a folder from another Unity project that contains construction .asset files. " +
             "The importer reads each asset's lodGroups, copies those referenced prefab folders into this project, " +
-            "and creates a parent prefab containing one child prefab instance per LOD group.",
+            "repairs unresolved material references by name, and creates a parent prefab containing one child prefab instance per LOD group.",
             MessageType.Info);
 
         using (new EditorGUILayout.HorizontalScope())
@@ -115,10 +117,11 @@ public class OldProjectConstructionLodImporter : EditorWindow
             var guidMap = BuildGuidMap(sourceAssetsRoot);
             var lodGuidUseCounts = CountLodGuidUses(constructionAssets);
             var copiedLodPrefabPathsByGuid = new Dictionary<string, string>();
+            var materialResolver = new MaterialReferenceResolver(guidMap);
             var log = new List<string>();
 
             foreach (var constructionAssetPath in constructionAssets)
-                ImportConstruction(constructionAssetPath, guidMap, lodGuidUseCounts, copiedLodPrefabPathsByGuid, log);
+                ImportConstruction(constructionAssetPath, guidMap, lodGuidUseCounts, copiedLodPrefabPathsByGuid, materialResolver, log);
 
             _lastResult = string.Join("\n", log);
         }
@@ -138,6 +141,7 @@ public class OldProjectConstructionLodImporter : EditorWindow
         IReadOnlyDictionary<string, string> guidMap,
         IReadOnlyDictionary<string, int> lodGuidUseCounts,
         IDictionary<string, string> copiedLodPrefabPathsByGuid,
+        MaterialReferenceResolver materialResolver,
         List<string> log)
     {
         var constructionName = GetConstructionName(constructionAssetPath);
@@ -220,6 +224,8 @@ public class OldProjectConstructionLodImporter : EditorWindow
             var sourceMetaPath = $"{sourceLodFolder}.meta";
             if (File.Exists(sourceMetaPath))
                 FileUtil.CopyFileOrDirectory(sourceMetaPath, $"{destinationLodFolder}.meta");
+
+            RepairMaterialReferences(destinationLodFolder, materialResolver, log);
 
             var copiedPrefabPath = AssetPathCombine(destinationLodFolder, Path.GetFileName(oldPrefabPath));
             AssetDatabase.ImportAsset(destinationLodFolder, ImportAssetOptions.ImportRecursive);
@@ -393,10 +399,127 @@ public class OldProjectConstructionLodImporter : EditorWindow
         return fileName.Trim();
     }
 
+    private static void RepairMaterialReferences(string assetFolder, MaterialReferenceResolver materialResolver, List<string> log)
+    {
+        if (!Directory.Exists(assetFolder))
+            return;
+
+        foreach (var prefabPath in Directory.EnumerateFiles(assetFolder, "*.prefab", SearchOption.AllDirectories))
+        {
+            var text = File.ReadAllText(prefabPath);
+            var changed = false;
+
+            var repairedText = MaterialReferenceRegex.Replace(text, match =>
+            {
+                var oldGuid = match.Groups["guid"].Value;
+                var replacementGuid = materialResolver.Resolve(oldGuid, log);
+                if (string.IsNullOrEmpty(replacementGuid) || replacementGuid == oldGuid)
+                    return match.Value;
+
+                changed = true;
+                return $"{match.Groups["prefix"].Value}{replacementGuid}{match.Groups["suffix"].Value}";
+            });
+
+            if (changed)
+                File.WriteAllText(prefabPath, repairedText);
+        }
+    }
+
     private void SavePrefs()
     {
         EditorPrefs.SetString(SourceFolderPrefsKey, _sourceFolder);
         EditorPrefs.SetString(DestinationRootPrefsKey, _destinationRoot);
         EditorPrefs.SetBool(OverwriteExistingPrefsKey, _overwriteExisting);
+    }
+
+    private sealed class MaterialReferenceResolver
+    {
+        private readonly IReadOnlyDictionary<string, string> _oldGuidMap;
+        private readonly Dictionary<string, string> _replacementGuidsByOldGuid = new Dictionary<string, string>();
+
+        public MaterialReferenceResolver(IReadOnlyDictionary<string, string> oldGuidMap)
+        {
+            _oldGuidMap = oldGuidMap;
+        }
+
+        public string Resolve(string oldGuid, List<string> log)
+        {
+            if (_replacementGuidsByOldGuid.TryGetValue(oldGuid, out var cachedGuid))
+                return cachedGuid;
+
+            var automaticallyMatchedPath = AssetDatabase.GUIDToAssetPath(oldGuid);
+            if (!string.IsNullOrEmpty(automaticallyMatchedPath))
+            {
+                _replacementGuidsByOldGuid[oldGuid] = oldGuid;
+                return oldGuid;
+            }
+
+            if (!_oldGuidMap.TryGetValue(oldGuid, out var oldMaterialPath) ||
+                !string.Equals(Path.GetExtension(oldMaterialPath), ".mat", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(oldMaterialPath))
+            {
+                _replacementGuidsByOldGuid[oldGuid] = oldGuid;
+                return oldGuid;
+            }
+
+            var materialName = Path.GetFileNameWithoutExtension(oldMaterialPath);
+            var matchedMaterialPath = FindMaterialByExactName(materialName, DefaultImportedMaterialsFolder) ??
+                                      FindMaterialByExactName(materialName, "Assets");
+
+            if (!string.IsNullOrEmpty(matchedMaterialPath))
+            {
+                var matchedGuid = AssetDatabase.AssetPathToGUID(matchedMaterialPath);
+                _replacementGuidsByOldGuid[oldGuid] = matchedGuid;
+                log.Add($"  Material matched by name: {materialName} -> {matchedMaterialPath}");
+                return matchedGuid;
+            }
+
+            var importedMaterialPath = ImportMaterial(oldMaterialPath, materialName);
+            if (!string.IsNullOrEmpty(importedMaterialPath))
+            {
+                var importedGuid = AssetDatabase.AssetPathToGUID(importedMaterialPath);
+                _replacementGuidsByOldGuid[oldGuid] = importedGuid;
+                log.Add($"  Material imported: {materialName} -> {importedMaterialPath}");
+                return importedGuid;
+            }
+
+            _replacementGuidsByOldGuid[oldGuid] = oldGuid;
+            return oldGuid;
+        }
+
+        private static string FindMaterialByExactName(string materialName, string searchFolder)
+        {
+            if (!AssetDatabase.IsValidFolder(searchFolder))
+                return null;
+
+            var guids = AssetDatabase.FindAssets($"{materialName} t:Material", new[] { searchFolder });
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (material != null && material.name == materialName)
+                    return path;
+            }
+
+            return null;
+        }
+
+        private static string ImportMaterial(string oldMaterialPath, string materialName)
+        {
+            EnsureAssetFolder(DefaultImportedMaterialsFolder);
+
+            var destinationPath = AssetPathCombine(DefaultImportedMaterialsFolder, $"{SanitizeFileName(materialName)}.mat");
+            if (File.Exists(destinationPath))
+                destinationPath = AssetDatabase.GenerateUniqueAssetPath(destinationPath);
+
+            FileUtil.CopyFileOrDirectory(oldMaterialPath, destinationPath);
+
+            var sourceMetaPath = $"{oldMaterialPath}.meta";
+            if (File.Exists(sourceMetaPath))
+                FileUtil.CopyFileOrDirectory(sourceMetaPath, $"{destinationPath}.meta");
+
+            AssetDatabase.ImportAsset(destinationPath, ImportAssetOptions.ForceSynchronousImport);
+            return destinationPath;
+        }
     }
 }
