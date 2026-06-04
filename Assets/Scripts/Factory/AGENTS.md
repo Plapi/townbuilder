@@ -186,6 +186,18 @@ These live under `Assets/Scripts/Factory/EditorTools` and are editor helpers att
 - Fence length is measured from prefab mesh bounds, with a default fallback length.
 - Uses construction `Right`, `Forward`, and `Size` to place each side.
 
+### Grouped Construction Fences
+
+- `ConstructionGroupedFencePlacer` places grouped fences around the construction perimeter using post/fence pairs.
+- Catalog type: `ConstructionGroupedFenceCatalog`; default asset is `Assets/Data/Editor/Catalogs/ConstructionGroupedFenceCatalog.asset`.
+- Each catalog entry is a `ConstructionGroupedFence` with a display name, post prefab, and fence prefab.
+- The placer auto-finds the parent `Construction`, supports custom size, and uses `FactoryConfig.constructionPropsScale`.
+- Side toggles control whether generated fences are placed on front, back, right, and left.
+- Generated side parents are named `Front`, `Back`, `Right`, or `Left` plus ` (Generated Grouped Fence)`.
+- Generated posts and fences are children of their side parent. Side parents define local placement space: local Z runs along the side.
+- Post positions are local integer Z positions. Back and right fence pieces start at local Z `0`; front and left fence pieces start at local Z `1`.
+- Changing the selected fence group in the inspector automatically clears and regenerates the grouped fence when the placer is valid.
+
 ### Not-Started Rope Fence
 
 - `ConstructionNotStartedFencePlacer` creates corner sticks and rope segments around the construction footprint.
@@ -207,6 +219,7 @@ These live under `Assets/Scripts/Factory/EditorTools` and are editor helpers att
   - Use the optimized prefab as runtime output.
 - New construction prop/fence catalog item:
   - Add prefab reference to the appropriate catalog asset under `Assets/Data/Editor/Catalogs`.
+  - For grouped fences, add a `ConstructionGroupedFence` entry with both post and fence prefab references.
   - Use the placer inspector buttons in Unity to regenerate source prefab children.
 - Save-affecting entity change:
   - Update the relevant save-data type in `Save/FactorySave.cs`.
