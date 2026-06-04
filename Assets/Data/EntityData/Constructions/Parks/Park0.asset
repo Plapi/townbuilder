@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
   name: Park
   description: Build parks to beautify your town and give citizens a relaxing place
-    to gather. Requires resources to start construction.
+    to gather.
   icon: {fileID: 21300000, guid: 035ebd043448044c49c7b16741ba5600, type: 3}
   imageScale: 1.5
   imageOffsetY: 0

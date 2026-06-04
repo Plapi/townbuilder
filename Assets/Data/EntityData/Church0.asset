@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
   name: Church
   description: Build churches to give your town a peaceful gathering place for the
-    community. Requires resources to start construction.
+    community.
   icon: {fileID: 21300000, guid: 8b8f9247061e34ee4bcdc697ffc3f5cb, type: 3}
   imageScale: 1.5
   imageOffsetY: 0

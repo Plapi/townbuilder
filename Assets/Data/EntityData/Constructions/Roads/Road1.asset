@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Road1
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
   name: Road
-  description: Build roads to connect your city and improve transportation. Requires
-    resources to start construction.
+  description: Build roads to connect your city and improve transportation.
   icon: {fileID: 21300000, guid: 31592bb89ad8b48119250582a147bf1e, type: 3}
   imageScale: 1.5
   imageOffsetY: 0

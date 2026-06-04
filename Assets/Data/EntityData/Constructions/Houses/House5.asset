@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
   name: House
   description: Build houses to grow your town and give citizens a place to live.
-    Requires resources to start consutrction.
   icon: {fileID: 21300000, guid: 65921e38a8d7343c8a184445a38365a7, type: 3}
   imageScale: 1.5
   imageOffsetY: 0
