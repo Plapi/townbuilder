@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 545a67d7b8cd2461fb6f4a3b226dbd7f, type: 3}
   m_Name: House8
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
-  name: House8
+  name: House
   description: Build houses to grow your town and give citizens a place to live.
   icon: {fileID: 21300000, guid: 22b43c6c3209548efb6828d58df8718c, type: 3}
   imageScale: 1.5
