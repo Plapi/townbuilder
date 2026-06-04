@@ -157,7 +157,7 @@ public class ConstructionEditor : Editor
             stages.Add(stage);
         }
 
-        var input0 = CreateInput(inputs.transform, "Input0", new Vector3(0f, 0f, -1f), inputArrowPrefab);
+        var input0 = CreateInput(inputs.transform, "Input0", new Vector3(1f, 0f, -1f), inputArrowPrefab);
         var input1 = CreateInput(inputs.transform, "Input1", new Vector3(3f, 0f, -1f), inputArrowPrefab);
         if (input0 == null || input1 == null)
         {
@@ -682,8 +682,8 @@ public class ConstructionEditor : Editor
 
         inputArrow.transform.SetParent(parent, false);
         inputArrow.transform.localPosition = Vector3.zero;
-        inputArrow.transform.localRotation = Quaternion.identity;
-        inputArrow.transform.localScale = Vector3.one;
+        inputArrow.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        inputArrow.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 
         return inputArrow;
     }
