@@ -23,7 +23,8 @@ public class ConstructionEditor : Editor
     private const string ENVIRONMENT_MESH_NAME = "EnvironmentMesh";
     private const string DEFAULT_EXPORT_FOLDER_PATH = "Assets/Graphic/Factory/Constructions";
     private const string UI_ARROW_PREFAB_PATH = "Assets/Graphic/Arrow/2DArrow/UIArrow.prefab";
-    private const string GROUND_MATERIAL_PATH = "Assets/Materials/Dirt.mat";
+    private const string DIRT_MATERIAL_PATH = "Assets/Materials/Dirt.mat";
+    private const string GRASS_MATERIAL_PATH = "Assets/Materials/Grass.mat";
     private const string ID_PROPERTY = "_id";
     private const string DATA_PROPERTY = "_data";
     private const string SIZE_PROPERTY = "_size";
@@ -145,7 +146,7 @@ public class ConstructionEditor : Editor
         {
             var stage = CreateChild(graphic.transform, $"Stage{i}{NOT_OPTIMIZED_SUFFIX}");
 
-            CreateDefaultGround(stage.transform);
+            CreateDefaultGround(stage.transform, GetGroundMaterialPath(constructionPrefix));
             var environment = CreateChild(stage.transform, ENVIRONMENT_NAME);
             SetLayerRecursively(environment, ENVIRONMENT_NAME);
 
@@ -688,7 +689,12 @@ public class ConstructionEditor : Editor
         return inputArrow;
     }
 
-    private static GameObject CreateDefaultGround(Transform parent)
+    private static string GetGroundMaterialPath(string constructionPrefix)
+    {
+        return constructionPrefix == "Road" ? DIRT_MATERIAL_PATH : GRASS_MATERIAL_PATH;
+    }
+
+    private static GameObject CreateDefaultGround(Transform parent, string groundMaterialPath)
     {
         var ground = GameObject.CreatePrimitive(PrimitiveType.Quad);
         ground.name = GROUND_NAME;
@@ -696,7 +702,7 @@ public class ConstructionEditor : Editor
         DestroyImmediate(ground.GetComponent<Collider>());
         ApplyGroundTransform(ground.transform, new Vector2Int(8, 8));
 
-        var groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(GROUND_MATERIAL_PATH);
+        var groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(groundMaterialPath);
         if (groundMaterial != null && ground.TryGetComponent<MeshRenderer>(out var meshRenderer))
             meshRenderer.sharedMaterial = groundMaterial;
 
