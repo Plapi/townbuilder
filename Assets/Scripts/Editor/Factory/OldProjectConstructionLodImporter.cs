@@ -10,7 +10,7 @@ public class OldProjectConstructionLodImporter : EditorWindow
     private const string DefaultDestinationRoot = "Assets/Graphic/OldProject";
     private const string DefaultImportedMaterialsFolder = "Assets/Graphic/OldProject/Materials";
     private const string MenuPath = "TownCrafter/Import Old Project Construction LODs";
-    private const string SharedLodFolderName = "_SharedLodGroups";
+    private const string SharedPrefabFolderName = "_SharedPrefabGroups";
     private const string SourceFolderPrefsKey = "TownCrafter.OldProjectConstructionLodImporter.SourceFolder";
     private const string DestinationRootPrefsKey = "TownCrafter.OldProjectConstructionLodImporter.DestinationRoot";
     private const string OverwriteExistingPrefsKey = "TownCrafter.OldProjectConstructionLodImporter.OverwriteExisting";
@@ -47,8 +47,8 @@ public class OldProjectConstructionLodImporter : EditorWindow
         EditorGUILayout.LabelField("Old Project Construction LOD Importer", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
             "Select a folder from another Unity project that contains construction .asset files. " +
-            "The importer reads each asset's lodGroups, copies those referenced prefab folders into this project, " +
-            "repairs unresolved material references by name, and creates a parent prefab containing one child prefab instance per LOD group.",
+            "The importer reads each asset's lodGroups and frontFences, copies those referenced prefab folders into this project, " +
+            "repairs unresolved material references by name, and creates a parent prefab containing LOD and front-fence prefab instances.",
             MessageType.Info);
 
         using (new EditorGUILayout.HorizontalScope())
@@ -107,7 +107,7 @@ public class OldProjectConstructionLodImporter : EditorWindow
         var constructionAssets = FindConstructionAssets(sourceFolder);
         if (constructionAssets.Count == 0)
         {
-            _lastResult = $"No construction .asset files with lodGroups found under:\n{sourceFolder}";
+            _lastResult = $"No construction .asset files with lodGroups or frontFences found under:\n{sourceFolder}";
             return;
         }
 
@@ -115,13 +115,13 @@ public class OldProjectConstructionLodImporter : EditorWindow
         {
             EnsureAssetFolder(_destinationRoot);
             var guidMap = BuildGuidMap(sourceAssetsRoot);
-            var lodGuidUseCounts = CountLodGuidUses(constructionAssets);
-            var copiedLodPrefabPathsByGuid = new Dictionary<string, string>();
+            var referencedGuidUseCounts = CountReferencedGuidUses(constructionAssets);
+            var copiedPrefabPathsByGuid = new Dictionary<string, string>();
             var materialResolver = new MaterialReferenceResolver(guidMap);
             var log = new List<string>();
 
             foreach (var constructionAssetPath in constructionAssets)
-                ImportConstruction(constructionAssetPath, guidMap, lodGuidUseCounts, copiedLodPrefabPathsByGuid, materialResolver, log);
+                ImportConstruction(constructionAssetPath, guidMap, referencedGuidUseCounts, copiedPrefabPathsByGuid, materialResolver, log);
 
             _lastResult = string.Join("\n", log);
         }
@@ -139,13 +139,14 @@ public class OldProjectConstructionLodImporter : EditorWindow
     private void ImportConstruction(
         string constructionAssetPath,
         IReadOnlyDictionary<string, string> guidMap,
-        IReadOnlyDictionary<string, int> lodGuidUseCounts,
-        IDictionary<string, string> copiedLodPrefabPathsByGuid,
+        IReadOnlyDictionary<string, int> referencedGuidUseCounts,
+        IDictionary<string, string> copiedPrefabPathsByGuid,
         MaterialReferenceResolver materialResolver,
         List<string> log)
     {
         var constructionName = GetConstructionName(constructionAssetPath);
-        var lodGuids = ReadLodGuids(constructionAssetPath);
+        var lodGuids = ReadGuidList(constructionAssetPath, "lodGroups");
+        var frontFenceGuids = ReadGuidList(constructionAssetPath, "frontFences");
 
         if (lodGuids.Count == 0)
         {
@@ -171,100 +172,147 @@ public class OldProjectConstructionLodImporter : EditorWindow
         var copiedLodPrefabPaths = new List<string>();
         for (int i = 0; i < lodGuids.Count; i++)
         {
-            var guid = lodGuids[i];
-            if (copiedLodPrefabPathsByGuid.TryGetValue(guid, out var alreadyCopiedPath))
-            {
-                copiedLodPrefabPaths.Add(alreadyCopiedPath);
-                continue;
-            }
+            if (TryCopyReferencedPrefab(
+                    lodGuids[i],
+                    $"LOD {i}",
+                    constructionName,
+                    constructionFolder,
+                    guidMap,
+                    referencedGuidUseCounts,
+                    copiedPrefabPathsByGuid,
+                    materialResolver,
+                    log,
+                    out var copiedPrefabPath))
+                copiedLodPrefabPaths.Add(copiedPrefabPath);
+        }
 
-            var existingAssetPath = AssetDatabase.GUIDToAssetPath(guid);
-            if (!_overwriteExisting && !string.IsNullOrEmpty(existingAssetPath))
-            {
-                copiedLodPrefabPathsByGuid[guid] = existingAssetPath;
-                copiedLodPrefabPaths.Add(existingAssetPath);
-                continue;
-            }
-
-            if (!guidMap.TryGetValue(guid, out var oldPrefabPath) || !File.Exists(oldPrefabPath))
-            {
-                log.Add($"  Missing LOD {i} for {constructionName}: {guid}");
-                continue;
-            }
-
-            var sourceLodFolder = Path.GetDirectoryName(oldPrefabPath);
-            if (string.IsNullOrEmpty(sourceLodFolder) || !Directory.Exists(sourceLodFolder))
-            {
-                log.Add($"  Missing LOD folder for {constructionName}: {oldPrefabPath}");
-                continue;
-            }
-
-            var lodFolderName = SanitizeFileName(Path.GetFileName(sourceLodFolder));
-            if (string.IsNullOrEmpty(lodFolderName))
-                lodFolderName = $"LOD{i}";
-
-            var shouldUseSharedFolder = lodGuidUseCounts.TryGetValue(guid, out var useCount) && useCount > 1;
-            var lodParentFolder = shouldUseSharedFolder
-                ? AssetPathCombine(_destinationRoot, SharedLodFolderName)
-                : constructionFolder;
-            EnsureAssetFolder(lodParentFolder);
-
-            var destinationLodFolderName = shouldUseSharedFolder
-                ? $"{lodFolderName}_{guid.Substring(0, 8)}"
-                : lodFolderName;
-            var destinationLodFolder = AssetPathCombine(lodParentFolder, destinationLodFolderName);
-            if (AssetDatabase.IsValidFolder(destinationLodFolder) || Directory.Exists(destinationLodFolder))
-            {
-                FileUtil.DeleteFileOrDirectory(destinationLodFolder);
-                FileUtil.DeleteFileOrDirectory($"{destinationLodFolder}.meta");
-            }
-
-            FileUtil.CopyFileOrDirectory(sourceLodFolder, destinationLodFolder);
-
-            var sourceMetaPath = $"{sourceLodFolder}.meta";
-            if (File.Exists(sourceMetaPath))
-                FileUtil.CopyFileOrDirectory(sourceMetaPath, $"{destinationLodFolder}.meta");
-
-            RepairMaterialReferences(destinationLodFolder, materialResolver, log);
-
-            var copiedPrefabPath = AssetPathCombine(destinationLodFolder, Path.GetFileName(oldPrefabPath));
-            AssetDatabase.ImportAsset(destinationLodFolder, ImportAssetOptions.ImportRecursive);
-            copiedLodPrefabPathsByGuid[guid] = copiedPrefabPath;
-            copiedLodPrefabPaths.Add(copiedPrefabPath);
+        var copiedFrontFencePrefabPaths = new List<string>();
+        for (int i = 0; i < frontFenceGuids.Count; i++)
+        {
+            if (TryCopyReferencedPrefab(
+                    frontFenceGuids[i],
+                    $"front fence {i}",
+                    constructionName,
+                    constructionFolder,
+                    guidMap,
+                    referencedGuidUseCounts,
+                    copiedPrefabPathsByGuid,
+                    materialResolver,
+                    log,
+                    out var copiedPrefabPath))
+                copiedFrontFencePrefabPaths.Add(copiedPrefabPath);
         }
 
         AssetDatabase.ImportAsset(constructionFolder, ImportAssetOptions.ImportRecursive);
-        CreateParentPrefab(constructionName, constructionFolder, copiedLodPrefabPaths, log);
+        CreateParentPrefab(constructionName, constructionFolder, copiedLodPrefabPaths, copiedFrontFencePrefabPaths, log);
     }
 
-    private static void CreateParentPrefab(string constructionName, string constructionFolder, IReadOnlyList<string> lodPrefabPaths, List<string> log)
+    private bool TryCopyReferencedPrefab(
+        string guid,
+        string label,
+        string constructionName,
+        string constructionFolder,
+        IReadOnlyDictionary<string, string> guidMap,
+        IReadOnlyDictionary<string, int> referencedGuidUseCounts,
+        IDictionary<string, string> copiedPrefabPathsByGuid,
+        MaterialReferenceResolver materialResolver,
+        List<string> log,
+        out string copiedPrefabPath)
+    {
+        copiedPrefabPath = "";
+
+        if (copiedPrefabPathsByGuid.TryGetValue(guid, out var alreadyCopiedPath))
+        {
+            copiedPrefabPath = alreadyCopiedPath;
+            return true;
+        }
+
+        var existingAssetPath = AssetDatabase.GUIDToAssetPath(guid);
+        if (!_overwriteExisting && !string.IsNullOrEmpty(existingAssetPath))
+        {
+            copiedPrefabPathsByGuid[guid] = existingAssetPath;
+            copiedPrefabPath = existingAssetPath;
+            return true;
+        }
+
+        if (!guidMap.TryGetValue(guid, out var oldPrefabPath) || !File.Exists(oldPrefabPath))
+        {
+            log.Add($"  Missing {label} for {constructionName}: {guid}");
+            return false;
+        }
+
+        var sourceFolder = Path.GetDirectoryName(oldPrefabPath);
+        if (string.IsNullOrEmpty(sourceFolder) || !Directory.Exists(sourceFolder))
+        {
+            log.Add($"  Missing {label} folder for {constructionName}: {oldPrefabPath}");
+            return false;
+        }
+
+        var folderName = SanitizeFileName(Path.GetFileName(sourceFolder));
+        if (string.IsNullOrEmpty(folderName))
+            folderName = SanitizeFileName(label.Replace(" ", ""));
+
+        var shouldUseSharedFolder = referencedGuidUseCounts.TryGetValue(guid, out var useCount) && useCount > 1;
+        var parentFolder = shouldUseSharedFolder
+            ? AssetPathCombine(_destinationRoot, SharedPrefabFolderName)
+            : constructionFolder;
+        EnsureAssetFolder(parentFolder);
+
+        var destinationFolderName = shouldUseSharedFolder
+            ? $"{folderName}_{guid.Substring(0, 8)}"
+            : folderName;
+        var destinationFolder = AssetPathCombine(parentFolder, destinationFolderName);
+        if (AssetDatabase.IsValidFolder(destinationFolder) || Directory.Exists(destinationFolder))
+        {
+            FileUtil.DeleteFileOrDirectory(destinationFolder);
+            FileUtil.DeleteFileOrDirectory($"{destinationFolder}.meta");
+        }
+
+        FileUtil.CopyFileOrDirectory(sourceFolder, destinationFolder);
+
+        var sourceMetaPath = $"{sourceFolder}.meta";
+        if (File.Exists(sourceMetaPath))
+            FileUtil.CopyFileOrDirectory(sourceMetaPath, $"{destinationFolder}.meta");
+
+        RepairMaterialReferences(destinationFolder, materialResolver, log);
+
+        copiedPrefabPath = AssetPathCombine(destinationFolder, Path.GetFileName(oldPrefabPath));
+        AssetDatabase.ImportAsset(destinationFolder, ImportAssetOptions.ImportRecursive);
+        copiedPrefabPathsByGuid[guid] = copiedPrefabPath;
+        return true;
+    }
+
+    private static void CreateParentPrefab(
+        string constructionName,
+        string constructionFolder,
+        IReadOnlyList<string> lodPrefabPaths,
+        IReadOnlyList<string> frontFencePrefabPaths,
+        List<string> log)
     {
         var root = new GameObject(constructionName);
 
         try
         {
             var createdCount = 0;
-            for (int i = 0; i < lodPrefabPaths.Count; i++)
+            createdCount += InstantiatePrefabChildren(root.transform, lodPrefabPaths, "LOD", log);
+
+            var frontFenceCount = 0;
+            if (frontFencePrefabPaths.Count > 0)
             {
-                var lodPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(lodPrefabPaths[i]);
-                if (lodPrefab == null)
-                {
-                    log.Add($"  Could not load copied LOD prefab: {lodPrefabPaths[i]}");
-                    continue;
-                }
-
-                var instance = PrefabUtility.InstantiatePrefab(lodPrefab) as GameObject;
-                if (instance == null)
-                    instance = Instantiate(lodPrefab);
-
-                instance.name = $"LOD{i}_{lodPrefab.name}";
-                instance.transform.SetParent(root.transform, false);
-                createdCount++;
+                var frontFencesRoot = new GameObject("FrontFences");
+                frontFencesRoot.transform.SetParent(root.transform, false);
+                frontFenceCount = InstantiatePrefabChildren(
+                    frontFencesRoot.transform,
+                    frontFencePrefabPaths,
+                    "FrontFence",
+                    log,
+                    true,
+                    Vector3.back * 10f);
             }
 
             var prefabPath = AssetPathCombine(constructionFolder, $"{SanitizeFileName(constructionName)}.prefab");
             PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
-            log.Add($"Imported {constructionName}: {createdCount} LOD prefab children -> {prefabPath}");
+            log.Add($"Imported {constructionName}: {createdCount} LOD prefab children, {frontFenceCount} front fence prefab children -> {prefabPath}");
         }
         finally
         {
@@ -272,12 +320,55 @@ public class OldProjectConstructionLodImporter : EditorWindow
         }
     }
 
+    private static int InstantiatePrefabChildren(
+        Transform parent,
+        IReadOnlyList<string> prefabPaths,
+        string label,
+        List<string> log)
+    {
+        return InstantiatePrefabChildren(parent, prefabPaths, label, log, false, Vector3.zero);
+    }
+
+    private static int InstantiatePrefabChildren(
+        Transform parent,
+        IReadOnlyList<string> prefabPaths,
+        string label,
+        List<string> log,
+        bool onlyFirstActive,
+        Vector3 localPosition)
+    {
+        var createdCount = 0;
+        for (int i = 0; i < prefabPaths.Count; i++)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPaths[i]);
+            if (prefab == null)
+            {
+                log.Add($"  Could not load copied {label} prefab: {prefabPaths[i]}");
+                continue;
+            }
+
+            var instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            if (instance == null)
+                instance = Instantiate(prefab);
+
+            instance.name = $"{label}{i}_{prefab.name}";
+            instance.transform.SetParent(parent, false);
+            instance.transform.localPosition = localPosition;
+            if (onlyFirstActive)
+                instance.SetActive(i == 0);
+
+            createdCount++;
+        }
+
+        return createdCount;
+    }
+
     private static List<string> FindConstructionAssets(string sourceFolder)
     {
         var result = new List<string>();
         foreach (var assetPath in Directory.EnumerateFiles(sourceFolder, "*.asset", SearchOption.AllDirectories))
         {
-            if (ReadLodGuids(assetPath).Count > 0)
+            if (ReadGuidList(assetPath, "lodGroups").Count > 0 || ReadGuidList(assetPath, "frontFences").Count > 0)
                 result.Add(assetPath);
         }
 
@@ -302,35 +393,41 @@ public class OldProjectConstructionLodImporter : EditorWindow
         return result;
     }
 
-    private static Dictionary<string, int> CountLodGuidUses(IEnumerable<string> constructionAssets)
+    private static Dictionary<string, int> CountReferencedGuidUses(IEnumerable<string> constructionAssets)
     {
         var result = new Dictionary<string, int>();
         foreach (var constructionAsset in constructionAssets)
         {
-            foreach (var guid in ReadLodGuids(constructionAsset))
-            {
-                if (!result.ContainsKey(guid))
-                    result[guid] = 0;
-
-                result[guid]++;
-            }
+            CountGuidUses(ReadGuidList(constructionAsset, "lodGroups"), result);
+            CountGuidUses(ReadGuidList(constructionAsset, "frontFences"), result);
         }
 
         return result;
     }
 
-    private static List<string> ReadLodGuids(string constructionAssetPath)
+    private static void CountGuidUses(IEnumerable<string> guids, IDictionary<string, int> result)
+    {
+        foreach (var guid in guids)
+        {
+            if (!result.ContainsKey(guid))
+                result[guid] = 0;
+
+            result[guid]++;
+        }
+    }
+
+    private static List<string> ReadGuidList(string constructionAssetPath, string fieldName)
     {
         var result = new List<string>();
-        var foundLodGroups = false;
+        var foundField = false;
 
         foreach (var line in File.ReadLines(constructionAssetPath))
         {
             var trimmedLine = line.Trim();
 
-            if (!foundLodGroups)
+            if (!foundField)
             {
-                foundLodGroups = trimmedLine == "lodGroups:";
+                foundField = trimmedLine == $"{fieldName}:";
                 continue;
             }
 
