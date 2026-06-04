@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4a2f3e8f85e4d8ca9e5d0b590d7a2c4, type: 3}
+  m_Name: ConstructionGroupedFenceCatalog
+  m_EditorClassIdentifier: 
+  _groups:
+  - _name: White Fence
+    _post: {fileID: 1440861179559792, guid: f5e7ac56f11b36342a85905dbff7ad28, type: 3}
+    _fence: {fileID: 1326242154806616, guid: 6feb631b9ce5ff940802dd0f457bf373, type: 3}
+  - _name: Wood Fence
+    _post: {fileID: 1330766047959420, guid: 957c0d3270bfd844aba900730d2fbad9, type: 3}
+    _fence: {fileID: 1719411279065754, guid: ffe16f9903d0b604aab93d16dfb3281d, type: 3}
+  - _name: City Fence
+    _post: {fileID: 141732, guid: 283736ea9955d7141bd3a4b0a155ddb7, type: 3}
+    _fence: {fileID: 159082, guid: cc10ce20cd2faea4ca8cb6505e5861d5, type: 3}
+  - _name: Concrete Fence
+    _post: {fileID: 1847739559296990, guid: e530ecd98d6a5d541b12fe59c564d311, type: 3}
+    _fence: {fileID: 1281240773930694, guid: 5864addef94c23c458de5835888882f7, type: 3}
+  - _name: Brick Fence
+    _post: {fileID: 1351921354885988, guid: 4ce45eafddcef5749933970b0aa5d275, type: 3}
+    _fence: {fileID: 1657986956626262, guid: 6b382d32b7d509e4b885188831f263b8, type: 3}
