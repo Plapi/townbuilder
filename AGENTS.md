@@ -94,6 +94,7 @@ This file is the first source of truth for Codex sessions in this repo. Keep it 
 ## Common Task Hints
 
 - Adding a new buildable entity usually touches the entity class, data asset, prefab/visual, UI/build state, and save data if it has runtime state.
+- Non-optimized construction editor creation is in `Assets/Scripts/Editor/Factory/ConstructionEditor.cs`; it creates typed constructions from existing numbered `ConstructionData` assets. Current prefixes include `House`, `Shop` for commercial, `Road`, `Church`, and `Park`, and construction inputs should be `Inputs/Input0/UIArrow` and `Inputs/Input1/UIArrow`.
 - Adding a new resource item usually touches `ResourceItemType`, a `ResourceItemData` asset, and any recipes or construction requirements that consume it.
 - Build-mode behavior usually belongs in `GameStateBuild*` classes and should use `FactorySystem.OnBuildEnter/OnBuildExit`.
 - Entity inspection or state transitions usually belong in `GameSystem` states, not directly in UI components.

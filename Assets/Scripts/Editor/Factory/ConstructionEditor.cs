@@ -21,9 +21,11 @@ public class ConstructionEditor : Editor
     private const string NOT_OPTIMIZED_SUFFIX = "NotOptimized";
     private const string OPTIMIZED_SUFFIX = "Optimized";
     private const string ENVIRONMENT_MESH_NAME = "EnvironmentMesh";
-    private const string DEFAULT_CONSTRUCTION_NAME = "NewConstructionNotOptimized";
     private const string DEFAULT_EXPORT_FOLDER_PATH = "Assets/Graphic/Factory/Constructions";
+    private const string UI_ARROW_PREFAB_PATH = "Assets/Graphic/Arrow/2DArrow/UIArrow.prefab";
     private const string GROUND_MATERIAL_PATH = "Assets/Materials/Dirt.mat";
+    private const string ID_PROPERTY = "_id";
+    private const string DATA_PROPERTY = "_data";
     private const string SIZE_PROPERTY = "_size";
     private const string CONSTRUCTION_PROPERTY = "_construction";
     private const string NOT_STARTED_STICK_GUID = "957c0d3270bfd844aba900730d2fbad9";
@@ -84,7 +86,53 @@ public class ConstructionEditor : Editor
     [MenuItem("TownCrafter/Construction/Create Not Optimized Construction")]
     private static void CreateNotOptimizedConstruction()
     {
-        var root = new GameObject(DEFAULT_CONSTRUCTION_NAME);
+        CreateNotOptimizedConstruction("House");
+    }
+
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction/House")]
+    private static void CreateHouseNotOptimizedConstruction()
+    {
+        CreateNotOptimizedConstruction("House");
+    }
+
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction/Commercial")]
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction/Comercial")]
+    private static void CreateCommercialNotOptimizedConstruction()
+    {
+        CreateNotOptimizedConstruction("Shop");
+    }
+
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction/Road")]
+    private static void CreateRoadNotOptimizedConstruction()
+    {
+        CreateNotOptimizedConstruction("Road");
+    }
+
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction/Church")]
+    private static void CreateChurchNotOptimizedConstruction()
+    {
+        CreateNotOptimizedConstruction("Church");
+    }
+
+    [MenuItem("TownCrafter/Construction/Create Not Optimized Construction/Park")]
+    private static void CreateParkNotOptimizedConstruction()
+    {
+        CreateNotOptimizedConstruction("Park");
+    }
+
+    private static void CreateNotOptimizedConstruction(string constructionPrefix)
+    {
+        var inputArrowPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(UI_ARROW_PREFAB_PATH);
+        if (inputArrowPrefab == null)
+        {
+            Debug.LogError($"Create construction failed: missing input arrow prefab '{UI_ARROW_PREFAB_PATH}'.");
+            return;
+        }
+
+        if (!TryDuplicateNextConstructionData(constructionPrefix, out var constructionName, out var constructionData))
+            return;
+
+        var root = new GameObject(constructionName);
         SetLayerRecursively(root, ENVIRONMENT_NAME);
         Undo.RegisterCreatedObjectUndo(root, "Create Not Optimized Construction");
 
@@ -109,17 +157,95 @@ public class ConstructionEditor : Editor
             stages.Add(stage);
         }
 
-        var input0 = CreateChild(inputs.transform, "Input0");
-        input0.transform.localPosition = new Vector3(0f, 0f, -1f);
+        var input0 = CreateInput(inputs.transform, "Input0", new Vector3(0f, 0f, -1f), inputArrowPrefab);
+        var input1 = CreateInput(inputs.transform, "Input1", new Vector3(3f, 0f, -1f), inputArrowPrefab);
+        if (input0 == null || input1 == null)
+        {
+            Object.DestroyImmediate(root);
+            return;
+        }
 
-        var input1 = CreateChild(inputs.transform, "Input1");
-        input1.transform.localPosition = new Vector3(3f, 0f, -1f);
-
-        AssignTemplateReferences(construction, stages, new[] { input0.transform, input1.transform });
+        AssignTemplateReferences(construction, stages, new[] { input0.transform, input1.transform }, constructionData, constructionName);
 
         Selection.activeGameObject = root;
         EditorGUIUtility.PingObject(root);
         EditorSceneManager.MarkSceneDirty(root.scene);
+    }
+
+    private static bool TryDuplicateNextConstructionData(string constructionPrefix, out string constructionName, out ConstructionData constructionData)
+    {
+        constructionName = null;
+        constructionData = null;
+
+        if (!TryFindLatestConstructionData(constructionPrefix, out var sourcePath, out var sourceIndex))
+        {
+            Debug.LogError($"Create construction failed: no ConstructionData asset found for prefix '{constructionPrefix}'.");
+            return false;
+        }
+
+        constructionName = $"{constructionPrefix}{sourceIndex + 1}";
+        var sourceFolder = Path.GetDirectoryName(sourcePath)?.Replace('\\', '/');
+        if (string.IsNullOrEmpty(sourceFolder) || !AssetDatabase.IsValidFolder(sourceFolder))
+        {
+            Debug.LogError($"Create construction failed: source ConstructionData folder is invalid for '{sourcePath}'.");
+            return false;
+        }
+
+        var destinationPath = $"{sourceFolder}/{constructionName}.asset";
+        if (File.Exists(destinationPath))
+        {
+            Debug.LogError($"Create construction failed: ConstructionData already exists at '{destinationPath}'.");
+            return false;
+        }
+
+        if (!AssetDatabase.CopyAsset(sourcePath, destinationPath))
+        {
+            Debug.LogError($"Create construction failed: could not duplicate '{sourcePath}' to '{destinationPath}'.");
+            return false;
+        }
+
+        AssetDatabase.ImportAsset(destinationPath);
+        constructionData = AssetDatabase.LoadAssetAtPath<ConstructionData>(destinationPath);
+        if (constructionData == null)
+        {
+            Debug.LogError($"Create construction failed: duplicated asset is not a ConstructionData at '{destinationPath}'.");
+            return false;
+        }
+
+        ((Object)constructionData).name = constructionName;
+        constructionData.name = constructionName;
+        constructionData.icon = null;
+        EditorUtility.SetDirty(constructionData);
+        AssetDatabase.SaveAssets();
+
+        return true;
+    }
+
+    private static bool TryFindLatestConstructionData(string constructionPrefix, out string assetPath, out int index)
+    {
+        assetPath = null;
+        index = -1;
+
+        var nameRegex = new Regex($"^{Regex.Escape(constructionPrefix)}(\\d+)$", RegexOptions.Compiled);
+        var guids = AssetDatabase.FindAssets("t:ConstructionData");
+
+        foreach (var guid in guids)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            var fileName = Path.GetFileNameWithoutExtension(path);
+            var match = nameRegex.Match(fileName);
+            if (!match.Success)
+                continue;
+
+            var currentIndex = int.Parse(match.Groups[1].Value);
+            if (currentIndex <= index)
+                continue;
+
+            assetPath = path;
+            index = currentIndex;
+        }
+
+        return !string.IsNullOrEmpty(assetPath);
     }
 
     private void AutoAssignExportFolderIfNeeded()
@@ -534,6 +660,34 @@ public class ConstructionEditor : Editor
         return child;
     }
 
+    private static GameObject CreateInput(Transform parent, string inputName, Vector3 localPosition, GameObject inputArrowPrefab)
+    {
+        var input = CreateChild(parent, inputName);
+        input.transform.localPosition = localPosition;
+
+        if (CreateInputArrow(input.transform, inputArrowPrefab) == null)
+            return null;
+
+        return input;
+    }
+
+    private static GameObject CreateInputArrow(Transform parent, GameObject inputArrowPrefab)
+    {
+        var inputArrow = (GameObject)PrefabUtility.InstantiatePrefab(inputArrowPrefab);
+        if (inputArrow == null)
+        {
+            Debug.LogError($"Create construction failed: could not instantiate '{UI_ARROW_PREFAB_PATH}'.");
+            return null;
+        }
+
+        inputArrow.transform.SetParent(parent, false);
+        inputArrow.transform.localPosition = Vector3.zero;
+        inputArrow.transform.localRotation = Quaternion.identity;
+        inputArrow.transform.localScale = Vector3.one;
+
+        return inputArrow;
+    }
+
     private static GameObject CreateDefaultGround(Transform parent)
     {
         var ground = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -581,9 +735,22 @@ public class ConstructionEditor : Editor
         EditorUtility.SetDirty(placer);
     }
 
-    private static void AssignTemplateReferences(Construction construction, List<GameObject> stages, Transform[] inputs)
+    private static void AssignTemplateReferences(
+        Construction construction,
+        List<GameObject> stages,
+        Transform[] inputs,
+        ConstructionData constructionData,
+        string constructionId)
     {
         var serializedConstruction = new SerializedObject(construction);
+
+        var idProperty = serializedConstruction.FindProperty(ID_PROPERTY);
+        if (idProperty != null)
+            idProperty.stringValue = constructionId;
+
+        var dataProperty = serializedConstruction.FindProperty(DATA_PROPERTY);
+        if (dataProperty != null)
+            dataProperty.objectReferenceValue = constructionData;
 
         var sizeProperty = serializedConstruction.FindProperty(SIZE_PROPERTY);
         if (sizeProperty != null)
