@@ -143,7 +143,14 @@ namespace com.Plapamaru.TownCrafter.Factory
             _selectedGroupIndexProperty.intValue = Mathf.Clamp(_selectedGroupIndexProperty.intValue, 0, names.Length - 1);
 
             EditorGUILayout.Space();
+            EditorGUI.BeginChangeCheck();
             _selectedGroupIndexProperty.intValue = EditorGUILayout.Popup("Fence Group", _selectedGroupIndexProperty.intValue, names);
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                RegenerateFenceIfPossible();
+                serializedObject.Update();
+            }
         }
 
         private void TryAssignDefaultCatalog()
@@ -206,6 +213,14 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             EditorUtility.SetDirty(placer);
             EditorSceneManager.MarkSceneDirty(placer.gameObject.scene);
+        }
+
+        private void RegenerateFenceIfPossible()
+        {
+            if (!CanGenerate())
+                return;
+
+            GenerateFence();
         }
 
         private static void CreateSide(
