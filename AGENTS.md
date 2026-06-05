@@ -74,6 +74,14 @@ This file is the first source of truth for Codex sessions in this repo. Keep it 
 - Build UI uses `UIBuildPanel` and `UIButtonType` for confirm, rotate, and close actions.
 - DOTween is used for UI fades; UniTask cancellation tokens are used for async UI operations.
 
+### Rendering Layers And Cameras
+
+- Custom render layers include `Terrain`, `Ground`, `Grid`, `Environment`, `Interactable`, and `Highlight`.
+- `Terrain` is Unity layer index `10` and is represented in `LayerType`.
+- `Assets/Scenes/Game/Game.unity` uses URP camera stacking for gameplay layers. Current world render order is `Terrain -> Ground -> Grid -> Environment -> Interactable -> Highlight`.
+- Overlay cameras are children of `MainCamera` and use `OverlayCameraSync` to copy camera lens settings from the base camera.
+- Keep scene terrain objects such as `Terrain`, `FlatTerrain0`, `FlatTerrain1`, and `River` on the `Terrain` layer so `OverlayCamera_Terrain` renders them.
+
 ### Data And Configuration
 
 - `FactoryConfig` is a `ScriptableObjectSingleton<FactoryConfig>` and is stored in `Assets/Resources/FactoryConfig.asset`.
