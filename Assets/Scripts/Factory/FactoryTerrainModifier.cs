@@ -17,6 +17,9 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private TerrainLayer _constructionLayer;
         [SerializeField] private TerrainLayer _roadLayer;
 
+        [Header("Holes")]
+        [SerializeField, Min(0f)] private float _holeInset = 0.1f;
+
         private readonly Dictionary<Terrain, TerrainData> _runtimeTerrainDataByTerrain = new Dictionary<Terrain, TerrainData>();
 
         private void PaintArea(TerrainPaintLayer paintLayer, TerrainPaintArea area)
@@ -50,7 +53,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             var area = CreateArea(construction.transform, construction.Size);
 
             PaintArea(paintLayer, area);
-            SetAreaHole(area, createHole);
+            SetAreaHole(area.Offset(-_holeInset), createHole);
         }
 
         private static TerrainPaintArea CreateArea(Transform areaTransform, Vector2 size)
@@ -194,7 +197,6 @@ namespace com.Plapamaru.TownCrafter.Factory
             return !string.IsNullOrEmpty(value) &&
                    value.IndexOf("road", StringComparison.OrdinalIgnoreCase) >= 0;
         }
-
     }
 
     public enum TerrainPaintLayer
@@ -230,6 +232,22 @@ namespace com.Plapamaru.TownCrafter.Factory
                    localZ >= 0f &&
                    localX <= Size.x &&
                    localZ <= Size.y;
+        }
+
+        public TerrainPaintArea Offset(float offset)
+        {
+            if (Mathf.Approximately(offset, 0f))
+                return this;
+
+            var offsetSize = Size + Vector2.one * (offset * 2f);
+            if (offsetSize.x <= 0f || offsetSize.y <= 0f)
+                return this;
+
+            return new TerrainPaintArea(
+                Origin - Right * offset - Forward * offset,
+                Right,
+                Forward,
+                offsetSize);
         }
     }
 }

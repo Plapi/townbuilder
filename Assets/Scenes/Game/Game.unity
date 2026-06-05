@@ -23214,6 +23214,7 @@ MonoBehaviour:
   _defaultLayer: {fileID: 8574412962073106934, guid: 125ce5c8840417b4ab3c43e1a2ed0042, type: 2}
   _constructionLayer: {fileID: 8574412962073106934, guid: a86fb074af234184d922b6e706995a72, type: 2}
   _roadLayer: {fileID: 8574412962073106934, guid: da66f7193a76906429fb00f235e99cb3, type: 2}
+  _holeInset: 0.04
 --- !u!1 &1746708724
 GameObject:
   m_ObjectHideFlags: 0
