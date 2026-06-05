@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using com.Plapamaru.Singletons;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace com.Plapamaru.TownCrafter.Factory
 {
     [ExecuteAlways]
@@ -20,6 +16,8 @@ namespace com.Plapamaru.TownCrafter.Factory
         [SerializeField] private TerrainLayer _defaultLayer;
         [SerializeField] private TerrainLayer _constructionLayer;
         [SerializeField] private TerrainLayer _roadLayer;
+
+        private readonly Dictionary<Terrain, TerrainData> _runtimeTerrainDataByTerrain = new Dictionary<Terrain, TerrainData>();
 
         private void PaintArea(TerrainPaintLayer paintLayer, TerrainPaintArea area)
         {
@@ -48,9 +46,6 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         public void ApplyConstructionArea(Construction construction, bool createHole)
         {
-            if (construction == null)
-                return;
-
             var paintLayer = IsRoad(construction) ? TerrainPaintLayer.Road : TerrainPaintLayer.Construction;
             var area = CreateArea(construction.transform, construction.Size);
 
@@ -89,14 +84,9 @@ namespace com.Plapamaru.TownCrafter.Factory
             return terrain != null && terrain.terrainData != null;
         }
 
-        private static void PaintTerrainArea(Terrain terrain, TerrainLayer terrainLayer, TerrainPaintArea area)
+        private void PaintTerrainArea(Terrain terrain, TerrainLayer terrainLayer, TerrainPaintArea area)
         {
-            var terrainData = terrain.terrainData;
-
-#if UNITY_EDITOR
-            RegisterTerrainDataUndo(terrainData, "Paint Terrain Area");
-#endif
-
+            var terrainData = GetWritableTerrainData(terrain);
             var layerIndex = EnsureTerrainLayer(terrainData, terrainLayer);
             var width = terrainData.alphamapWidth;
             var height = terrainData.alphamapHeight;
@@ -122,20 +112,15 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             terrainData.SetAlphamaps(0, 0, alphaMaps);
-            MarkTerrainDataDirty(terrainData);
         }
 
-        private static void SetTerrainHoleArea(Terrain terrain, TerrainPaintArea area, bool isHole)
+        private void SetTerrainHoleArea(Terrain terrain, TerrainPaintArea area, bool isHole)
         {
-            var terrainData = terrain.terrainData;
+            var terrainData = GetWritableTerrainData(terrain);
             var resolution = terrainData.holesResolution;
 
             if (resolution <= 0)
                 return;
-
-#if UNITY_EDITOR
-            RegisterTerrainDataUndo(terrainData, isHole ? "Create Terrain Hole" : "Restore Terrain Hole");
-#endif
 
             var holes = terrainData.GetHoles(0, 0, resolution, resolution);
             var visible = !isHole;
@@ -156,7 +141,29 @@ namespace com.Plapamaru.TownCrafter.Factory
             }
 
             terrainData.SetHoles(0, 0, holes);
-            MarkTerrainDataDirty(terrainData);
+        }
+
+        private TerrainData GetWritableTerrainData(Terrain terrain)
+        {
+            if (!Application.isPlaying)
+                return terrain.terrainData;
+
+            if (_runtimeTerrainDataByTerrain.TryGetValue(terrain, out var runtimeTerrainData))
+                return runtimeTerrainData;
+
+            var sourceTerrainData = terrain.terrainData;
+            runtimeTerrainData = Instantiate(sourceTerrainData);
+            runtimeTerrainData.name = $"{sourceTerrainData.name} Runtime";
+            terrain.terrainData = runtimeTerrainData;
+
+            if (terrain.TryGetComponent<TerrainCollider>(out var terrainCollider) &&
+                terrainCollider.terrainData == sourceTerrainData)
+            {
+                terrainCollider.terrainData = runtimeTerrainData;
+            }
+
+            _runtimeTerrainDataByTerrain.Add(terrain, runtimeTerrainData);
+            return runtimeTerrainData;
         }
 
         private static int EnsureTerrainLayer(TerrainData terrainData, TerrainLayer terrainLayer)
@@ -188,20 +195,6 @@ namespace com.Plapamaru.TownCrafter.Factory
                    value.IndexOf("road", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        private static void MarkTerrainDataDirty(TerrainData terrainData)
-        {
-#if UNITY_EDITOR
-            EditorUtility.SetDirty(terrainData);
-#endif
-        }
-
-#if UNITY_EDITOR
-        private static void RegisterTerrainDataUndo(TerrainData terrainData, string undoName)
-        {
-            if (!Application.isPlaying)
-                Undo.RegisterCompleteObjectUndo(terrainData, undoName);
-        }
-#endif
     }
 
     public enum TerrainPaintLayer
