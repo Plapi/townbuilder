@@ -143,6 +143,8 @@ namespace com.Plapamaru.TownCrafter.Factory
 
             foreach (var stage in _stages)
                 UnityEditor.EditorUtility.SetDirty(stage);
+
+            FactoryTerrainModifier.Instance.ApplyConstructionArea(this, stageIndex > 0);
         }
 #endif
 
@@ -165,6 +167,7 @@ namespace com.Plapamaru.TownCrafter.Factory
             foreach (var stage in _stages)
                 stage.SetActive(false);
             _stages[stageIndex].SetActive(true);
+            FactoryTerrainModifier.Instance.ApplyConstructionArea(this, stageIndex > 0);
         }
 
         private int CalculateInProgressStageIndex()

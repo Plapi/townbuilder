@@ -146,7 +146,7 @@ public class ConstructionEditor : Editor
         {
             var stage = CreateChild(graphic.transform, $"Stage{i}{NOT_OPTIMIZED_SUFFIX}");
 
-            CreateDefaultGround(stage.transform, GetGroundMaterialPath(constructionPrefix));
+            CreateDefaultGround(stage.transform, GetGroundMaterialPath(constructionPrefix), GetGroundLayerName(i));
             var environment = CreateChild(stage.transform, ENVIRONMENT_NAME);
             SetLayerRecursively(environment, ENVIRONMENT_NAME);
 
@@ -364,7 +364,7 @@ public class ConstructionEditor : Editor
 
             Undo.RecordObject(ground, "Update Construction Ground");
             ApplyGroundTransform(ground, constructionSize);
-            SetLayerRecursively(ground.gameObject, GROUND_NAME);
+            SetLayerRecursively(ground.gameObject, GetGroundLayerName(stage.name));
             EditorUtility.SetDirty(ground);
             updatedCount++;
         }
@@ -694,7 +694,7 @@ public class ConstructionEditor : Editor
         return constructionPrefix == "Road" ? DIRT_MATERIAL_PATH : GRASS_MATERIAL_PATH;
     }
 
-    private static GameObject CreateDefaultGround(Transform parent, string groundMaterialPath)
+    private static GameObject CreateDefaultGround(Transform parent, string groundMaterialPath, string layerName)
     {
         var ground = GameObject.CreatePrimitive(PrimitiveType.Quad);
         ground.name = GROUND_NAME;
@@ -706,7 +706,7 @@ public class ConstructionEditor : Editor
         if (groundMaterial != null && ground.TryGetComponent<MeshRenderer>(out var meshRenderer))
             meshRenderer.sharedMaterial = groundMaterial;
 
-        SetLayerRecursively(ground, GROUND_NAME);
+        SetLayerRecursively(ground, layerName);
         return ground;
     }
 
@@ -833,7 +833,7 @@ public class ConstructionEditor : Editor
                 var groundCopy = Object.Instantiate(stage.Ground.gameObject, stageRoot.transform);
                 groundCopy.name = GROUND_NAME;
                 CopyLocalTransform(stage.Ground, groundCopy.transform);
-                SetLayerRecursively(groundCopy, GROUND_NAME);
+                SetLayerRecursively(groundCopy, GetGroundLayerName(stage.Index));
             }
 
             var environmentInstance = (GameObject)PrefabUtility.InstantiatePrefab(environmentPrefab);
@@ -1083,6 +1083,19 @@ public class ConstructionEditor : Editor
 
         foreach (var child in gameObject.GetComponentsInChildren<Transform>(true))
             child.gameObject.layer = layer;
+    }
+
+    private static string GetGroundLayerName(string stageName)
+    {
+        var match = StageRegex.Match(stageName);
+        return match.Success && int.TryParse(match.Groups[1].Value, out var stageIndex)
+            ? GetGroundLayerName(stageIndex)
+            : GROUND_NAME;
+    }
+
+    private static string GetGroundLayerName(int stageIndex)
+    {
+        return stageIndex == 1 || stageIndex == 2 ? ENVIRONMENT_NAME : GROUND_NAME;
     }
 
     private readonly struct StageInfo

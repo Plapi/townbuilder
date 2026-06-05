@@ -6753,7 +6753,7 @@ GameObject:
   - component: {fileID: 7178657191370651997}
   - component: {fileID: 8341766968937700489}
   - component: {fileID: 588461041200335867}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

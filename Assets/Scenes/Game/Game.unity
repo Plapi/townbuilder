@@ -2218,7 +2218,6 @@ GameObject:
   - component: {fileID: 165255272}
   - component: {fileID: 165255276}
   - component: {fileID: 165255275}
-  - component: {fileID: 165255277}
   m_Layer: 0
   m_Name: Factory
   m_TagString: Untagged
@@ -2286,25 +2285,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactoryMap
   _debugCells: {fileID: 1290306709}
---- !u!114 &165255277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 165255271}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f15e6af6d72b414f8a0e4ed52392e4ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.EditorTools.FactoryConstructionTerrainPainter
-  _terrainRoot: {fileID: 1745950275}
-  _constructionRoot: {fileID: 165255273}
-  _defaultTerrainLayer: {fileID: 8574412962073106934, guid: 125ce5c8840417b4ab3c43e1a2ed0042, type: 2}
-  _constructionTerrainLayer: {fileID: 8574412962073106934, guid: a86fb074af234184d922b6e706995a72, type: 2}
-  _roadTerrainLayer: {fileID: 8574412962073106934, guid: da66f7193a76906429fb00f235e99cb3, type: 2}
-  _includeInactiveConstructions: 1
-  _autoFindTerrainRoot: 1
 --- !u!1 &167302308
 GameObject:
   m_ObjectHideFlags: 0
@@ -6039,7 +6019,7 @@ RectTransform:
   m_GameObject: {fileID: 350455546}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1223634155}
@@ -23188,6 +23168,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1745950275}
+  - component: {fileID: 1745950276}
   m_Layer: 9
   m_Name: Terrain
   m_TagString: Untagged
@@ -23215,6 +23196,24 @@ Transform:
   - {fileID: 226503729}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1745950276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745950274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f15e6af6d72b414f8a0e4ed52392e4ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.FactoryTerrainModifier
+  _modifiableTerrains:
+  - {fileID: 311397784}
+  - {fileID: 718752217}
+  _defaultLayer: {fileID: 8574412962073106934, guid: 125ce5c8840417b4ab3c43e1a2ed0042, type: 2}
+  _constructionLayer: {fileID: 8574412962073106934, guid: a86fb074af234184d922b6e706995a72, type: 2}
+  _roadLayer: {fileID: 8574412962073106934, guid: da66f7193a76906429fb00f235e99cb3, type: 2}
 --- !u!1 &1746708724
 GameObject:
   m_ObjectHideFlags: 0
