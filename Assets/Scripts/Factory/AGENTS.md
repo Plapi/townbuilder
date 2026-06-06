@@ -20,6 +20,7 @@ This guide documents the factory subsystem. Use it when working under `Assets/Sc
 - `Entities/FactoryEntities/FactoryEntity.cs`: pooled runtime factory entity base, save-data hooks, resource passing, highlight object lifecycle.
 - `Entities/FactoryEntities`: extractor, conveyor, crafter, conveyor helper/type classes.
 - `Entities/Construction.cs`: construction runtime state, resource intake, progress/stage switching, save data.
+- `FactoryTerrainModifier.cs`: singleton terrain paint/hole modifier driven by construction stage changes.
 - `Entities/Data`: ScriptableObject entity data types.
 - `ResourceItem`: resource item runtime/data/type classes.
 - `Save/FactorySave.cs`: PlayerPrefs save/load model.
@@ -88,7 +89,19 @@ This guide documents the factory subsystem. Use it when working under `Assets/Sc
   - `NotStarted`: stage `0`.
   - `InProgress`: interpolated middle stages.
   - `Finished`: last stage.
+- Stage changes call `FactoryTerrainModifier.Instance.ApplyConstructionArea`; stage `0` restores the construction footprint, and stages above `0` cut a terrain hole to avoid z-fighting with construction grounds.
 - Save data stores state and delivered resource counts; held resource is intentionally not saved.
+
+### Factory Terrain Modifier
+
+- `FactoryTerrainModifier` is a `MonoBehaviourSingleton` intended to live on the Terrain root object.
+- The inspector list `_modifiableTerrains` is the source of truth for which terrain tiles may be painted or cut. Do not hardcode exclusions such as river terrain.
+- The modifier paints the construction footprint with one of its assigned `TerrainLayer` references:
+  - road layer when the construction name, id, or data name contains `road`;
+  - construction layer for all other constructions.
+- Terrain holes use the construction footprint with `_holeInset` applied inward; increasing the inset makes the terrain hole smaller so construction ground can overlap the terrain edge slightly.
+- Runtime terrain writes clone each accepted terrain's `TerrainData` once and assign the clone back to both `Terrain` and same-object `TerrainCollider`, so play-mode painting/holes do not modify terrain data assets on disk.
+- Edit-mode writes operate on the assigned terrain data directly and intentionally do not use Unity undo in this modifier.
 
 ## Data And Config
 
@@ -149,7 +162,7 @@ Generated structure:
   - Combines meshes under `StageNNotOptimized/Environment` into `EnvironmentMesh.mesh`.
   - Saves a combined `Environment.prefab`.
   - Creates `StageN.prefab` containing optional `Ground` plus optimized `Environment`.
-  - Sets generated `Ground` children to layer `Ground`.
+  - Sets generated `Ground` children to layer `Ground` for Stage 0 and `Environment` for Stage 1/2, so active construction grounds render with the environment layer.
   - Sets generated `Environment` children to layer `Environment`.
 - Creates the optimized root prefab:
   - Rebuilds `Graphic`.
