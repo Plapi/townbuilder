@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 545a67d7b8cd2461fb6f4a3b226dbd7f, type: 3}
   m_Name: Bridge0
   m_EditorClassIdentifier: TownCrafter.Factory::com.Plapamaru.TownCrafter.Factory.ConstructionData
-  name: Road5
-  description: Build roads to connect your city and improve transportation.
-  icon: {fileID: 0}
+  name: Bridge
+  description: Build bridges to cross water and connect separated parts of your
+    town.
+  icon: {fileID: 21300000, guid: 6e0ac39b5bd8e4b47abf84dc81c4a644, type: 3}
   imageScale: 1.5
   imageOffsetY: 0
-  completedDescription: The road has been successfully built. Your town is better
-    connected now!
+  completedDescription: The bridge has been successfully built. Your town can
+    reach across the water now!
   requiredResources:
   - resourceItem: {fileID: 11400000, guid: e5fcb8f8dba74480eb90396f41a7e6fa, type: 2}
     amount: 10

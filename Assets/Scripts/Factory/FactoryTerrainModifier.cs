@@ -187,15 +187,16 @@ namespace com.Plapamaru.TownCrafter.Factory
 
         private static bool IsRoad(Construction construction)
         {
-            return HasRoadName(construction.name) ||
-                   HasRoadName(construction.Id) ||
-                   HasRoadName(construction.Data != null ? construction.Data.name : null);
+            return HasRoadTerrainName(construction.name) ||
+                   HasRoadTerrainName(construction.Id) ||
+                   HasRoadTerrainName(construction.Data != null ? construction.Data.name : null);
         }
 
-        private static bool HasRoadName(string value)
+        private static bool HasRoadTerrainName(string value)
         {
             return !string.IsNullOrEmpty(value) &&
-                   value.IndexOf("road", StringComparison.OrdinalIgnoreCase) >= 0;
+                   (value.IndexOf("road", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    value.IndexOf("bridge", StringComparison.OrdinalIgnoreCase) >= 0);
         }
     }
 
