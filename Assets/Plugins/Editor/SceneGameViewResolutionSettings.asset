@@ -15,7 +15,7 @@ MonoBehaviour:
   _sceneResolutions:
   - scene: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
     sceneName: Game
-    scenePath: Assets/Scenes/Game.unity
+    scenePath: Assets/Scenes/Game/Game.unity
     width: 1440
     height: 2560
     baseText: 2560x1440 Portrait
